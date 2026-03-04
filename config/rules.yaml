@@ -1,0 +1,645 @@
+# AI Component Detection Rules
+# 运行时 AI 组件检测规则配置文件
+
+# ==================== LLM 推理服务 ====================
+llm_services:
+  - name: "Ollama"
+    id: "ollama"
+    type: "llm_framework"
+    severity: "medium"
+    description: "本地 LLM 推理服务"
+    
+    # 进程匹配规则
+    process_patterns:
+      - "\\bollama\\b"
+      - "ollama\\.serve"
+    
+    # 端口检测
+    default_ports:
+      - 11434
+    
+    # 版本探测配置
+    version_probe:
+      methods:
+        - type: "cli_arg"
+          patterns:
+            - "--version[=\\s]*([\\d.]+)"
+        - type: "http_api"
+          endpoint: "/api/version"
+          json_path: "version"
+    
+    # HTTP 健康/版本端点
+    http_endpoints:
+      - path: "/api/tags"
+        method: "GET"
+    
+    # 环境变量检测
+    env_indicators:
+      - "OLLAMA_HOST"
+      - "OLLAMA_MODELS"
+
+  - name: "vLLM"
+    id: "vllm"
+    type: "deployment"
+    severity: "medium"
+    description: "高性能 LLM 推理引擎"
+    
+    process_patterns:
+      - "\\bvllm\\b"
+      - "vllm\\.entrypoints"
+      - "python.*vllm"
+    
+    default_ports:
+      - 8000
+      - 8080
+    
+    version_probe:
+      methods:
+        - type: "exec"
+          command: "--version"
+          parser: "v?([\\d.]+)"
+        - type: "http_api"
+          endpoint: "/v1/models"
+    
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+  - name: "Text Generation Inference"
+    id: "tgi"
+    type: "deployment"
+    severity: "medium"
+    description: "HuggingFace TGI 推理服务"
+    
+    process_patterns:
+      - "text-generation-inference"
+      - "\\btgi\\b"
+    
+    default_ports:
+      - 8080
+      - 80
+    
+    http_endpoints:
+      - path: "/info"
+        method: "GET"
+
+  - name: "OpenAI API"
+    id: "openai"
+    type: "llm_framework"
+    severity: "medium"
+    description: "OpenAI API 服务或代理"
+    
+    process_patterns:
+      - "openai-(api|serve)"
+      - "openai.*api"
+    
+    default_ports:
+      - 8080
+      - 3000
+    
+    env_indicators:
+      - "OPENAI_API_KEY"
+      - "OPENAI_BASE_URL"
+
+  - name: "FastChat"
+    id: "fastchat"
+    type: "llm_framework"
+    severity: "medium"
+    description: "多模型对话服务"
+    
+    process_patterns:
+      - "fastchat.*serve"
+      - "fastchat.*controller"
+    
+    default_ports:
+      - 8000
+      - 21001
+
+# ==================== 向量数据库 ====================
+vector_databases:
+  - name: "Milvus"
+    id: "milvus"
+    type: "vector_database"
+    severity: "medium"
+    description: "分布式向量数据库"
+    
+    process_patterns:
+      - "milvus.*server"
+      - "milvus-standalone"
+    
+    default_ports:
+      - 19530
+      - 9091
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/v1/health"
+    
+    http_endpoints:
+      - path: "/v1/health"
+        method: "GET"
+
+  - name: "Chroma"
+    id: "chroma"
+    type: "vector_database"
+    severity: "low"
+    description: "轻量级向量数据库"
+    
+    process_patterns:
+      - "chromadb"
+      - "chroma.*server"
+      - "python.*chroma"
+    
+    default_ports:
+      - 8000
+    
+    http_endpoints:
+      - path: "/api/v1/heartbeat"
+        method: "GET"
+
+  - name: "Weaviate"
+    id: "weaviate"
+    type: "vector_database"
+    severity: "medium"
+    description: "向量搜索引擎"
+    
+    process_patterns:
+      - "weaviate"
+      - "weaviate.*server"
+    
+    default_ports:
+      - 8080
+    
+    http_endpoints:
+      - path: "/v1/meta"
+        method: "GET"
+
+  - name: "Qdrant"
+    id: "qdrant"
+    type: "vector_database"
+    severity: "low"
+    description: "Rust 向量数据库"
+    
+    process_patterns:
+      - "\\bqdrant\\b"
+      - "qdrant.*server"
+    
+    default_ports:
+      - 6333
+      - 6334
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/"
+          json_path: "version"
+    
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+
+  - name: "Pinecone"
+    id: "pinecone"
+    type: "vector_database"
+    severity: "medium"
+    description: "托管向量数据库"
+    
+    process_patterns:
+      - "pinecone.*proxy"
+      - "pinecone.*gateway"
+    
+    env_indicators:
+      - "PINECONE_API_KEY"
+      - "PINECONE_ENVIRONMENT"
+
+  - name: "FAISS"
+    id: "faiss"
+    type: "vector_database"
+    severity: "low"
+    description: "Facebook 相似度搜索库"
+    
+    process_patterns:
+      - "faiss.*server"
+      - "faiss-cpu"
+      - "faiss-gpu"
+
+  - name: "pgvector"
+    id: "pgvector"
+    type: "vector_database"
+    severity: "low"
+    description: "PostgreSQL 向量扩展"
+    
+    process_patterns:
+      - "pgvector"
+      - "postgres.*vector"
+    
+    default_ports:
+      - 5432
+
+  - name: "Redis Vector"
+    id: "redis-vector"
+    type: "vector_database"
+    severity: "low"
+    description: "Redis Vector Library"
+    
+    process_patterns:
+      - "redis.*vector"
+      - "redisvl"
+    
+    default_ports:
+      - 6379
+    
+    env_indicators:
+      - "REDIS_URL"
+
+  - name: "Elasticsearch"
+    id: "elasticsearch"
+    type: "vector_database"
+    severity: "low"
+    description: "Elasticsearch 向量搜索"
+    
+    process_patterns:
+      - "elasticsearch.*vector"
+      - "es.*knn"
+    
+    default_ports:
+      - 9200
+    
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+
+# ==================== ML 框架 ====================
+ml_frameworks:
+  - name: "Hugging Face Transformers"
+    id: "transformers"
+    type: "ml_framework"
+    severity: "low"
+    description: "HuggingFace 模型库"
+    
+    process_patterns:
+      - "transformers"
+      - "huggingface.*transformers"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from transformers import"
+          - "import transformers"
+
+  - name: "PyTorch"
+    id: "torch"
+    type: "ml_framework"
+    severity: "low"
+    description: "PyTorch 深度学习框架"
+    
+    process_patterns:
+      - "torchserve"
+      - "python.*torch"
+      - "\\btorch\\b"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import torch"
+          - "from torch import"
+
+  - name: "TensorFlow"
+    id: "tensorflow"
+    type: "ml_framework"
+    severity: "low"
+    description: "TensorFlow ML 框架"
+    
+    process_patterns:
+      - "tensorflow.*serving"
+      - "tf_serving"
+      - "python.*tensorflow"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import tensorflow"
+          - "tf\\."
+
+  - name: "ONNX Runtime"
+    id: "onnx"
+    type: "ml_framework"
+    severity: "low"
+    description: "ONNX 推理运行时"
+    
+    process_patterns:
+      - "onnxruntime.*server"
+      - "onnxruntime"
+
+# ==================== Agent/RAG 框架 ====================
+agent_frameworks:
+  - name: "LangChain"
+    id: "langchain"
+    type: "llm_framework"
+    severity: "low"
+    description: "LLM 应用开发框架"
+    
+    process_patterns:
+      - "langchain-(serve|cli)"
+      - "python.*langchain"
+      - "\\blangchain\\b"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import langchain"
+          - "from langchain import"
+
+  - name: "LlamaIndex"
+    id: "llamaindex"
+    type: "rag_tool"
+    severity: "low"
+    description: "RAG 数据框架"
+    
+    process_patterns:
+      - "llamaindex"
+      - "llama_index"
+      - "python.*llamaindex"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import llama_index"
+          - "from llama_index import"
+
+  - name: "AutoGPT"
+    id: "autogpt"
+    type: "agent_framework"
+    severity: "low"
+    description: "自主 AI 智能体"
+    
+    process_patterns:
+      - "\\bautogpt\\b"
+      - "python.*autogpt"
+
+  - name: "AutoGen"
+    id: "autogen"
+    type: "agent_framework"
+    severity: "low"
+    description: "Microsoft 多智能体框架"
+    
+    process_patterns:
+      - "\\bautogen\\b"
+      - "pyautogen"
+      - "python.*autogen"
+
+  - name: "CrewAI"
+    id: "crewai"
+    type: "agent_framework"
+    severity: "low"
+    description: "多智能体协作框架"
+    
+    process_patterns:
+      - "\\bcrewai\\b"
+      - "python.*crewai"
+
+# ==================== 部署/推理 ====================
+deployment_tools:
+  - name: "Triton Inference Server"
+    id: "triton"
+    type: "deployment"
+    severity: "low"
+    description: "NVIDIA 推理服务器"
+    
+    process_patterns:
+      - "tritonserver"
+    
+    default_ports:
+      - 8000
+      - 8001
+      - 8002
+
+  - name: "BentoML"
+    id: "bentoml"
+    type: "deployment"
+    severity: "low"
+    description: "模型服务框架"
+    
+    process_patterns:
+      - "bentoml.*serve"
+    
+    default_ports:
+      - 3000
+
+  - name: "Ray Serve"
+    id: "ray-serve"
+    type: "deployment"
+    severity: "low"
+    description: "Ray 模型服务"
+    
+    process_patterns:
+      - "ray.*serve"
+    
+    default_ports:
+      - 8265
+      - 8000
+
+  - name: "Gradio"
+    id: "gradio"
+    type: "deployment"
+    severity: "low"
+    description: "ML 模型演示界面"
+    
+    process_patterns:
+      - "\\bgradio\\b"
+    
+    default_ports:
+      - 7860
+
+  - name: "Streamlit"
+    id: "streamlit"
+    type: "deployment"
+    severity: "low"
+    description: "数据应用框架"
+    
+    process_patterns:
+      - "streamlit.*run"
+    
+    default_ports:
+      - 8501
+
+# ==================== 监控/可观测性 ====================
+monitoring_tools:
+  - name: "MLflow"
+    id: "mlflow"
+    type: "monitoring"
+    severity: "low"
+    description: "ML 生命周期管理"
+    
+    process_patterns:
+      - "mlflow.*server"
+      - "mlflow.*ui"
+    
+    default_ports:
+      - 5000
+      - 5001
+    
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+
+  - name: "Weights & Biases"
+    id: "wandb"
+    type: "monitoring"
+    severity: "low"
+    description: "实验跟踪平台"
+    
+    process_patterns:
+      - "wandb.*server"
+      - "wandb.*local"
+    
+    env_indicators:
+      - "WANDB_API_KEY"
+      - "WANDB_BASE_URL"
+
+  - name: "LangSmith"
+    id: "langsmith"
+    type: "monitoring"
+    severity: "low"
+    description: "LangChain 应用监控"
+    
+    process_patterns:
+      - "langsmith"
+    
+    env_indicators:
+      - "LANGCHAIN_API_KEY"
+      - "LANGSMITH_API_KEY"
+
+  - name: "Langfuse"
+    id: "langfuse"
+    type: "monitoring"
+    severity: "low"
+    description: "LLM 可观测性"
+    
+    process_patterns:
+      - "langfuse"
+    
+    env_indicators:
+      - "LANGFUSE_API_KEY"
+      - "LANGFUSE_HOST"
+
+  - name: "Jupyter"
+    id: "jupyter"
+    type: "monitoring"
+    severity: "low"
+    description: "交互式开发环境"
+    
+    process_patterns:
+      - "jupyter.*notebook"
+      - "jupyter.*lab"
+      - "jupyter.*server"
+      - "ipython"
+    
+    default_ports:
+      - 8888
+
+# ==================== API Key 检测规则 ====================
+api_key_patterns:
+  - name: "OpenAI API Key"
+    key: "OPENAI_API_KEY"
+    severity: "critical"
+    
+  - name: "Anthropic API Key"
+    key: "ANTHROPIC_API_KEY"
+    severity: "critical"
+    
+  - name: "Google API Key"
+    key: "GOOGLE_API_KEY"
+    severity: "critical"
+    
+  - name: "HuggingFace Token"
+    key: "HUGGINGFACE_TOKEN"
+    severity: "high"
+    
+  - name: "Azure OpenAI Key"
+    key: "AZURE_OPENAI_KEY"
+    severity: "critical"
+    
+  - name: "Cohere API Key"
+    key: "COHERE_API_KEY"
+    severity: "high"
+    
+  - name: "Pinecone API Key"
+    key: "PINECONE_API_KEY"
+    severity: "high"
+    
+  - name: "Qdrant API Key"
+    key: "QDRANT_API_KEY"
+    severity: "high"
+    
+  - name: "Milvus URI"
+    key: "MILVUS_URI"
+    severity: "medium"
+    
+  - name: "Weaviate API Key"
+    key: "WEAVIATE_API_KEY"
+    severity: "high"
+    
+  - name: "Mistral API Key"
+    key: "MISTRAL_API_KEY"
+    severity: "high"
+    
+  - name: "Moonshot API Key"
+    key: "MOONSHOT_API_KEY"
+    severity: "high"
+    
+  - name: "DashScope API Key"
+    key: "DASHSCOPE_API_KEY"
+    severity: "high"
+    
+  - name: "Zhipu API Key"
+    key: "ZHIPU_API_KEY"
+    severity: "high"
+    
+  - name: "Baidu API Key"
+    key: "BAIDU_API_KEY"
+    severity: "high"
+    
+  - name: "Xunfei API Key"
+    key: "XUNFEI_API_KEY"
+    severity: "high"
+    
+  - name: "LangSmith API Key"
+    key: "LANGCHAIN_API_KEY"
+    severity: "high"
+    
+  - name: "Langfuse API Key"
+    key: "LANGFUSE_API_KEY"
+    severity: "high"
+    
+  - name: "Generic AI API Key"
+    key: "AI_API_KEY"
+    severity: "critical"
+
+# ==================== 全局配置 ====================
+global:
+  # 扫描配置
+  scan:
+    timeout: 30s
+    max_processes: 10000
+    
+  # 版本探测配置
+  version_probe:
+    timeout: 5s
+    retry_count: 2
+    
+  # HTTP 探测配置
+  http_probe:
+    timeout: 2s
+    user_agent: "AIComponentScanner/0.3.0"
+    
+  # 置信度计算权重
+  confidence_weights:
+    process_name_match: 0.2
+    has_listening_port: 0.15
+    has_api_env_var: 0.05
+    long_uptime: 0.1
+    parent_is_ai: 0.1

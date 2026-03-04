@@ -6,93 +6,68 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/wz200210/AIGenerateProject/internal/config"
 	"github.com/wz200210/AIGenerateProject/internal/runtime"
 	"github.com/wz200210/AIGenerateProject/internal/scanner"
+	"github.com/wz200210/AIGenerateProject/pkg/ai/types"
 )
 
 var (
 	outputFormat string
-	version      = "0.3.0"
+	configPath   string
+	version      = "0.4.0"
 )
 
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "scanner",
-		Short: "AI Component Scanner - 运行时 AI 组件检测工具",
-		Long: `scanner v0.3.0 - 纯运行时 AI 组件检测工具 (已废弃文件扫描)
+		Short: "AI Component Scanner - 配置化运行时检测工具",
+		Long: `scanner v0.4.0 - 基于配置文件的运行时 AI 组件检测
 
 🚀 全新架构：
-  • 完全基于运行时进程检测，不再扫描代码文件
-  • 智能语义分析，准确识别 AI 服务类型
-  • 自动版本探测，支持多种版本获取方式
-  • 进程关系分析，理解服务依赖拓扑
+  • 组件特征完全外置到 YAML 配置文件
+  • 支持热更新，无需重新编译
+  • 灵活的版本探测策略配置
+  • 可扩展的语义分析器
 
 检测能力：
-  • LLM 推理服务 (Ollama, vLLM, TGI, OpenAI API, etc.)
-  • 向量数据库 (Milvus, Chroma, Weaviate, Qdrant, etc.)
-  • ML 框架服务 (Transformers, TorchServe, Triton, etc.)
-  • RAG/Agent 框架 (LangChain, LlamaIndex, etc.)
-  • 监控工具 (MLflow, W&B, etc.)
+  • LLM 推理服务 (Ollama, vLLM, TGI, etc.)
+  • 向量数据库 (Milvus, Chroma, Weaviate, etc.)
+  • ML 框架服务 (Transformers, PyTorch, etc.)
+  • Agent/RAG 框架 (LangChain, LlamaIndex, etc.)
   • Docker/K8s 容器中的 AI 服务
-  • API Key 泄露检测
-
-⚠️  注意：v0.3.0 起已废弃文件扫描功能，专注于运行时检测。`,
+  • API Key 泄露检测`,
 		Version: version,
 	}
 
-	// 运行时扫描命令（默认）
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "配置文件路径 (默认: ./config/rules.yaml)")
+
+	// 扫描命令
 	scanCmd := &cobra.Command{
 		Use:   "scan",
-		Short: "扫描运行时 AI 组件（默认）",
-		Long: `扫描当前系统中运行的 AI 相关进程、服务和容器。
-
-检测内容:
-  • 运行中的 AI/ML 进程 (ollama, vllm, python, etc.)
-  • 监听的 AI 服务端口 (11434, 8000, 6333, etc.)
-  • Docker 容器中的 AI 服务
-  • 进程环境变量中的 API Key
-  • 进程版本信息自动探测
-  • 服务依赖关系分析`,
-		RunE: runScan,
+		Short: "扫描运行时 AI 组件",
+		Long:  "扫描当前系统中运行的 AI 相关进程、服务和容器",
+		RunE:  runScan,
 	}
 	scanCmd.Flags().StringVarP(&outputFormat, "output", "o", "console", "输出格式 (console|json)")
 
-	// 详细扫描命令
-	detailCmd := &cobra.Command{
-		Use:   "detail",
-		Short: "详细扫描（包含进程树和网络连接）",
-		Long:  "执行更详细的扫描，包含完整的进程关系和网络连接分析",
-		RunE:  runDetailScan,
-	}
-	detailCmd.Flags().StringVarP(&outputFormat, "output", "o", "console", "输出格式 (console|json)")
-
-	// 版本探测命令
-	versionCmd := &cobra.Command{
-		Use:   "version-check",
-		Short: "检查 AI 服务版本",
-		Long:  "主动探测运行的 AI 服务的版本信息",
-		RunE:  runVersionCheck,
+	// 验证配置命令
+	validateCmd := &cobra.Command{
+		Use:   "validate-config",
+		Short: "验证配置文件",
+		Long:  "检查配置文件格式和规则有效性",
+		RunE:  runValidateConfig,
 	}
 
-	// 遗留命令（提示已废弃）
-	legacyScanCmd := &cobra.Command{
-		Use:    "static",
-		Short:  "[已废弃] 静态文件扫描",
-		Long:   "⚠️  此功能已在 v0.3.0 中废弃，请使用 'scan' 命令进行运行时检测",
-		Hidden: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("⚠️  静态文件扫描功能已在 v0.3.0 中废弃")
-			fmt.Println("📝 请使用 'scanner scan' 进行运行时 AI 组件检测")
-			fmt.Println("")
-			fmt.Println("原因：")
-			fmt.Println("  1. 文件扫描只能发现代码中存在，无法确认是否在运行")
-			fmt.Println("  2. 运行时检测能发现容器化、远程服务等实际运行的 AI")
-			fmt.Println("  3. 版本号只能从运行中的进程准确获取")
-			return nil
-		},
+	// 列出规则命令
+	listRulesCmd := &cobra.Command{
+		Use:   "list-rules",
+		Short: "列出所有检测规则",
+		Long:  "显示配置文件中定义的所有 AI 组件检测规则",
+		RunE:  runListRules,
 	}
 
-	rootCmd.AddCommand(scanCmd, detailCmd, versionCmd, legacyScanCmd)
+	rootCmd.AddCommand(scanCmd, validateCmd, listRulesCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -100,13 +75,28 @@ func main() {
 	}
 }
 
-// runScan 执行运行时扫描
+// getConfigPath 获取配置文件路径
+func getConfigPath() string {
+	if configPath != "" {
+		return configPath
+	}
+	return config.DefaultConfigPath()
+}
+
+// runScan 执行扫描
 func runScan(cmd *cobra.Command, args []string) error {
-	fmt.Println("🔍 AI Component Runtime Scanner v" + version)
+	cfgPath := getConfigPath()
+
+	fmt.Printf("🔍 AI Component Runtime Scanner v%s\n", version)
+	fmt.Printf("📄 Config: %s\n", cfgPath)
 	fmt.Println("═══════════════════════════════════════════════════════")
 	fmt.Println()
 
-	rs := runtime.NewRuntimeScanner()
+	// 创建基于配置的扫描器
+	rs, err := runtime.NewConfigBasedScanner(cfgPath)
+	if err != nil {
+		return fmt.Errorf("failed to initialize scanner: %w", err)
+	}
 
 	start := time.Now()
 	result, err := rs.ScanAll()
@@ -116,7 +106,6 @@ func runScan(cmd *cobra.Command, args []string) error {
 		fmt.Fprintf(os.Stderr, "⚠️  Scan warning: %v\n", err)
 	}
 
-	// 添加扫描统计
 	result.ScanDuration = elapsed.String()
 
 	switch outputFormat {
@@ -129,45 +118,69 @@ func runScan(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// runDetailScan 执行详细扫描
-func runDetailScan(cmd *cobra.Command, args []string) error {
-	fmt.Println("🔍 AI Component Detailed Scanner v" + version)
-	fmt.Println("═══════════════════════════════════════════════════════")
+// runValidateConfig 验证配置
+func runValidateConfig(cmd *cobra.Command, args []string) error {
+	cfgPath := getConfigPath()
+
+	fmt.Printf("📄 Validating config: %s\n", cfgPath)
 	fmt.Println()
 
-	rs := runtime.NewRuntimeScanner()
-
-	start := time.Now()
-	result, err := rs.ScanAll()
-	elapsed := time.Since(start)
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Scan warning: %v\n", err)
+	loader := config.NewLoader(cfgPath)
+	if err := loader.Load(); err != nil {
+		fmt.Printf("❌ Config validation failed: %v\n", err)
+		return err
 	}
 
-	result.ScanDuration = elapsed.String()
+	cfg := loader.GetConfig()
+	services := loader.GetAllServices()
+	apiKeys := loader.GetAPIKeyPatterns()
 
-	// TODO: 实现更详细的报告，包含进程树
-	fmt.Printf("⏱️  Scan completed in %s\n", elapsed)
+	fmt.Println("✅ Config file is valid")
 	fmt.Println()
-
-	switch outputFormat {
-	case "json":
-		return scanner.PrintRuntimeJSONReport(result)
-	default:
-		scanner.PrintRuntimeConsoleReport(result)
-	}
+	fmt.Printf("📊 Summary:\n")
+	fmt.Printf("  • LLM Services: %d\n", len(cfg.LLMServices))
+	fmt.Printf("  • Vector Databases: %d\n", len(cfg.VectorDatabases))
+	fmt.Printf("  • ML Frameworks: %d\n", len(cfg.MLFrameworks))
+	fmt.Printf("  • Agent Frameworks: %d\n", len(cfg.AgentFrameworks))
+	fmt.Printf("  • Deployment Tools: %d\n", len(cfg.DeploymentTools))
+	fmt.Printf("  • Monitoring Tools: %d\n", len(cfg.MonitoringTools))
+	fmt.Printf("  • Total Services: %d\n", len(services))
+	fmt.Printf("  • API Key Patterns: %d\n", len(apiKeys))
 
 	return nil
 }
 
-// runVersionCheck 执行版本检查
-func runVersionCheck(cmd *cobra.Command, args []string) error {
-	fmt.Println("🔍 Checking AI Service Versions...")
+// runListRules 列出规则
+func runListRules(cmd *cobra.Command, args []string) error {
+	cfgPath := getConfigPath()
+
+	loader := config.NewLoader(cfgPath)
+	if err := loader.Load(); err != nil {
+		return err
+	}
+
+	services := loader.GetAllServices()
+
+	fmt.Println("🔍 AI Component Detection Rules")
+	fmt.Println("═══════════════════════════════════════════════════════")
 	fmt.Println()
 
-	// TODO: 实现专门的版本探测功能
-	fmt.Println("此功能正在开发中...")
+	// 按类型分组
+	byType := make(map[types.AIComponentType][]config.ServiceConfig)
+	for _, svc := range services {
+		byType[types.AIComponentType(svc.Type)] = append(byType[types.AIComponentType(svc.Type)], svc)
+	}
+
+	for typeName, svcs := range byType {
+		fmt.Printf("\n[%s]\n", typeName)
+		for _, svc := range svcs {
+			fmt.Printf("  • %s (id: %s)\n", svc.Name, svc.ID)
+			fmt.Printf("    Ports: %v\n", svc.DefaultPorts)
+			if len(svc.ProcessPatterns) > 0 {
+				fmt.Printf("    Patterns: %d regex rules\n", len(svc.ProcessPatterns))
+			}
+		}
+	}
 
 	return nil
 }
