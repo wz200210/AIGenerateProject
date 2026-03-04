@@ -1,0 +1,43 @@
+🔍 AI Component Runtime Scanner v0.4.0
+📄 Config: ./config/rules.yaml
+═══════════════════════════════════════════════════════
+
+🔍 Scanning process tree...
+🔍 Scanning network services...
+🔍 Scanning Docker containers...
+
+╔══════════════════════════════════════════════════════╗
+║     Runtime AI Component Scan Report                 ║
+╚══════════════════════════════════════════════════════╝
+
+⏱️  Scan Time: 2026-03-05T00:14:44+08:00
+
+📊 Scan Summary:
+  • Processes scanned: 0
+  • Ports scanned: 4
+  • Containers scanned: 0
+  • Total components found: 4
+
+Running AI Components:
+────────────────────────────────────────────────────────────
+
+[vector_database]
+  • Milvus [medium]
+    Source: /proc/48485 (port 19530)
+    Service listening on port 19530
+
+  • Qdrant [low]
+    Source: /proc/48484 (port 6333)
+    Service listening on port 6333
+
+
+[monitoring]
+  • MLflow [low]
+    Source: /proc/48487 (port 5000)
+    Service listening on port 5000
+
+  • Jupyter [low]
+    Source: /proc/48486 (port 8888)
+    Service listening on port 8888
+
+
