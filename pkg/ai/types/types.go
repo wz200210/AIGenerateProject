@@ -525,3 +525,22 @@ func GetComponentStats(components []AIComponent) map[AIComponentType]int {
 	}
 	return stats
 }
+
+// RuntimeScanResult 运行时扫描结果
+type RuntimeScanResult struct {
+	ScanTime       string         `json:"scan_time"`
+	ProcessCount   int            `json:"process_count"`
+	PortCount      int            `json:"port_count"`
+	ContainerCount int            `json:"container_count"`
+	Components     []AIComponent  `json:"components"`
+	Errors         []string       `json:"errors,omitempty"`
+}
+
+// FullScanResult 完整扫描结果（静态+运行时）
+type FullScanResult struct {
+	ProjectPath      string          `json:"project_path"`
+	StaticScan       *ScanResult     `json:"static_scan,omitempty"`
+	RuntimeScan      *RuntimeScanResult `json:"runtime_scan,omitempty"`
+	TotalComponents  int             `json:"total_components"`
+	ScanTime         string          `json:"scan_time"`
+}
