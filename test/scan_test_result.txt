@@ -1,0 +1,29 @@
+🔍 AI Component Runtime Scanner v0.4.0
+📄 Config: ./config/rules.yaml
+═══════════════════════════════════════════════════════
+
+🔍 Scanning process tree...
+🔍 Scanning network services...
+🔍 Scanning Docker containers...
+
+╔══════════════════════════════════════════════════════╗
+║     Runtime AI Component Scan Report                 ║
+╚══════════════════════════════════════════════════════╝
+
+⏱️  Scan Time: 2026-03-05T00:12:14+08:00
+
+📊 Scan Summary:
+  • Processes scanned: 0
+  • Ports scanned: 1
+  • Containers scanned: 0
+  • Total components found: 1
+
+Running AI Components:
+────────────────────────────────────────────────────────────
+
+[vector_database]
+  • Qdrant [low]
+    Source: /proc/48394 (port 6333)
+    Service listening on port 6333
+
+
