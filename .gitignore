@@ -1,0 +1,49 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+scanner
+build/
+dist/
+
+# Test
+*.test
+*.out
+coverage.txt
+coverage.html
+
+# Go
+vendor/
+go.work
+go.work.sum
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# AI Model files (large files)
+*.gguf
+*.ggml
+*.bin
+*.pt
+*.pth
+*.onnx
+*.pb
+*.h5
+*.tflite
+*.mlmodel
+*.safetensors
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
