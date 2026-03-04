@@ -266,7 +266,11 @@ func PrintRuntimeConsoleReport(result *types.RuntimeScanResult) {
 			for _, c := range components {
 				severityColor := getSeverityColor(c.Severity)
 				fmt.Printf("  • %s ", c.Name)
-				severityColor.Printf("[%s]\n", c.Severity)
+				severityColor.Printf("[%s]", c.Severity)
+				if c.Version != "" {
+					fmt.Printf(" v%s", c.Version)
+				}
+				fmt.Println()
 				fmt.Printf("    Source: %s\n", c.FilePath)
 				if c.Description != "" {
 					fmt.Printf("    %s\n", c.Description)
