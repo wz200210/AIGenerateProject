@@ -529,6 +529,7 @@ func GetComponentStats(components []AIComponent) map[AIComponentType]int {
 // RuntimeScanResult 运行时扫描结果
 type RuntimeScanResult struct {
 	ScanTime       string         `json:"scan_time"`
+	ScanDuration   string         `json:"scan_duration,omitempty"`
 	ProcessCount   int            `json:"process_count"`
 	PortCount      int            `json:"port_count"`
 	ContainerCount int            `json:"container_count"`
