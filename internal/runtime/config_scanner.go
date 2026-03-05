@@ -426,58 +426,165 @@ func (cs *ConfigBasedScanner) detectAPIKeys(proc *ProcessInfo, comp *types.AICom
 	}
 }
 
-// scanNetworkServices 扫描网络服务
+// scanNetworkServices 扫描网络服务 - 优化版：端口+进程名双重验证
 func (cs *ConfigBasedScanner) scanNetworkServices(processes map[int]*ProcessInfo) ([]types.AIComponent, error) {
 	var components []types.AIComponent
+	
+	// 获取端口到 PID 的映射
 	portToPID := cs.getPortToPIDMapping()
-
-	cmd := exec.Command("ss", "-tlnp")
-	output, err := cmd.Output()
-	if err != nil {
-		return components, err
+	
+	// 获取所有监听端口的列表（用于日志输出）
+	listeningPorts := cs.getListeningPorts()
+	
+	// 遍历所有服务配置
+	for _, svc := range cs.serviceConfigs {
+		// 跳过没有配置端口的服务
+		if len(svc.DefaultPorts) == 0 {
+			continue
+		}
+		
+		// 检查该服务的端口是否有进程在监听
+		for _, port := range svc.DefaultPorts {
+			pid, ok := portToPID[port]
+			if !ok {
+				// 端口没有在监听，跳过
+				continue
+			}
+			
+			// 获取监听该端口的进程
+			proc, ok := processes[pid]
+			if !ok {
+				// 进程信息获取失败，记录错误但继续
+				continue
+			}
+			
+			// 关键：进程名必须匹配服务的 ProcessPatterns 才算
+			if !cs.matchProcessPatterns(proc, svc) {
+				// 进程名不匹配，可能是其他服务占用了这个端口，跳过
+				continue
+			}
+			
+			// 进程名匹配成功，创建组件
+			comp := cs.createComponentFromNetworkService(proc, svc, port)
+			if comp != nil {
+				components = append(components, *comp)
+			}
+		}
 	}
+	
+	// 记录发现的监听端口信息（用于调试）
+	_ = listeningPorts
+	
+	return components, nil
+}
 
-	scanner := bufio.NewScanner(strings.NewReader(string(output)))
-	for scanner.Scan() {
-		line := scanner.Text()
+// matchProcessPatterns 检查进程是否匹配服务的进程模式
+func (cs *ConfigBasedScanner) matchProcessPatterns(proc *ProcessInfo, svc config.ServiceConfig) bool {
+	// 检查进程名
+	procNameLower := strings.ToLower(proc.Name)
+	cmdlineLower := strings.ToLower(proc.Cmdline)
+	exeLower := strings.ToLower(filepath.Base(proc.Executable))
+	
+	for _, pattern := range svc.ProcessPatterns {
+		if re, ok := cs.processPatterns[pattern]; ok {
+			// 匹配进程名
+			if re.MatchString(procNameLower) {
+				return true
+			}
+			// 匹配命令行
+			if re.MatchString(cmdlineLower) {
+				return true
+			}
+			// 匹配可执行文件名
+			if re.MatchString(exeLower) {
+				return true
+			}
+		}
+	}
+	
+	return false
+}
 
-		for _, svc := range cs.serviceConfigs {
-			for _, port := range svc.DefaultPorts {
-				portStr := fmt.Sprintf(":%d", port)
-				if strings.Contains(line, portStr) {
-					comp := types.AIComponent{
-						Name:        svc.Name,
-						Type:        types.AIComponentType(svc.Type),
-						Confidence:  0.8,
-						Severity:    types.Severity(svc.Severity),
-						Description: fmt.Sprintf("Service listening on port %d", port),
-						RawContent:  line,
-					}
+// createComponentFromNetworkService 从网络服务创建组件（带版本验证）
+// 只有当版本号能获取到时才返回组件，否则返回 nil
+func (cs *ConfigBasedScanner) createComponentFromNetworkService(proc *ProcessInfo, svc config.ServiceConfig, port int) *types.AIComponent {
+	// 提取版本号 - 关键：版本号必须能获取到才算匹配
+	version := cs.extractVersion(proc, svc)
+	
+	// 如果无法获取版本号，则视为未匹配成功，避免误报
+	if version == "" {
+		return nil
+	}
+	
+	// 计算置信度
+	confidence := cs.calculateConfidence(proc, svc)
+	// 网络服务检测有端口+进程名+版本号三重验证，置信度更高
+	confidence += 0.2
+	if confidence > 1.0 {
+		confidence = 1.0
+	}
+	
+	// 构建描述
+	description := fmt.Sprintf("Network service detected | PID: %d | Port: %d", proc.PID, port)
+	if proc.Executable != "" {
+		description += fmt.Sprintf(" | Exe: %s", filepath.Base(proc.Executable))
+	}
+	if version != "" {
+		description += fmt.Sprintf(" | Version: %s", version)
+	}
+	
+	comp := &types.AIComponent{
+		Name:        svc.Name,
+		Type:        types.AIComponentType(svc.Type),
+		Version:     version,
+		FilePath:    fmt.Sprintf("/proc/%d (port %d)", proc.PID, port),
+		Confidence:  confidence,
+		Severity:    types.Severity(svc.Severity),
+		Description: description,
+		RawContent:  fmt.Sprintf("Process: %s | Cmdline: %s", proc.Name, proc.Cmdline),
+	}
+	
+	// 检测 API Key
+	cs.detectAPIKeys(proc, comp)
+	
+	return comp
+}
 
-					// 关联到进程
-					if pid, ok := portToPID[port]; ok {
-						if proc, ok := processes[pid]; ok {
-							comp.FilePath = fmt.Sprintf("/proc/%d (port %d)", pid, port)
-							comp.Version = cs.extractVersion(proc, svc)
-						}
-					}
-
-					// HTTP 探测版本
-					for _, endpoint := range svc.HTTPEndpoints {
-						if version := cs.probeHTTPVersion(port, endpoint.Path, ""); version != "" {
-							comp.Version = version
-							comp.Confidence = 0.9
-							break
-						}
-					}
-
-					components = append(components, comp)
+// getListeningPorts 获取所有正在监听的端口列表
+func (cs *ConfigBasedScanner) getListeningPorts() []int {
+	var ports []int
+	
+	for _, file := range []string{"/proc/net/tcp", "/proc/net/tcp6"} {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			continue
+		}
+		
+		lines := strings.Split(string(data), "\n")
+		for _, line := range lines[1:] {
+			fields := strings.Fields(line)
+			if len(fields) < 4 {
+				continue
+			}
+			
+			// 检查是否为监听状态 (0x0A = TCP_LISTEN)
+			state := fields[3]
+			if state != "0A" {
+				continue
+			}
+			
+			localAddr := fields[1]
+			if idx := strings.LastIndex(localAddr, ":"); idx > 0 {
+				portHex := localAddr[idx+1:]
+				port, _ := strconv.ParseInt(portHex, 16, 32)
+				if port > 0 {
+					ports = append(ports, int(port))
 				}
 			}
 		}
 	}
-
-	return components, scanner.Err()
+	
+	return ports
 }
 
 // getPortToPIDMapping 获取端口到 PID 映射
