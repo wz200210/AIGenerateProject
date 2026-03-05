@@ -94,10 +94,16 @@ llm_services:
     process_patterns:
       - "openai-(api|serve)"
       - "openai.*api"
+      - "mock_openai"
     
     default_ports:
       - 8080
       - 3000
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/v1/models"
     
     env_indicators:
       - "OPENAI_API_KEY"
@@ -152,12 +158,24 @@ vector_databases:
       - "chromadb"
       - "chroma.*server"
       - "python.*chroma"
+      - "mock_chroma"
     
     default_ports:
       - 8000
     
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/"
+          json_path: "version"
+        - type: "cli_arg"
+          patterns:
+            - "version[=\\s]*([\\d.]+)"
+    
     http_endpoints:
       - path: "/api/v1/heartbeat"
+        method: "GET"
+      - path: "/"
         method: "GET"
 
   - name: "Weaviate"
@@ -346,6 +364,13 @@ agent_frameworks:
       - "langchain-(serve|cli)"
       - "python.*langchain"
       - "\\blangchain\\b"
+      - "mock_langchain"
+    
+    version_probe:
+      methods:
+        - type: "cli_arg"
+          patterns:
+            - "version[=\\s]*([\\d.]+)"
     
     semantic_analyzers:
       - type: "python_import"

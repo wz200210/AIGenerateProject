@@ -1,0 +1,43 @@
+🔍 AI Component Runtime Scanner v0.4.0
+📄 Config: ./config/rules.yaml
+═══════════════════════════════════════════════════════
+
+🔍 Scanning process tree...
+🔍 Scanning network services...
+🔍 Scanning Docker containers...
+
+╔══════════════════════════════════════════════════════╗
+║     Runtime AI Component Scan Report                 ║
+╚══════════════════════════════════════════════════════╝
+
+⏱️  Scan Time: 2026-03-05T09:58:08+08:00
+
+📊 Scan Summary:
+  • Processes scanned: 4
+  • Ports scanned: 0
+  • Containers scanned: 0
+  • Total components found: 4
+
+Running AI Components:
+────────────────────────────────────────────────────────────
+
+[vector_database]
+  • Chroma [low]
+    Source: /proc/66096
+    PID: 66096 | Default Ports: 8000 | Exe: bash
+
+  • Chroma [low]
+    Source: /proc/66098
+    PID: 66098 | Default Ports: 8000 | Exe: python3.12
+
+
+[llm_framework]
+  • LangChain [low]
+    Source: /proc/66036
+    PID: 66036 | Exe: python3.12
+
+  • LangChain [low]
+    Source: /proc/66035
+    PID: 66035 | Exe: bash
+
+
