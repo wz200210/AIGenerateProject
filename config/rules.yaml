@@ -166,8 +166,8 @@ vector_databases:
     version_probe:
       methods:
         - type: "http_api"
-          endpoint: "/"
-          json_path: "version"
+          endpoint: "/openapi.json"
+          json_path: "info.version"
         - type: "cli_arg"
           patterns:
             - "version[=\\s]*([\\d.]+)"
