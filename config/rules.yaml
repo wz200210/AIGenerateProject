@@ -387,7 +387,7 @@ agent_frameworks:
     process_patterns:
       - "llamaindex"
       - "llama_index"
-      - "python.*llamaindex"
+      - "llamaindex_service"
     
     semantic_analyzers:
       - type: "python_import"
