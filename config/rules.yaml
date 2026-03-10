@@ -475,9 +475,18 @@ deployment_tools:
     
     process_patterns:
       - "\\bgradio\\b"
+      - "gradio_app"
     
     default_ports:
       - 7860
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import gradio"
+          - "from gradio import"
+          - "gradio.Interface"
+          - "gradio.Blocks"
 
   - name: "Streamlit"
     id: "streamlit"
