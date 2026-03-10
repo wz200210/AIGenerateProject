@@ -316,6 +316,50 @@ make build-all
 - Docker 容器扫描：~100ms
 - 总扫描时间：通常 < 1秒
 
+## ✅ 测试验证
+
+### 已验证的 AI 组件 (8个)
+
+| 组件 | 类型 | 检测方式 | 版本 |
+|------|------|----------|------|
+| **Ollama** | LLM推理服务 | 进程+端口+版本API | v0.17.7 |
+| **PyTorch** | ML框架 | 语义分析器 | 2.10.0 |
+| **TensorFlow** | ML框架 | 语义分析器 | 2.20.0 |
+| **LlamaIndex** | RAG框架 | 语义分析器 | - |
+| **Gradio** | 部署工具 | 语义分析器 | - |
+| **Streamlit** | 部署工具 | 进程匹配 | - |
+| **Jupyter** | 监控工具 | 进程匹配 | - |
+| **Chroma** | 向量数据库 | 进程匹配 | - |
+
+### 配置优化
+
+通过添加 `semantic_analyzers` 配置，提升 Python 库的识别率：
+
+```yaml
+# config/rules.yaml 示例
+- name: "Gradio"
+  semantic_analyzers:
+    - type: "python_import"
+      patterns:
+        - "import gradio"
+        - "from gradio import"
+
+- name: "LlamaIndex"
+  semantic_analyzers:
+    - type: "python_import"
+      patterns:
+        - "import llama_index"
+        - "from llama_index import"
+```
+
+### 测试脚本
+
+详见 `test/` 目录：
+- `pytorch_service.py` - PyTorch 测试服务
+- `tensorflow_service.py` - TensorFlow 测试服务
+- `llamaindex_service.py` - LlamaIndex 测试服务
+- `transformers_service.py` - Transformers 测试服务
+
 ## 📝 更新日志
 
 ### v0.3.1 (2026-03-05)
