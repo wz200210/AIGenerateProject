@@ -270,6 +270,14 @@ var CommonAIFrameworks = []FrameworkInfo{
 		Severity:     SeverityLow,
 		Description:  "LiteLLM 统一 LLM API 网关",
 	},
+	{
+		Name:         "OpenClaw",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"openclaw", "@openclaw"},
+		FilePatterns: []string{"package.json", "go.mod", "config.yaml", "config.yml"},
+		Severity:     SeverityLow,
+		Description:  "OpenClaw AI Agent Gateway",
+	},
 
 	// ========== 向量数据库 ==========
 	{
@@ -515,6 +523,8 @@ var APIKeyPatterns = map[string]string{
 	"LANGCHAIN_API_KEY":      "LangSmith API Key",
 	"LANGFUSE_API_KEY":       "Langfuse API Key",
 	"AI_API_KEY":             "Generic AI API Key",
+	"OPENCLAW_API_KEY":       "OpenClaw API Key",
+	"OPENCLAW_GATEWAY_TOKEN": "OpenClaw Gateway Token",
 }
 
 // GetComponentStats 返回各类组件数量统计

@@ -502,6 +502,48 @@ deployment_tools:
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
+  - name: "OpenClaw"
+    id: "openclaw"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenClaw AI Agent Gateway - AI 代理网关"
+    
+    process_patterns:
+      - "\\bopenclaw\\b"
+      - "openclaw.*gateway"
+      - "node.*openclaw"
+      - "/usr/lib/node_modules/openclaw"
+    
+    # OpenClaw 作为网关通常没有固定端口，但可能通过配置指定
+    default_ports:
+      - 8787
+      - 3000
+      - 8080
+    
+    # 版本探测配置
+    version_probe:
+      methods:
+        - type: "cli_arg"
+          patterns:
+            - "version[=\\s]*([\\d.]+)"
+        - type: "exec"
+          command: "--version"
+          parser: "v?([\\d.]+)"
+    
+    # HTTP 端点探测
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/status"
+        method: "GET"
+    
+    # 环境变量检测
+    env_indicators:
+      - "OPENCLAW_API_KEY"
+      - "OPENCLAW_GATEWAY_TOKEN"
+      - "OPENCLAW_CONFIG_PATH"
+      - "OPENCLAW_HOME"
+
   - name: "MLflow"
     id: "mlflow"
     type: "monitoring"
@@ -652,6 +694,14 @@ api_key_patterns:
   - name: "Generic AI API Key"
     key: "AI_API_KEY"
     severity: "critical"
+
+  - name: "OpenClaw API Key"
+    key: "OPENCLAW_API_KEY"
+    severity: "high"
+
+  - name: "OpenClaw Gateway Token"
+    key: "OPENCLAW_GATEWAY_TOKEN"
+    severity: "high"
 
 # ==================== 全局配置 ====================
 global:
