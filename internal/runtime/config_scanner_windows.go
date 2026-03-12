@@ -1,3 +1,5 @@
+//go:build windows
+
 package runtime
 
 import (
@@ -107,29 +109,136 @@ func (cs *ConfigBasedScanner) ScanAll() (*types.RuntimeScanResult, error) {
 	return result, nil
 }
 
-// scanProcessTree 扫描进程树
+// scanProcessTree 扫描进程树 (Windows 实现)
 func (cs *ConfigBasedScanner) scanProcessTree() (map[int]*ProcessInfo, error) {
 	processes := make(map[int]*ProcessInfo)
 
-	entries, err := os.ReadDir("/proc")
+	// 使用 PowerShell 获取进程信息
+	cmd := exec.Command("powershell", "-Command",
+		`Get-Process | Select-Object Id, ParentId, ProcessName, Path, @{Name="CommandLine";Expression={$_.CommandLine}} | ConvertTo-Json`)
+	
+	output, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		// 降级方案：使用 tasklist
+		return cs.scanProcessTreeTasklist()
 	}
 
-	// 收集所有进程
-	for _, entry := range entries {
-		if !entry.IsDir() {
+	// 解析 JSON 输出
+	var procList []struct {
+		ID           int    `json:"Id"`
+		ParentId     int    `json:"ParentId"`
+		ProcessName  string `json:"ProcessName"`
+		Path         string `json:"Path"`
+		CommandLine  string `json:"CommandLine"`
+	}
+
+	if err := json.Unmarshal(output, &procList); err != nil {
+		// 可能是单个对象，包装成数组
+		var singleProc struct {
+			ID           int    `json:"Id"`
+			ParentId     int    `json:"ParentId"`
+			ProcessName  string `json:"ProcessName"`
+			Path         string `json:"Path"`
+			CommandLine  string `json:"CommandLine"`
+		}
+		if err := json.Unmarshal(output, &singleProc); err == nil {
+			procList = append(procList, singleProc)
+		} else {
+			// 降级到 tasklist
+			return cs.scanProcessTreeTasklist()
+		}
+	}
+
+	for _, p := range procList {
+		proc := &ProcessInfo{
+			PID:         p.ID,
+			PPID:        p.ParentId,
+			Name:        p.ProcessName,
+			Cmdline:     p.CommandLine,
+			Executable:  p.Path,
+			Environment: make(map[string]string),
+			StartTime:   time.Now(),
+		}
+		processes[p.ID] = proc
+	}
+
+	// 建立父子关系
+	for _, proc := range processes {
+		if parent, ok := processes[proc.PPID]; ok {
+			proc.Parent = parent
+			parent.Children = append(parent.Children, proc)
+		}
+	}
+
+	return processes, nil
+}
+
+// scanProcessTreeTasklist 使用 tasklist 作为降级方案
+func (cs *ConfigBasedScanner) scanProcessTreeTasklist() (map[int]*ProcessInfo, error) {
+	processes := make(map[int]*ProcessInfo)
+
+	// 使用 tasklist 获取进程列表
+	cmd := exec.Command("tasklist", "/FO", "CSV", "/NH")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to run tasklist: %w", err)
+	}
+
+	scanner := bufio.NewScanner(strings.NewReader(string(output)))
+	for scanner.Scan() {
+		line := scanner.Text()
+		parts := parseCSVLine(line)
+		if len(parts) < 2 {
 			continue
 		}
 
-		pid, err := strconv.Atoi(entry.Name())
-		if err != nil {
+		pid, _ := strconv.Atoi(strings.TrimSpace(parts[1]))
+		if pid == 0 {
 			continue
 		}
 
-		proc := cs.readProcessInfo(pid)
-		if proc != nil {
-			processes[pid] = proc
+		proc := &ProcessInfo{
+			PID:         pid,
+			Name:        strings.Trim(strings.TrimSpace(parts[0]), `"`),
+			Environment: make(map[string]string),
+			StartTime:   time.Now(),
+		}
+		processes[pid] = proc
+	}
+
+	// 使用 wmic 获取命令行和父进程信息
+	cmd = exec.Command("wmic", "process", "get", "ProcessId,ParentProcessId,CommandLine", "/FORMAT:CSV")
+	output, err = cmd.Output()
+	if err == nil {
+		scanner = bufio.NewScanner(strings.NewReader(string(output)))
+		firstLine := true
+		for scanner.Scan() {
+			line := scanner.Text()
+			if firstLine {
+				firstLine = false
+				continue // 跳过 CSV 头
+			}
+			
+			parts := strings.Split(line, ",")
+			if len(parts) < 4 {
+				continue
+			}
+
+			pid, _ := strconv.Atoi(strings.TrimSpace(parts[2]))
+			ppid, _ := strconv.Atoi(strings.TrimSpace(parts[3]))
+			cmdline := strings.Trim(parts[1], `"`)
+
+			if proc, ok := processes[pid]; ok {
+				proc.PPID = ppid
+				proc.Cmdline = cmdline
+				// 从命令行提取可执行文件路径
+				if cmdline != "" {
+					parts := strings.Fields(cmdline)
+					if len(parts) > 0 {
+						proc.Executable = strings.Trim(parts[0], `"`)
+					}
+				}
+			}
 		}
 	}
 
@@ -144,64 +253,52 @@ func (cs *ConfigBasedScanner) scanProcessTree() (map[int]*ProcessInfo, error) {
 	return processes, nil
 }
 
-// readProcessInfo 读取进程信息
-func (cs *ConfigBasedScanner) readProcessInfo(pid int) *ProcessInfo {
-	proc := &ProcessInfo{
-		PID:         pid,
-		Environment: make(map[string]string),
-	}
+// parseCSVLine 简单解析 CSV 行
+func parseCSVLine(line string) []string {
+	var parts []string
+	var current strings.Builder
+	inQuotes := false
 
-	// 读取命令行
-	cmdlineData, err := os.ReadFile(fmt.Sprintf("/proc/%d/cmdline", pid))
-	if err != nil {
-		return nil
-	}
-	proc.Cmdline = strings.ReplaceAll(string(cmdlineData), "\x00", " ")
-
-	// 读取状态
-	statusData, err := os.ReadFile(fmt.Sprintf("/proc/%d/status", pid))
-	if err == nil {
-		for _, line := range strings.Split(string(statusData), "\n") {
-			if strings.HasPrefix(line, "PPid:") {
-				ppidStr := strings.TrimSpace(strings.TrimPrefix(line, "PPid:"))
-				proc.PPID, _ = strconv.Atoi(ppidStr)
+	for _, r := range line {
+		switch r {
+		case '"':
+			inQuotes = !inQuotes
+		case ',':
+			if !inQuotes {
+				parts = append(parts, current.String())
+				current.Reset()
+			} else {
+				current.WriteRune(r)
 			}
-			if strings.HasPrefix(line, "Name:") {
-				proc.Name = strings.TrimSpace(strings.TrimPrefix(line, "Name:"))
-			}
+		default:
+			current.WriteRune(r)
 		}
 	}
-
-	// 读取可执行文件
-	exePath, err := os.Readlink(fmt.Sprintf("/proc/%d/exe", pid))
-	if err == nil {
-		proc.Executable = exePath
-	}
-
-	// 读取环境变量
-	envData, err := os.ReadFile(fmt.Sprintf("/proc/%d/environ", pid))
-	if err == nil {
-		for _, env := range strings.Split(string(envData), "\x00") {
-			if idx := strings.Index(env, "="); idx > 0 {
-				key := env[:idx]
-				value := env[idx+1:]
-				proc.Environment[key] = value
-			}
-		}
-	}
-
-	proc.StartTime = time.Now()
-	return proc
+	parts = append(parts, current.String())
+	return parts
 }
 
 // analyzeProcess 分析进程
 func (cs *ConfigBasedScanner) analyzeProcess(proc *ProcessInfo) *types.AIComponent {
 	cmdlineLower := strings.ToLower(proc.Cmdline)
+	exeLower := strings.ToLower(filepath.Base(proc.Executable))
+	nameLower := strings.ToLower(proc.Name)
 
 	for _, svc := range cs.serviceConfigs {
 		for _, pattern := range svc.ProcessPatterns {
-			if re, ok := cs.processPatterns[pattern]; ok && re.MatchString(cmdlineLower) {
-				return cs.createComponentFromService(proc, svc)
+			if re, ok := cs.processPatterns[pattern]; ok {
+				// 匹配命令行
+				if re.MatchString(cmdlineLower) {
+					return cs.createComponentFromService(proc, svc)
+				}
+				// 匹配可执行文件名
+				if re.MatchString(exeLower) {
+					return cs.createComponentFromService(proc, svc)
+				}
+				// 匹配进程名
+				if re.MatchString(nameLower) {
+					return cs.createComponentFromService(proc, svc)
+				}
 			}
 		}
 	}
@@ -214,7 +311,7 @@ func (cs *ConfigBasedScanner) createComponentFromService(proc *ProcessInfo, svc 
 	comp := &types.AIComponent{
 		Name:        svc.Name,
 		Type:        types.AIComponentType(svc.Type),
-		FilePath:    fmt.Sprintf("/proc/%d", proc.PID),
+		FilePath:    fmt.Sprintf("PID:%d", proc.PID),
 		Confidence:  cs.calculateConfidence(proc, svc),
 		Severity:    types.Severity(svc.Severity),
 		Description: cs.buildDescription(proc, svc),
@@ -264,13 +361,6 @@ func (cs *ConfigBasedScanner) extractVersion(proc *ProcessInfo, svc config.Servi
 		}
 	}
 
-	// 从环境变量检查
-	for _, envVar := range []string{"VERSION", "APP_VERSION", "SERVICE_VERSION"} {
-		if version, ok := proc.Environment[envVar]; ok && version != "" {
-			return version
-		}
-	}
-
 	return ""
 }
 
@@ -293,7 +383,6 @@ func (cs *ConfigBasedScanner) executeVersionCommand(executable, command, parser 
 		}
 	}
 
-	// 默认解析
 	return cs.parseVersionOutput(string(output))
 }
 
@@ -330,7 +419,6 @@ func (cs *ConfigBasedScanner) probeHTTPVersion(port int, endpoint, jsonPath stri
 	if jsonPath != "" {
 		var result map[string]interface{}
 		if err := json.Unmarshal(body, &result); err == nil {
-			// 简单支持一级路径
 			if version, ok := result[jsonPath].(string); ok {
 				return version
 			}
@@ -426,45 +514,34 @@ func (cs *ConfigBasedScanner) detectAPIKeys(proc *ProcessInfo, comp *types.AICom
 	}
 }
 
-// scanNetworkServices 扫描网络服务 - 优化版：端口+进程名双重验证
+// scanNetworkServices 扫描网络服务
 func (cs *ConfigBasedScanner) scanNetworkServices(processes map[int]*ProcessInfo) ([]types.AIComponent, error) {
 	var components []types.AIComponent
 	
-	// 获取端口到 PID 的映射
+	// 获取端口到 PID 的映射 (Windows 使用 netstat)
 	portToPID := cs.getPortToPIDMapping()
-	
-	// 获取所有监听端口的列表（用于日志输出）
-	listeningPorts := cs.getListeningPorts()
 	
 	// 遍历所有服务配置
 	for _, svc := range cs.serviceConfigs {
-		// 跳过没有配置端口的服务
 		if len(svc.DefaultPorts) == 0 {
 			continue
 		}
 		
-		// 检查该服务的端口是否有进程在监听
 		for _, port := range svc.DefaultPorts {
 			pid, ok := portToPID[port]
 			if !ok {
-				// 端口没有在监听，跳过
 				continue
 			}
 			
-			// 获取监听该端口的进程
 			proc, ok := processes[pid]
 			if !ok {
-				// 进程信息获取失败，记录错误但继续
 				continue
 			}
 			
-			// 关键：进程名必须匹配服务的 ProcessPatterns 才算
 			if !cs.matchProcessPatterns(proc, svc) {
-				// 进程名不匹配，可能是其他服务占用了这个端口，跳过
 				continue
 			}
 			
-			// 进程名匹配成功，创建组件
 			comp := cs.createComponentFromNetworkService(proc, svc, port)
 			if comp != nil {
 				components = append(components, *comp)
@@ -472,30 +549,23 @@ func (cs *ConfigBasedScanner) scanNetworkServices(processes map[int]*ProcessInfo
 		}
 	}
 	
-	// 记录发现的监听端口信息（用于调试）
-	_ = listeningPorts
-	
 	return components, nil
 }
 
 // matchProcessPatterns 检查进程是否匹配服务的进程模式
 func (cs *ConfigBasedScanner) matchProcessPatterns(proc *ProcessInfo, svc config.ServiceConfig) bool {
-	// 检查进程名
 	procNameLower := strings.ToLower(proc.Name)
 	cmdlineLower := strings.ToLower(proc.Cmdline)
 	exeLower := strings.ToLower(filepath.Base(proc.Executable))
 	
 	for _, pattern := range svc.ProcessPatterns {
 		if re, ok := cs.processPatterns[pattern]; ok {
-			// 匹配进程名
 			if re.MatchString(procNameLower) {
 				return true
 			}
-			// 匹配命令行
 			if re.MatchString(cmdlineLower) {
 				return true
 			}
-			// 匹配可执行文件名
 			if re.MatchString(exeLower) {
 				return true
 			}
@@ -505,26 +575,20 @@ func (cs *ConfigBasedScanner) matchProcessPatterns(proc *ProcessInfo, svc config
 	return false
 }
 
-// createComponentFromNetworkService 从网络服务创建组件（带版本验证）
-// 只有当版本号能获取到时才返回组件，否则返回 nil
+// createComponentFromNetworkService 从网络服务创建组件
 func (cs *ConfigBasedScanner) createComponentFromNetworkService(proc *ProcessInfo, svc config.ServiceConfig, port int) *types.AIComponent {
-	// 提取版本号 - 关键：版本号必须能获取到才算匹配
 	version := cs.extractVersion(proc, svc)
 	
-	// 如果无法获取版本号，则视为未匹配成功，避免误报
 	if version == "" {
 		return nil
 	}
 	
-	// 计算置信度
 	confidence := cs.calculateConfidence(proc, svc)
-	// 网络服务检测有端口+进程名+版本号三重验证，置信度更高
 	confidence += 0.2
 	if confidence > 1.0 {
 		confidence = 1.0
 	}
 	
-	// 构建描述
 	description := fmt.Sprintf("Network service detected | PID: %d | Port: %d", proc.PID, port)
 	if proc.Executable != "" {
 		description += fmt.Sprintf(" | Exe: %s", filepath.Base(proc.Executable))
@@ -537,110 +601,62 @@ func (cs *ConfigBasedScanner) createComponentFromNetworkService(proc *ProcessInf
 		Name:        svc.Name,
 		Type:        types.AIComponentType(svc.Type),
 		Version:     version,
-		FilePath:    fmt.Sprintf("/proc/%d (port %d)", proc.PID, port),
+		FilePath:    fmt.Sprintf("PID:%d (port %d)", proc.PID, port),
 		Confidence:  confidence,
 		Severity:    types.Severity(svc.Severity),
 		Description: description,
 		RawContent:  fmt.Sprintf("Process: %s | Cmdline: %s", proc.Name, proc.Cmdline),
 	}
 	
-	// 检测 API Key
 	cs.detectAPIKeys(proc, comp)
 	
 	return comp
 }
 
-// getListeningPorts 获取所有正在监听的端口列表
-func (cs *ConfigBasedScanner) getListeningPorts() []int {
-	var ports []int
-	
-	for _, file := range []string{"/proc/net/tcp", "/proc/net/tcp6"} {
-		data, err := os.ReadFile(file)
-		if err != nil {
-			continue
-		}
-		
-		lines := strings.Split(string(data), "\n")
-		for _, line := range lines[1:] {
-			fields := strings.Fields(line)
-			if len(fields) < 4 {
-				continue
-			}
-			
-			// 检查是否为监听状态 (0x0A = TCP_LISTEN)
-			state := fields[3]
-			if state != "0A" {
-				continue
-			}
-			
-			localAddr := fields[1]
-			if idx := strings.LastIndex(localAddr, ":"); idx > 0 {
-				portHex := localAddr[idx+1:]
-				port, _ := strconv.ParseInt(portHex, 16, 32)
-				if port > 0 {
-					ports = append(ports, int(port))
-				}
-			}
-		}
-	}
-	
-	return ports
-}
-
-// getPortToPIDMapping 获取端口到 PID 映射
+// getPortToPIDMapping 获取端口到 PID 映射 (Windows 实现)
 func (cs *ConfigBasedScanner) getPortToPIDMapping() map[int]int {
 	mapping := make(map[int]int)
 
-	for _, file := range []string{"/proc/net/tcp", "/proc/net/tcp6"} {
-		data, err := os.ReadFile(file)
-		if err != nil {
+	// 使用 netstat -ano 获取端口和 PID 映射
+	cmd := exec.Command("netstat", "-ano")
+	output, err := cmd.Output()
+	if err != nil {
+		return mapping
+	}
+
+	lines := strings.Split(string(output), "\n")
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if len(fields) < 5 {
 			continue
 		}
 
-		lines := strings.Split(string(data), "\n")
-		for _, line := range lines[1:] {
-			fields := strings.Fields(line)
-			if len(fields) < 10 {
+		// 检查是否为 LISTENING 状态
+		if !strings.Contains(line, "LISTENING") {
+			continue
+		}
+
+		// 解析本地地址和端口
+		localAddr := fields[1]
+		if idx := strings.LastIndex(localAddr, ":"); idx > 0 {
+			portStr := localAddr[idx+1:]
+			port, err := strconv.Atoi(portStr)
+			if err != nil {
 				continue
 			}
 
-			localAddr := fields[1]
-			if idx := strings.LastIndex(localAddr, ":"); idx > 0 {
-				portHex := localAddr[idx+1:]
-				port, _ := strconv.ParseInt(portHex, 16, 32)
-				inode := fields[9]
-
-				if inode != "0" {
-					if pid := cs.findPIDByInode(inode); pid > 0 {
-						mapping[int(port)] = pid
-					}
-				}
+			// 获取 PID
+			pidStr := fields[len(fields)-1]
+			pid, err := strconv.Atoi(pidStr)
+			if err != nil {
+				continue
 			}
+
+			mapping[port] = pid
 		}
 	}
 
 	return mapping
-}
-
-// findPIDByInode 通过 inode 查找 PID
-func (cs *ConfigBasedScanner) findPIDByInode(inode string) int {
-	entries, _ := os.ReadDir("/proc")
-	for _, entry := range entries {
-		pid, err := strconv.Atoi(entry.Name())
-		if err != nil {
-			continue
-		}
-
-		fdDir := fmt.Sprintf("/proc/%d/fd", pid)
-		fds, _ := os.ReadDir(fdDir)
-		for _, fd := range fds {
-			link, _ := os.Readlink(filepath.Join(fdDir, fd.Name()))
-			if strings.Contains(link, "socket:["+inode+"]") {
-				return pid
-			}
-		}
-	}
-	return 0
 }
 
 // scanDockerContainers 扫描 Docker 容器
@@ -663,7 +679,6 @@ func (cs *ConfigBasedScanner) scanDockerContainers() ([]types.AIComponent, error
 
 		containerName := parts[1]
 		image := strings.ToLower(parts[2])
-		_ = parts[3] // ports 未使用
 		status := parts[4]
 
 		// 提取版本
@@ -714,7 +729,7 @@ func (cs *ConfigBasedScanner) deduplicateComponents(components []types.AICompone
 	return unique
 }
 
-// ProcessInfo 进程信息（与之前兼容）
+// ProcessInfo 进程信息
 type ProcessInfo struct {
 	PID         int
 	PPID        int

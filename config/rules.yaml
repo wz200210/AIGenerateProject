@@ -513,6 +513,15 @@ monitoring_tools:
       - "openclaw.*gateway"
       - "node.*openclaw"
       - "/usr/lib/node_modules/openclaw"
+      # Windows 特定模式
+      - "openclaw\\.exe"
+      - "openclaw.*\\.exe"
+      - "openclaw.*gateway.*\\.exe"
+      - "node\\.exe.*openclaw"
+      - "\\\\openclaw"
+      - "openclaw.*index\\.js"
+      - "openclaw.*main\\.js"
+      - "@openclaw"
     
     # OpenClaw 作为网关通常没有固定端口，但可能通过配置指定
     default_ports:

@@ -6,10 +6,11 @@
 
 ## 🚀 核心特性
 
-### 🔍 运行时进程检测
-- 扫描 `/proc` 目录发现运行中的 AI 进程
+### 🔍 运行时进程检测（跨平台）
+- **Linux**：扫描 `/proc` 目录发现运行中的 AI 进程
+- **Windows**：使用 PowerShell/wmic/netstat 获取进程信息
 - 分析进程父子关系，构建服务拓扑
-- 通过 inode 映射端口到进程
+- 通过端口映射关联进程与服务
 
 ### 🎯 智能语义分析
 - **Python ML 分析器**：识别 PyTorch、TensorFlow、Transformers 等
@@ -26,6 +27,8 @@
 5. Docker 镜像标签
 
 ### 🌐 网络服务发现（三重验证机制）
+- **Linux**：通过 inode 映射端口到进程 (`/proc/net/tcp`)
+- **Windows**：使用 `netstat -ano` 获取端口-PID 映射
 - **第一重**：检测端口是否有进程监听
 - **第二重**：验证监听进程名是否匹配组件特征
 - **第三重**：必须能获取到版本号才算匹配成功
@@ -232,15 +235,30 @@ Running AI Components:
 ## 🔧 技术细节
 
 ### 进程检测
+
+#### Linux
 - 读取 `/proc/<pid>/cmdline` 获取命令行
 - 读取 `/proc/<pid>/environ` 获取环境变量
 - 读取 `/proc/<pid>/status` 获取 PPID
 - 通过 `/proc/<pid>/exe` 获取可执行文件路径
 
+#### Windows
+- 使用 PowerShell `Get-Process` 获取进程列表（主要方案）
+- 降级到 `wmic process` 获取命令行和父进程信息
+- 使用 `tasklist` 作为最后的降级方案
+- 支持解析 CSV 格式输出
+
 ### 端口映射
+
+#### Linux
 - 解析 `/proc/net/tcp` 和 `/proc/net/tcp6`
 - 通过 inode 查找绑定端口的进程
 - 使用 `/proc/<pid>/fd/` 目录匹配 socket
+
+#### Windows
+- 执行 `netstat -ano` 获取端口和 PID 映射
+- 解析状态为 LISTENING 的连接
+- 关联端口与进程信息
 
 ### 版本探测策略（5种方式）
 ```
@@ -271,6 +289,27 @@ Running AI Components:
 - 组件使用自定义端口配置
 - 残留僵尸进程
 
+## 🤖 OpenClaw 检测
+
+本项目特别优化了对 **OpenClaw AI Agent Gateway** 的检测支持，可在 Linux 和 Windows 平台上识别运行中的 OpenClaw 实例：
+
+### 检测模式
+- 进程名匹配：`openclaw`, `openclaw.exe`, `openclaw.*gateway`
+- Node.js 模式：`node.*openclaw`, `openclaw.*index.js`
+- 路径匹配：`/usr/lib/node_modules/openclaw`, `\\openclaw`
+- npm 包：`@openclaw`
+
+### 环境变量检测
+- `OPENCLAW_API_KEY`
+- `OPENCLAW_GATEWAY_TOKEN`
+- `OPENCLAW_CONFIG_PATH`
+- `OPENCLAW_HOME`
+
+### 默认端口
+- `8787` (OpenClaw 默认端口)
+- `3000` (Node.js 常用端口)
+- `8080` (通用网关端口)
+
 ## 📁 项目结构
 
 ```
@@ -279,11 +318,16 @@ Running AI Components:
 │   └── main.go
 ├── internal/
 │   ├── runtime/              # 运行时扫描器（核心）
-│   │   └── scanner.go        # 进程/网络/容器扫描
-│   └── scanner/              # 报告生成
-│       └── scanner.go        # 控制台/JSON 输出
+│   │   ├── config_scanner_linux.go    # Linux 实现
+│   │   └── config_scanner_windows.go  # Windows 实现
+│   ├── scanner/              # 报告生成
+│   │   └── scanner.go        # 控制台/JSON 输出
+│   └── detector/             # 静态文件检测
+│       └── detector.go
 ├── pkg/ai/types/             # 类型定义
 │   └── types.go
+├── config/
+│   └── rules.yaml            # AI 组件检测规则
 ├── go.mod
 ├── Makefile
 └── README.md
@@ -304,10 +348,18 @@ make build-all
 
 ## ⚠️ 已知限制
 
-- 需要 Linux 环境（依赖 `/proc` 文件系统）
+### Linux
 - 需要 root 权限或 CAP_SYS_PTRACE 以读取其他用户进程
 - Docker 检测需要 docker CLI 和权限
+
+### Windows
+- 部分功能需要 PowerShell 或 wmic 支持
+- 进程命令行获取可能受限于系统权限
+- Docker 检测需要 Docker Desktop 或 Docker Engine
+
+### 通用
 - 某些版本探测可能需要服务响应 HTTP 请求
+- 环境变量扫描受限于当前用户权限
 
 ## 📈 性能
 
@@ -361,6 +413,16 @@ make build-all
 - `transformers_service.py` - Transformers 测试服务
 
 ## 📝 更新日志
+
+### v0.3.2 (2026-03-12)
+- **新增**：Windows 平台支持
+  - 使用 PowerShell/wmic/tasklist 获取进程信息
+  - 使用 netstat 获取端口映射
+  - 支持跨平台编译 (`GOOS=windows`)
+- **新增**：OpenClaw AI Gateway 检测优化
+  - 添加 Windows 特定进程模式
+  - 支持检测 `openclaw.exe` 等 Windows 可执行文件
+  - 增强 Node.js 模式匹配
 
 ### v0.3.1 (2026-03-05)
 - **优化**：网络服务检测改为三重验证机制（端口+进程名+版本号）
