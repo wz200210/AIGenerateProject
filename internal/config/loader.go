@@ -16,6 +16,7 @@ type RulesConfig struct {
 	DeploymentTools   []ServiceConfig   `yaml:"deployment_tools"`
 	MonitoringTools   []ServiceConfig   `yaml:"monitoring_tools"`
 	APIKeyPatterns    []APIKeyPattern   `yaml:"api_key_patterns"`
+	SkillScans        []SkillScanConfig `yaml:"skill_scans,omitempty"`  // 新增：Skill 扫描配置
 	Global            GlobalConfig      `yaml:"global"`
 }
 
@@ -66,6 +67,26 @@ type APIKeyPattern struct {
 	Name     string `yaml:"name"`
 	Key      string `yaml:"key"`
 	Severity string `yaml:"severity"`
+}
+
+// SkillScanConfig Skill 扫描配置
+type SkillScanConfig struct {
+	Name           string                 `yaml:"name"`            // 扫描器名称，如 "openclaw", "claude"
+	Type           string                 `yaml:"type"`            // 类型标识
+	Description    string                 `yaml:"description"`
+	ConfigPaths    []string               `yaml:"config_paths"`    // 配置文件可能路径（支持通配符和 ~ 扩展）
+	SkillDirs      []string               `yaml:"skill_dirs"`      // Skill 目录路径
+	ParseRules     SkillParseRules        `yaml:"parse_rules"`     // 解析规则
+	Enabled        bool                   `yaml:"enabled"`         // 是否启用
+}
+
+// SkillParseRules Skill 解析规则
+type SkillParseRules struct {
+	ConfigFormat   string   `yaml:"config_format"`    // yaml, json
+	SkillNamePath  string   `yaml:"skill_name_path"`  // YAML/JSON 路径，如 "skills.*.name"
+	SkillDescPath  string   `yaml:"skill_desc_path"`  // 描述字段路径
+	SkillEnablePath string  `yaml:"skill_enable_path"` // 启用状态字段路径
+	SkillFilePattern string `yaml:"skill_file_pattern"` // Skill 文件名匹配模式，如 "SKILL.md"
 }
 
 // GlobalConfig 全局配置
@@ -160,6 +181,14 @@ func (l *Loader) GetGlobalConfig() GlobalConfig {
 		return GlobalConfig{}
 	}
 	return l.config.Global
+}
+
+// GetSkillScanConfigs 获取 Skill 扫描配置
+func (l *Loader) GetSkillScanConfigs() []SkillScanConfig {
+	if l.config == nil {
+		return nil
+	}
+	return l.config.SkillScans
 }
 
 // Reload 重新加载配置（热更新支持）

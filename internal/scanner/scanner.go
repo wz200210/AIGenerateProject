@@ -251,6 +251,36 @@ func PrintRuntimeConsoleReport(result *types.RuntimeScanResult) {
 	}
 	fmt.Println()
 
+	// Skills 信息
+	if len(result.Skills) > 0 {
+		bold.Println("🛠️  AI Agent Skills:")
+		fmt.Printf("  • Total skills found: ")
+		cyan.Println(len(result.Skills))
+		fmt.Println()
+
+		// 按 Source 分组
+		bySource := make(map[string][]types.SkillInfo)
+		for _, s := range result.Skills {
+			bySource[s.Source] = append(bySource[s.Source], s)
+		}
+
+		for source, skills := range bySource {
+			cyan.Printf("[%s Skills] (%d)\n", source, len(skills))
+			for _, s := range skills {
+				status := "✅"
+				if !s.Enabled {
+					status = "⏸️"
+				}
+				fmt.Printf("  %s %s\n", status, s.Name)
+				if s.Description != "" {
+					fmt.Printf("     %s\n", s.Description)
+				}
+				fmt.Printf("     📍 %s\n", s.Location)
+			}
+			fmt.Println()
+		}
+	}
+
 	if len(result.Components) > 0 {
 		bold.Println("Running AI Components:")
 		fmt.Println(strings.Repeat("─", 60))

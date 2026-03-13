@@ -736,3 +736,75 @@ global:
     has_api_env_var: 0.05
     long_uptime: 0.1
     parent_is_ai: 0.1
+
+# ==================== Skill 扫描配置 ====================
+skill_scans:
+  # OpenClaw Skill 扫描
+  - name: "OpenClaw"
+    type: "agent_framework"
+    description: "OpenClaw AI Agent Gateway Skills"
+    enabled: true
+    
+    # 配置文件可能路径
+    config_paths:
+      - "~/.openclaw/config.yaml"
+      - "~/.openclaw/config.yml"
+      - "/etc/openclaw/config.yaml"
+      - "${OPENCLAW_HOME}/config.yaml"
+      - "/root/.openclaw/config.yaml"
+    
+    # Skill 目录路径
+    skill_dirs:
+      - "~/.openclaw/skills"
+      - "${OPENCLAW_HOME}/skills"
+      - "/root/.openclaw/skills"
+      - "/usr/lib/node_modules/openclaw/skills"
+    
+    # 解析规则
+    parse_rules:
+      config_format: "yaml"          # 配置文件格式
+      skill_name_path: "name"        # Skill 名称字段路径
+      skill_desc_path: "description" # Skill 描述字段路径
+      skill_enable_path: "enabled"   # 启用状态字段路径
+      skill_file_pattern: "SKILL.md" # Skill 定义文件名
+
+  # Claude Desktop Skill 扫描 (MCP)
+  - name: "Claude Desktop"
+    type: "agent_framework"
+    description: "Claude Desktop MCP Servers"
+    enabled: true
+    
+    config_paths:
+      - "~/Library/Application Support/Claude/claude_desktop_config.json"  # macOS
+      - "~/.config/claude/claude_desktop_config.json"                      # Linux
+      - "~/AppData/Roaming/Claude/claude_desktop_config.json"              # Windows
+      - "${CLAUDE_CONFIG_PATH}"
+    
+    skill_dirs: []  # Claude 使用配置文件管理，不需要扫描目录
+    
+    parse_rules:
+      config_format: "json"
+      skill_name_path: "name"
+      skill_desc_path: "description"
+      skill_enable_path: "enabled"
+
+  # Claude Code Skill 扫描
+  - name: "Claude Code"
+    type: "agent_framework"
+    description: "Claude Code Tools"
+    enabled: true
+    
+    config_paths:
+      - "~/.claude/settings.json"
+      - "~/.claude/config.json"
+      - ".claude/config.json"  # 项目级配置
+    
+    skill_dirs:
+      - "~/.claude/tools"
+      - ".claude/tools"  # 项目级 tools
+    
+    parse_rules:
+      config_format: "json"
+      skill_name_path: "name"
+      skill_desc_path: "description"
+      skill_file_pattern: "tool.json"

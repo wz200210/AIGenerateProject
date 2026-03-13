@@ -70,6 +70,7 @@ func (cs *ConfigBasedScanner) ScanAll() (*types.RuntimeScanResult, error) {
 	result := &types.RuntimeScanResult{
 		ScanTime:   time.Now().Format(time.RFC3339),
 		Components: []types.AIComponent{},
+		Skills:     []types.SkillInfo{},
 		Errors:     []string{},
 	}
 
@@ -106,56 +107,51 @@ func (cs *ConfigBasedScanner) ScanAll() (*types.RuntimeScanResult, error) {
 	// 智能去重
 	result.Components = cs.deduplicateComponents(result.Components)
 
+	// 扫描 Skills
+	fmt.Println("🔍 Scanning AI Agent Skills...")
+	skills, err := cs.scanSkills()
+	if err != nil {
+		result.Errors = append(result.Errors, fmt.Sprintf("Skill scan error: %v", err))
+	}
+	result.Skills = skills
+
 	return result, nil
 }
 
-// scanProcessTree 扫描进程树 (Windows 实现)
+// scanProcessTree 扫描进程树 (Windows 版本)
 func (cs *ConfigBasedScanner) scanProcessTree() (map[int]*ProcessInfo, error) {
 	processes := make(map[int]*ProcessInfo)
 
-	// 使用 PowerShell 获取进程信息
-	cmd := exec.Command("powershell", "-Command",
-		`Get-Process | Select-Object Id, ParentId, ProcessName, Path, @{Name="CommandLine";Expression={$_.CommandLine}} | ConvertTo-Json`)
-	
+	// 尝试使用 PowerShell 获取进程信息
+	cmd := exec.Command("powershell", "-Command", `
+		Get-Process | Select-Object Id, Parent.Id, ProcessName, Path, CommandLine | ConvertTo-Json -Compress
+	`)
 	output, err := cmd.Output()
 	if err != nil {
-		// 降级方案：使用 tasklist
-		return cs.scanProcessTreeTasklist()
+		// 降级到 wmic
+		return cs.scanProcessTreeWMIC()
 	}
 
 	// 解析 JSON 输出
-	var procList []struct {
-		ID           int    `json:"Id"`
-		ParentId     int    `json:"ParentId"`
-		ProcessName  string `json:"ProcessName"`
-		Path         string `json:"Path"`
-		CommandLine  string `json:"CommandLine"`
+	var psProcesses []struct {
+		ID          int    `json:"Id"`
+		ParentID    int    `json:"Parent.Id"`
+		ProcessName string `json:"ProcessName"`
+		Path        string `json:"Path"`
+		CommandLine string `json:"CommandLine"`
 	}
 
-	if err := json.Unmarshal(output, &procList); err != nil {
-		// 可能是单个对象，包装成数组
-		var singleProc struct {
-			ID           int    `json:"Id"`
-			ParentId     int    `json:"ParentId"`
-			ProcessName  string `json:"ProcessName"`
-			Path         string `json:"Path"`
-			CommandLine  string `json:"CommandLine"`
-		}
-		if err := json.Unmarshal(output, &singleProc); err == nil {
-			procList = append(procList, singleProc)
-		} else {
-			// 降级到 tasklist
-			return cs.scanProcessTreeTasklist()
-		}
+	if err := json.Unmarshal(output, &psProcesses); err != nil {
+		return cs.scanProcessTreeWMIC()
 	}
 
-	for _, p := range procList {
+	for _, p := range psProcesses {
 		proc := &ProcessInfo{
 			PID:         p.ID,
-			PPID:        p.ParentId,
+			PPID:        p.ParentID,
 			Name:        p.ProcessName,
-			Cmdline:     p.CommandLine,
 			Executable:  p.Path,
+			Cmdline:     p.CommandLine,
 			Environment: make(map[string]string),
 			StartTime:   time.Now(),
 		}
@@ -173,71 +169,39 @@ func (cs *ConfigBasedScanner) scanProcessTree() (map[int]*ProcessInfo, error) {
 	return processes, nil
 }
 
-// scanProcessTreeTasklist 使用 tasklist 作为降级方案
-func (cs *ConfigBasedScanner) scanProcessTreeTasklist() (map[int]*ProcessInfo, error) {
+// scanProcessTreeWMIC 使用 WMIC 扫描进程树
+func (cs *ConfigBasedScanner) scanProcessTreeWMIC() (map[int]*ProcessInfo, error) {
 	processes := make(map[int]*ProcessInfo)
 
-	// 使用 tasklist 获取进程列表
-	cmd := exec.Command("tasklist", "/FO", "CSV", "/NH")
+	cmd := exec.Command("wmic", "process", "get", "ProcessId,ParentProcessId,Name,ExecutablePath,CommandLine", "/format:csv")
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("failed to run tasklist: %w", err)
+		// 降级到 tasklist
+		return cs.scanProcessTreeTasklist()
 	}
 
-	scanner := bufio.NewScanner(strings.NewReader(string(output)))
-	for scanner.Scan() {
-		line := scanner.Text()
-		parts := parseCSVLine(line)
-		if len(parts) < 2 {
+	lines := strings.Split(string(output), "\n")
+	for _, line := range lines[1:] {
+		parts := strings.Split(line, ",")
+		if len(parts) < 5 {
 			continue
 		}
 
-		pid, _ := strconv.Atoi(strings.TrimSpace(parts[1]))
-		if pid == 0 {
-			continue
-		}
+		pid, _ := strconv.Atoi(strings.TrimSpace(parts[2]))
+		ppid, _ := strconv.Atoi(strings.TrimSpace(parts[3]))
+		name := strings.TrimSpace(parts[4])
+		exePath := strings.TrimSpace(parts[5])
+		cmdline := strings.TrimSpace(parts[1])
 
-		proc := &ProcessInfo{
-			PID:         pid,
-			Name:        strings.Trim(strings.TrimSpace(parts[0]), `"`),
-			Environment: make(map[string]string),
-			StartTime:   time.Now(),
-		}
-		processes[pid] = proc
-	}
-
-	// 使用 wmic 获取命令行和父进程信息
-	cmd = exec.Command("wmic", "process", "get", "ProcessId,ParentProcessId,CommandLine", "/FORMAT:CSV")
-	output, err = cmd.Output()
-	if err == nil {
-		scanner = bufio.NewScanner(strings.NewReader(string(output)))
-		firstLine := true
-		for scanner.Scan() {
-			line := scanner.Text()
-			if firstLine {
-				firstLine = false
-				continue // 跳过 CSV 头
-			}
-			
-			parts := strings.Split(line, ",")
-			if len(parts) < 4 {
-				continue
-			}
-
-			pid, _ := strconv.Atoi(strings.TrimSpace(parts[2]))
-			ppid, _ := strconv.Atoi(strings.TrimSpace(parts[3]))
-			cmdline := strings.Trim(parts[1], `"`)
-
-			if proc, ok := processes[pid]; ok {
-				proc.PPID = ppid
-				proc.Cmdline = cmdline
-				// 从命令行提取可执行文件路径
-				if cmdline != "" {
-					parts := strings.Fields(cmdline)
-					if len(parts) > 0 {
-						proc.Executable = strings.Trim(parts[0], `"`)
-					}
-				}
+		if pid > 0 {
+			processes[pid] = &ProcessInfo{
+				PID:         pid,
+				PPID:        ppid,
+				Name:        name,
+				Executable:  exePath,
+				Cmdline:     cmdline,
+				Environment: make(map[string]string),
+				StartTime:   time.Now(),
 			}
 		}
 	}
@@ -253,52 +217,48 @@ func (cs *ConfigBasedScanner) scanProcessTreeTasklist() (map[int]*ProcessInfo, e
 	return processes, nil
 }
 
-// parseCSVLine 简单解析 CSV 行
-func parseCSVLine(line string) []string {
-	var parts []string
-	var current strings.Builder
-	inQuotes := false
+// scanProcessTreeTasklist 使用 tasklist 扫描进程树
+func (cs *ConfigBasedScanner) scanProcessTreeTasklist() (map[int]*ProcessInfo, error) {
+	processes := make(map[int]*ProcessInfo)
 
-	for _, r := range line {
-		switch r {
-		case '"':
-			inQuotes = !inQuotes
-		case ',':
-			if !inQuotes {
-				parts = append(parts, current.String())
-				current.Reset()
-			} else {
-				current.WriteRune(r)
+	cmd := exec.Command("tasklist", "/fo", "csv", "/nh")
+	output, err := cmd.Output()
+	if err != nil {
+		return processes, err
+	}
+
+	lines := strings.Split(string(output), "\n")
+	for _, line := range lines {
+		parts := strings.Split(line, "\",\""))
+		if len(parts) < 2 {
+			continue
+		}
+
+		name := strings.Trim(parts[0], "\"")
+		pidStr := strings.Trim(parts[1], "\"")
+		pid, _ := strconv.Atoi(pidStr)
+
+		if pid > 0 {
+			processes[pid] = &ProcessInfo{
+				PID:         pid,
+				Name:        name,
+				Environment: make(map[string]string),
+				StartTime:   time.Now(),
 			}
-		default:
-			current.WriteRune(r)
 		}
 	}
-	parts = append(parts, current.String())
-	return parts
+
+	return processes, nil
 }
 
 // analyzeProcess 分析进程
 func (cs *ConfigBasedScanner) analyzeProcess(proc *ProcessInfo) *types.AIComponent {
 	cmdlineLower := strings.ToLower(proc.Cmdline)
-	exeLower := strings.ToLower(filepath.Base(proc.Executable))
-	nameLower := strings.ToLower(proc.Name)
 
 	for _, svc := range cs.serviceConfigs {
 		for _, pattern := range svc.ProcessPatterns {
-			if re, ok := cs.processPatterns[pattern]; ok {
-				// 匹配命令行
-				if re.MatchString(cmdlineLower) {
-					return cs.createComponentFromService(proc, svc)
-				}
-				// 匹配可执行文件名
-				if re.MatchString(exeLower) {
-					return cs.createComponentFromService(proc, svc)
-				}
-				// 匹配进程名
-				if re.MatchString(nameLower) {
-					return cs.createComponentFromService(proc, svc)
-				}
+			if re, ok := cs.processPatterns[pattern]; ok && re.MatchString(cmdlineLower) {
+				return cs.createComponentFromService(proc, svc)
 			}
 		}
 	}
@@ -358,6 +318,13 @@ func (cs *ConfigBasedScanner) extractVersion(proc *ProcessInfo, svc config.Servi
 					return version
 				}
 			}
+		}
+	}
+
+	// 从环境变量检查
+	for _, envVar := range []string{"VERSION", "APP_VERSION", "SERVICE_VERSION"} {
+		if version, ok := proc.Environment[envVar]; ok && version != "" {
+			return version
 		}
 	}
 
@@ -518,7 +485,7 @@ func (cs *ConfigBasedScanner) detectAPIKeys(proc *ProcessInfo, comp *types.AICom
 func (cs *ConfigBasedScanner) scanNetworkServices(processes map[int]*ProcessInfo) ([]types.AIComponent, error) {
 	var components []types.AIComponent
 	
-	// 获取端口到 PID 的映射 (Windows 使用 netstat)
+	// 获取端口到 PID 的映射
 	portToPID := cs.getPortToPIDMapping()
 	
 	// 遍历所有服务配置
@@ -560,13 +527,7 @@ func (cs *ConfigBasedScanner) matchProcessPatterns(proc *ProcessInfo, svc config
 	
 	for _, pattern := range svc.ProcessPatterns {
 		if re, ok := cs.processPatterns[pattern]; ok {
-			if re.MatchString(procNameLower) {
-				return true
-			}
-			if re.MatchString(cmdlineLower) {
-				return true
-			}
-			if re.MatchString(exeLower) {
+			if re.MatchString(procNameLower) || re.MatchString(cmdlineLower) || re.MatchString(exeLower) {
 				return true
 			}
 		}
@@ -578,7 +539,6 @@ func (cs *ConfigBasedScanner) matchProcessPatterns(proc *ProcessInfo, svc config
 // createComponentFromNetworkService 从网络服务创建组件
 func (cs *ConfigBasedScanner) createComponentFromNetworkService(proc *ProcessInfo, svc config.ServiceConfig, port int) *types.AIComponent {
 	version := cs.extractVersion(proc, svc)
-	
 	if version == "" {
 		return nil
 	}
@@ -613,11 +573,10 @@ func (cs *ConfigBasedScanner) createComponentFromNetworkService(proc *ProcessInf
 	return comp
 }
 
-// getPortToPIDMapping 获取端口到 PID 映射 (Windows 实现)
+// getPortToPIDMapping 获取端口到 PID 映射 (Windows)
 func (cs *ConfigBasedScanner) getPortToPIDMapping() map[int]int {
 	mapping := make(map[int]int)
 
-	// 使用 netstat -ano 获取端口和 PID 映射
 	cmd := exec.Command("netstat", "-ano")
 	output, err := cmd.Output()
 	if err != nil {
@@ -640,19 +599,11 @@ func (cs *ConfigBasedScanner) getPortToPIDMapping() map[int]int {
 		localAddr := fields[1]
 		if idx := strings.LastIndex(localAddr, ":"); idx > 0 {
 			portStr := localAddr[idx+1:]
-			port, err := strconv.Atoi(portStr)
-			if err != nil {
-				continue
+			port, _ := strconv.Atoi(portStr)
+			pid, _ := strconv.Atoi(fields[len(fields)-1])
+			if port > 0 && pid > 0 {
+				mapping[port] = pid
 			}
-
-			// 获取 PID
-			pidStr := fields[len(fields)-1]
-			pid, err := strconv.Atoi(pidStr)
-			if err != nil {
-				continue
-			}
-
-			mapping[port] = pid
 		}
 	}
 
@@ -727,6 +678,12 @@ func (cs *ConfigBasedScanner) deduplicateComponents(components []types.AICompone
 	}
 
 	return unique
+}
+
+// scanSkills 扫描 AI Agent Skills
+func (cs *ConfigBasedScanner) scanSkills() ([]types.SkillInfo, error) {
+	skillScanner := NewSkillScanner(cs.configLoader.GetSkillScanConfigs())
+	return skillScanner.ScanAll()
 }
 
 // ProcessInfo 进程信息

@@ -70,6 +70,7 @@ func (cs *ConfigBasedScanner) ScanAll() (*types.RuntimeScanResult, error) {
 	result := &types.RuntimeScanResult{
 		ScanTime:   time.Now().Format(time.RFC3339),
 		Components: []types.AIComponent{},
+		Skills:     []types.SkillInfo{},
 		Errors:     []string{},
 	}
 
@@ -105,6 +106,14 @@ func (cs *ConfigBasedScanner) ScanAll() (*types.RuntimeScanResult, error) {
 
 	// 智能去重
 	result.Components = cs.deduplicateComponents(result.Components)
+
+	// 扫描 Skills
+	fmt.Println("🔍 Scanning AI Agent Skills...")
+	skills, err := cs.scanSkills()
+	if err != nil {
+		result.Errors = append(result.Errors, fmt.Sprintf("Skill scan error: %v", err))
+	}
+	result.Skills = skills
 
 	return result, nil
 }
@@ -714,6 +723,12 @@ func (cs *ConfigBasedScanner) deduplicateComponents(components []types.AICompone
 	}
 
 	return unique
+}
+
+// scanSkills 扫描 AI Agent Skills
+func (cs *ConfigBasedScanner) scanSkills() ([]types.SkillInfo, error) {
+	skillScanner := NewSkillScanner(cs.configLoader.GetSkillScanConfigs())
+	return skillScanner.ScanAll()
 }
 
 // ProcessInfo 进程信息（与之前兼容）

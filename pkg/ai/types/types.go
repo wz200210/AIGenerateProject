@@ -544,7 +544,18 @@ type RuntimeScanResult struct {
 	PortCount      int            `json:"port_count"`
 	ContainerCount int            `json:"container_count"`
 	Components     []AIComponent  `json:"components"`
+	Skills         []SkillInfo    `json:"skills,omitempty"`  // 新增：识别的 Skill 列表
 	Errors         []string       `json:"errors,omitempty"`
+}
+
+// SkillInfo 表示识别到的 Skill 信息
+type SkillInfo struct {
+	Name        string `json:"name"`
+	Source      string `json:"source"`       // openclaw, claude, etc.
+	Description string `json:"description,omitempty"`
+	Location    string `json:"location"`     // 配置文件路径
+	Version     string `json:"version,omitempty"`
+	Enabled     bool   `json:"enabled"`      // 是否启用
 }
 
 // FullScanResult 完整扫描结果（静态+运行时）
