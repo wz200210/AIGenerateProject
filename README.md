@@ -39,6 +39,13 @@
 - 检测潜在敏感信息泄露
 - 标记关键安全风险
 
+### 🛠️ AI Agent Skill 扫描
+- **OpenClaw Skills**：扫描 `~/.openclaw/skills/` 目录，解析 `SKILL.md` 文件
+- **Claude Desktop MCP**：解析 Claude Desktop 的 `claude_desktop_config.json` 配置
+- **Claude Code Tools**：扫描 `~/.claude/tools/` 目录
+- 支持 YAML/JSON 配置文件解析
+- 自动识别启用/禁用状态
+
 ## 📦 安装
 
 ```bash
@@ -111,6 +118,13 @@ scanner version-check
 | AutoGPT | 进程匹配 |
 | CrewAI | 进程匹配 |
 
+### AI Agent Skills
+| Skill 源 | 检测方式 | 配置路径 |
+|---------|---------|---------|
+| OpenClaw Skills | 目录扫描 + SKILL.md 解析 | `~/.openclaw/skills/` |
+| Claude Desktop MCP | JSON 配置解析 | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Claude Code Tools | 目录扫描 | `~/.claude/tools/` |
+
 ## 📊 示例输出
 
 ### 控制台报告
@@ -151,6 +165,20 @@ Running AI Components:
   • LangChain Service [low] v0.2.0
     Source: /proc/3456
     Python process using LangChain (PID: 3456)
+
+🛠️  AI Agent Skills:
+  • Total skills found: 54
+
+[OpenClaw Skills] (54)
+  ✅ channels-setup
+     Setup guide for IM channels (Telegram, Discord, Slack, etc.)
+     📍 /root/.openclaw/skills/channels-setup
+  ✅ find-skills
+     Helps users discover and install agent skills
+     📍 /root/.openclaw/skills/find-skills
+  ✅ healthcheck
+     Host security hardening for OpenClaw deployments
+     📍 /root/.openclaw/skills/healthcheck
 ```
 
 ### JSON 输出
@@ -171,6 +199,22 @@ Running AI Components:
       "severity": "medium",
       "description": "PID: 1234 | Ports: 11434 | Exe: /usr/local/bin/ollama"
     }
+  ],
+  "skills": [
+    {
+      "name": "channels-setup",
+      "source": "OpenClaw",
+      "description": "Setup guide for IM channels",
+      "location": "/root/.openclaw/skills/channels-setup",
+      "enabled": true
+    },
+    {
+      "name": "healthcheck",
+      "source": "OpenClaw", 
+      "description": "Host security hardening",
+      "location": "/root/.openclaw/skills/healthcheck",
+      "enabled": true
+    }
   ]
 }
 ```
@@ -179,7 +223,7 @@ Running AI Components:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Runtime Scanner v0.3.1                    │
+│                    Runtime Scanner v0.4.0                    │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
@@ -196,12 +240,12 @@ Running AI Components:
 │         │  • Docker Analyzer                │             │
 │         └────────┬──────────────────────────┘             │
 │                  │                                         │
-│         ┌────────▼────────┐                              │
-│         │ Network Service │                              │
-│         │    Validator    │                              │
-│         │  ├─ Port Check  │                              │
-│         │  ├─ Process Match│                             │
-│         │  └─ Version Probe│                             │
+│         ┌────────▼────────┐      ┌─────────────────┐     │
+│         │ Network Service │      │  Skill Scanner  │     │
+│         │    Validator    │      │  • OpenClaw     │     │
+│         │  ├─ Port Check  │      │  • Claude       │     │
+│         │  ├─ Process Match│      │  • Config Parse │     │
+│         │  └─ Version Probe│      └─────────────────┘     │
 │         └────────┬────────┘                              │
 │                  │                                         │
 │         ┌────────▼────────┐                              │
@@ -319,7 +363,9 @@ Running AI Components:
 ├── internal/
 │   ├── runtime/              # 运行时扫描器（核心）
 │   │   ├── config_scanner_linux.go    # Linux 实现
-│   │   └── config_scanner_windows.go  # Windows 实现
+│   │   ├── config_scanner_windows.go  # Windows 实现
+│   │   ├── skill_scanner_linux.go     # Skill 扫描 (Linux)
+│   │   └── skill_scanner_windows.go   # Skill 扫描 (Windows)
 │   ├── scanner/              # 报告生成
 │   │   └── scanner.go        # 控制台/JSON 输出
 │   └── detector/             # 静态文件检测
@@ -327,7 +373,7 @@ Running AI Components:
 ├── pkg/ai/types/             # 类型定义
 │   └── types.go
 ├── config/
-│   └── rules.yaml            # AI 组件检测规则
+│   └── rules.yaml            # AI 组件检测规则 + Skill 扫描配置
 ├── go.mod
 ├── Makefile
 └── README.md
@@ -413,6 +459,18 @@ make build-all
 - `transformers_service.py` - Transformers 测试服务
 
 ## 📝 更新日志
+
+### v0.4.0 (2026-03-13)
+- **新增**：AI Agent Skill 扫描功能
+  - 支持 OpenClaw Skills 目录扫描和 SKILL.md 解析
+  - 支持 Claude Desktop MCP 配置解析
+  - 支持 Claude Code Tools 目录扫描
+  - 配置文件驱动，支持 YAML/JSON 格式
+  - 控制台和 JSON 输出均展示 Skill 列表
+- **新增**：Skill 扫描配置 (`skill_scans`)
+  - 可配置多个 Skill 源
+  - 支持路径扩展 (`~`, 环境变量)
+  - 支持启用/禁用控制
 
 ### v0.3.2 (2026-03-12)
 - **新增**：Windows 平台支持
