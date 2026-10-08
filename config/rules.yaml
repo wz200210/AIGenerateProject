@@ -123,6 +123,146 @@ llm_services:
       - 8000
       - 21001
 
+  - name: "SGLang"
+    id: "sglang"
+    type: "deployment"
+    severity: "medium"
+    description: "SGLang 高性能 LLM 推理引擎"
+    
+    process_patterns:
+      - "sglang"
+      - "sglang\\.launch_server"
+      - "sglang::scheduler"
+      - "python.*sglang"
+    
+    default_ports:
+      - 30000
+      - 30001
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/get_model_info"
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/get_model_info"
+        method: "GET"
+    
+    env_indicators:
+      - "SGLANG_"
+
+  - name: "llama.cpp"
+    id: "llama-cpp"
+    type: "deployment"
+    severity: "medium"
+    description: "llama.cpp 本地 LLM 推理服务"
+    
+    process_patterns:
+      - "llama-server"
+      - "llama\\.cpp"
+      - "llama_cpp"
+    
+    default_ports:
+      - 8080
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/health"
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+  - name: "LM Studio"
+    id: "lm-studio"
+    type: "deployment"
+    severity: "low"
+    description: "LM Studio 本地 LLM 运行时"
+    
+    process_patterns:
+      - "lm[\\s-]studio"
+      - "lmserver"
+      - "lmstudio"
+    
+    default_ports:
+      - 1234
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/v1/models"
+    
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+  - name: "LocalAI"
+    id: "localai"
+    type: "deployment"
+    severity: "medium"
+    description: "LocalAI 本地 OpenAI 兼容推理服务"
+    
+    process_patterns:
+      - "localai"
+      - "local-ai"
+    
+    default_ports:
+      - 8080
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/version"
+    
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/version"
+        method: "GET"
+    
+    env_indicators:
+      - "LOCALAI_MODELS_PATH"
+
+  - name: "KTransformers"
+    id: "ktransformers"
+    type: "deployment"
+    severity: "low"
+    description: "KTransformers 异构模型推理框架"
+    
+    process_patterns:
+      - "ktransformers"
+      - "ktransformers\\.server"
+    
+    default_ports:
+      - 10002
+    
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+  - name: "MLX LM Server"
+    id: "mlx-lm"
+    type: "deployment"
+    severity: "low"
+    description: "Apple MLX 本地推理服务"
+    
+    process_patterns:
+      - "mlx_lm\\.server"
+      - "mlx-lm"
+      - "mlx_lm"
+    
+    default_ports:
+      - 8080
+    
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -426,6 +566,145 @@ agent_frameworks:
       - "\\bcrewai\\b"
       - "python.*crewai"
 
+  - name: "Dify"
+    id: "dify"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Dify LLM 应用开发平台"
+    
+    process_patterns:
+      - "\\bdify\\b"
+      - "langgenius/dify"
+      - "dify-api"
+      - "dify-web"
+      - "dify-worker"
+      - "dify-sandbox"
+      - "dify-plugin"
+    
+    default_ports:
+      - 80
+      - 3000
+      - 5001
+    
+    http_endpoints:
+      - path: "/v1/health"
+        method: "GET"
+      - path: "/console/api/setup"
+        method: "GET"
+    
+    env_indicators:
+      - "DIFY_"
+
+  - name: "Flowise"
+    id: "flowise"
+    type: "agent_framework"
+    severity: "low"
+    description: "Flowise 低代码 LLM 工作流"
+    
+    process_patterns:
+      - "flowise"
+    
+    default_ports:
+      - 3000
+    
+    http_endpoints:
+      - path: "/api/v1/version"
+        method: "GET"
+
+  - name: "n8n"
+    id: "n8n"
+    type: "agent_framework"
+    severity: "low"
+    description: "n8n AI 工作流自动化"
+    
+    process_patterns:
+      - "n8n"
+      - "n8n-worker"
+    
+    default_ports:
+      - 5678
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/healthz"
+    
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+
+  - name: "MCP Server"
+    id: "mcp-server"
+    type: "agent_framework"
+    severity: "low"
+    description: "Model Context Protocol 服务进程"
+    
+    process_patterns:
+      - "mcp-server"
+      - "mcp_server"
+      - "modelcontextprotocol"
+      - "@modelcontextprotocol"
+      - "mcp\\.server"
+      - "mcp-proxy"
+    
+    env_indicators:
+      - "MCP_"
+
+  - name: "RAGFlow"
+    id: "ragflow"
+    type: "rag_tool"
+    severity: "medium"
+    description: "RAGFlow 深度文档理解 RAG 引擎"
+    
+    process_patterns:
+      - "ragflow"
+      - "infiniflow/ragflow"
+      - "ragflow-server"
+    
+    default_ports:
+      - 9380
+      - 80
+    
+    http_endpoints:
+      - path: "/v1/system/version"
+        method: "GET"
+      - path: "/"
+        method: "GET"
+    
+    env_indicators:
+      - "RAGFLOW_"
+
+  - name: "FastGPT"
+    id: "fastgpt"
+    type: "rag_tool"
+    severity: "low"
+    description: "FastGPT 知识库问答平台"
+    
+    process_patterns:
+      - "fastgpt"
+      - "labring/fastgpt"
+    
+    default_ports:
+      - 3000
+    
+    http_endpoints:
+      - path: "/api/common/system/getInitData"
+        method: "GET"
+
+  - name: "Coze Studio"
+    id: "coze-studio"
+    type: "agent_framework"
+    severity: "low"
+    description: "Coze Studio 开源 Bot 平台"
+    
+    process_patterns:
+      - "coze-studio"
+      - "coze_server"
+      - "coze-loop"
+    
+    default_ports:
+      - 8888
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -499,6 +778,82 @@ deployment_tools:
     
     default_ports:
       - 8501
+
+  - name: "NVIDIA NIM"
+    id: "nvidia-nim"
+    type: "deployment"
+    severity: "medium"
+    description: "NVIDIA NIM 推理微服务"
+    
+    process_patterns:
+      - "nvcr\\.io/nim"
+      - "nim-llm"
+      - "\\bnim-serve\\b"
+      - "nim\\.serve"
+    
+    default_ports:
+      - 8000
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/v1/health/ready"
+    
+    http_endpoints:
+      - path: "/v1/health/ready"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+    
+    env_indicators:
+      - "NIM_"
+
+  - name: "TEI"
+    id: "tei"
+    type: "embedding"
+    severity: "low"
+    description: "HuggingFace Text Embeddings Inference"
+    
+    process_patterns:
+      - "text-embeddings-inference"
+      - "huggingface/tei"
+      - "tei.*server"
+    
+    default_ports:
+      - 8080
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/health"
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+  - name: "Open WebUI"
+    id: "open-webui"
+    type: "deployment"
+    severity: "low"
+    description: "Open WebUI LLM 前端界面(常配 Ollama)"
+    
+    process_patterns:
+      - "open-webui"
+      - "open_webui"
+      - "ghcr\\.io/open-webui"
+    
+    default_ports:
+      - 8080
+      - 3000
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/api/config"
+        method: "GET"
+    
+    env_indicators:
+      - "WEBUI_"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
@@ -678,6 +1033,42 @@ api_key_patterns:
     
   - name: "DashScope API Key"
     key: "DASHSCOPE_API_KEY"
+    severity: "high"
+
+  - name: "DeepSeek API Key"
+    key: "DEEPSEEK_API_KEY"
+    severity: "critical"
+
+  - name: "xAI API Key"
+    key: "XAI_API_KEY"
+    severity: "high"
+
+  - name: "Groq API Key"
+    key: "GROQ_API_KEY"
+    severity: "high"
+
+  - name: "Together AI Key"
+    key: "TOGETHER_API_KEY"
+    severity: "high"
+
+  - name: "OpenRouter API Key"
+    key: "OPENROUTER_API_KEY"
+    severity: "high"
+
+  - name: "SiliconFlow API Key"
+    key: "SILICONFLOW_API_KEY"
+    severity: "high"
+
+  - name: "Volcengine API Key"
+    key: "VOLCENGINE_API_KEY"
+    severity: "high"
+
+  - name: "Ark (Doubao) API Key"
+    key: "ARK_API_KEY"
+    severity: "high"
+
+  - name: "NVIDIA NIM API Key"
+    key: "NVIDIA_NIM_API_KEY"
     severity: "high"
     
   - name: "Zhipu API Key"
