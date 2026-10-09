@@ -143,6 +143,7 @@ func runValidateConfig(cmd *cobra.Command, args []string) error {
 	fmt.Printf("  • ML Frameworks: %d\n", len(cfg.MLFrameworks))
 	fmt.Printf("  • Agent Frameworks: %d\n", len(cfg.AgentFrameworks))
 	fmt.Printf("  • Deployment Tools: %d\n", len(cfg.DeploymentTools))
+	fmt.Printf("  • AI Gateways: %d\n", len(cfg.AIGateways))
 	fmt.Printf("  • Monitoring Tools: %d\n", len(cfg.MonitoringTools))
 	fmt.Printf("  • Total Services: %d\n", len(services))
 	fmt.Printf("  • API Key Patterns: %d\n", len(apiKeys))

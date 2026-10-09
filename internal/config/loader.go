@@ -14,6 +14,7 @@ type RulesConfig struct {
 	MLFrameworks      []ServiceConfig   `yaml:"ml_frameworks"`
 	AgentFrameworks   []ServiceConfig   `yaml:"agent_frameworks"`
 	DeploymentTools   []ServiceConfig   `yaml:"deployment_tools"`
+	AIGateways        []ServiceConfig   `yaml:"ai_gateways"`
 	MonitoringTools   []ServiceConfig   `yaml:"monitoring_tools"`
 	APIKeyPatterns    []APIKeyPattern   `yaml:"api_key_patterns"`
 	SkillScans        []SkillScanConfig `yaml:"skill_scans,omitempty"`  // 新增：Skill 扫描配置
@@ -152,6 +153,7 @@ func (l *Loader) GetAllServices() []ServiceConfig {
 	services = append(services, l.config.MLFrameworks...)
 	services = append(services, l.config.AgentFrameworks...)
 	services = append(services, l.config.DeploymentTools...)
+	services = append(services, l.config.AIGateways...)
 	services = append(services, l.config.MonitoringTools...)
 
 	return services

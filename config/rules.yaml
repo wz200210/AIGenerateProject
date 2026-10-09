@@ -263,6 +263,97 @@ llm_services:
       - path: "/v1/models"
         method: "GET"
 
+  - name: "Xinference"
+    id: "xinference"
+    type: "deployment"
+    severity: "medium"
+    description: "Xorbits Inference 模型推理平台(支持 LLM/Embedding/多模态)"
+    
+    process_patterns:
+      - "xinference"
+      - "xinference-supervisor"
+      - "xinference-worker"
+      - "python.*xinference"
+    
+    default_ports:
+      - 9997
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/v1/models"
+    
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+    
+    env_indicators:
+      - "XINFERENCE_"
+
+  - name: "TabbyAPI"
+    id: "tabbyapi"
+    type: "deployment"
+    severity: "low"
+    description: "TabbyAPI ExLlamaV2 高速推理服务"
+    
+    process_patterns:
+      - "tabbyapi"
+      - "tabby_api"
+      - "exllamav2"
+      - "exllama.*server"
+    
+    default_ports:
+      - 5000
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/v1/model"
+    
+    http_endpoints:
+      - path: "/v1/model"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+  - name: "OpenAI Codex CLI"
+    id: "codex-cli"
+    type: "llm_framework"
+    severity: "low"
+    description: "OpenAI Codex 终端 AI 编码代理"
+    
+    process_patterns:
+      - "\\bcodex\\b"
+      - "codex.*exec"
+      - "codex.*tui"
+      - "@openai/codex"
+    
+    env_indicators:
+      - "CODEX_HOME"
+      - "OPENAI_CODEX"
+
+  - name: "OmniRoute"
+    id: "omniroute"
+    type: "llm_framework"
+    severity: "low"
+    description: "OmniRoute 开源 AI 网关(统一 359+ 提供商)"
+    
+    process_patterns:
+      - "omniroute"
+      - "omni-route"
+    
+    default_ports:
+      - 20128
+      - 8080
+    
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -428,6 +519,45 @@ vector_databases:
     
     http_endpoints:
       - path: "/"
+        method: "GET"
+
+  - name: "LanceDB"
+    id: "lancedb"
+    type: "vector_database"
+    severity: "low"
+    description: "LanceDB 嵌入式/服务端向量数据库"
+    
+    process_patterns:
+      - "lancedb"
+      - "lance.*server"
+    
+    default_ports:
+      - 8000
+      - 8080
+    
+    http_endpoints:
+      - path: "/v1/table"
+        method: "GET"
+
+  - name: "Vespa"
+    id: "vespa"
+    type: "vector_database"
+    severity: "low"
+    description: "Vespa 大规模向量+文本搜索引擎"
+    
+    process_patterns:
+      - "\\bvespa\\b"
+      - "vespa.*container"
+      - "vespa.*configserver"
+    
+    default_ports:
+      - 8080
+      - 19071
+    
+    http_endpoints:
+      - path: "/state/v1/health"
+        method: "GET"
+      - path: "/ApplicationStatus"
         method: "GET"
 
 # ==================== ML 框架 ====================
@@ -705,6 +835,157 @@ agent_frameworks:
     default_ports:
       - 8888
 
+  - name: "Langflow"
+    id: "langflow"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Langflow 可视化 AI 代理构建平台(DataStax)"
+    
+    process_patterns:
+      - "langflow"
+      - "langflow.*run"
+      - "python.*langflow"
+    
+    default_ports:
+      - 7860
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/api/v1/version"
+    
+    http_endpoints:
+      - path: "/api/v1/version"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from langflow import"
+          - "import langflow"
+
+  - name: "Mastra"
+    id: "mastra"
+    type: "agent_framework"
+    severity: "low"
+    description: "Mastra TypeScript AI Agent 框架"
+    
+    process_patterns:
+      - "\\bmastra\\b"
+      - "mastra.*dev"
+      - "mastra.*serve"
+      - "node.*mastra"
+    
+    default_ports:
+      - 4111
+      - 3000
+    
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+
+  - name: "Semantic Kernel"
+    id: "semantic-kernel"
+    type: "agent_framework"
+    severity: "low"
+    description: "Microsoft Semantic Kernel AI 编排 SDK"
+    
+    process_patterns:
+      - "semantic-kernel"
+      - "semantic_kernel"
+      - "python.*semantic"
+    
+    env_indicators:
+      - "SEMANTIC_KERNEL_"
+
+  - name: "Microsoft Agent Framework"
+    id: "agent-framework"
+    type: "agent_framework"
+    severity: "low"
+    description: "Microsoft Agent Framework(AutoGen + Semantic Kernel 合并版)"
+    
+    process_patterns:
+      - "agent-framework"
+      - "agent_framework"
+      - "microsoft.*agent"
+    
+    env_indicators:
+      - "AGENT_FRAMEWORK_"
+
+  - name: "Aider"
+    id: "aider"
+    type: "agent_framework"
+    severity: "low"
+    description: "Aider 终端 AI 结对编程工具"
+    
+    process_patterns:
+      - "\\baider\\b"
+      - "python.*aider"
+      - "aider.*chat"
+    
+    env_indicators:
+      - "AIDER_"
+
+  - name: "Cline"
+    id: "cline"
+    type: "agent_framework"
+    severity: "low"
+    description: "Cline 自主 AI 编码代理(VS Code 扩展/CLI)"
+    
+    process_patterns:
+      - "\\bcline\\b"
+      - "cline.*task"
+      - "cline.*agent"
+    
+    env_indicators:
+      - "CLINE_"
+
+  - name: "opencode"
+    id: "opencode"
+    type: "agent_framework"
+    severity: "low"
+    description: "opencode 终端 AI 编码代理(sst/opencode)"
+    
+    process_patterns:
+      - "\\bopencode\\b"
+      - "opencode.*run"
+      - "opencode.*agent"
+
+  - name: "DSPy"
+    id: "dspy"
+    type: "agent_framework"
+    severity: "low"
+    description: "DSPy 声明式 LLM 编程/优化框架(Stanford)"
+    
+    process_patterns:
+      - "\\bdspy\\b"
+      - "dspy.*optimize"
+      - "python.*dspy"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import dspy"
+          - "from dspy import"
+
+  - name: "Instructor"
+    id: "instructor"
+    type: "agent_framework"
+    severity: "low"
+    description: "Instructor 结构化 LLM 输出框架"
+    
+    process_patterns:
+      - "instructor.*patch"
+      - "python.*instructor"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import instructor"
+          - "from instructor import"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -855,6 +1136,275 @@ deployment_tools:
     env_indicators:
       - "WEBUI_"
 
+  - name: "ComfyUI"
+    id: "comfyui"
+    type: "deployment"
+    severity: "medium"
+    description: "ComfyUI 节点式图像/视频生成工作流"
+    
+    process_patterns:
+      - "comfyui"
+      - "comfy.*server"
+      - "main\\.py.*comfy"
+    
+    default_ports:
+      - 8188
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/system_stats"
+    
+    http_endpoints:
+      - path: "/system_stats"
+        method: "GET"
+      - path: "/prompt"
+        method: "GET"
+    
+    env_indicators:
+      - "COMFYUI_"
+      - "COMFY_"
+
+  - name: "Docling"
+    id: "docling"
+    type: "rag_tool"
+    severity: "low"
+    description: "IBM Docling 文档解析/转换服务"
+    
+    process_patterns:
+      - "docling"
+      - "docling-serve"
+      - "python.*docling"
+    
+    default_ports:
+      - 5001
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/api/v1/convert"
+        method: "GET"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from docling import"
+          - "import docling"
+
+  - name: "LiveKit"
+    id: "livekit"
+    type: "deployment"
+    severity: "low"
+    description: "LiveKit 实时语音/视频 AI 通信栈"
+    
+    process_patterns:
+      - "livekit-server"
+      - "\\blivekit\\b"
+      - "livekit.*agent"
+      - "livekit.*worker"
+    
+    default_ports:
+      - 7880
+      - 7881
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/"
+    
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+    
+    env_indicators:
+      - "LIVEKIT_"
+
+  - name: "Pipecat"
+    id: "pipecat"
+    type: "agent_framework"
+    severity: "low"
+    description: "Pipecat 语音/多模态 AI Agent 框架"
+    
+    process_patterns:
+      - "\\bpipecat\\b"
+      - "pipecat.*bot"
+      - "pipecat.*agent"
+      - "python.*pipecat"
+    
+    env_indicators:
+      - "PIPECAT_"
+
+  - name: "LobeChat"
+    id: "lobe-chat"
+    type: "deployment"
+    severity: "low"
+    description: "LobeChat 开源 AI 聊天框架(LobeHub)"
+    
+    process_patterns:
+      - "lobe-chat"
+      - "lobechat"
+      - "lobe-hub"
+    
+    default_ports:
+      - 3210
+      - 3000
+    
+    http_endpoints:
+      - path: "/api/version"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+    
+    env_indicators:
+      - "LOBE_"
+
+  - name: "NextChat"
+    id: "nextchat"
+    type: "deployment"
+    severity: "low"
+    description: "NextChat (原 ChatGPT-Next-Web) AI 聊天前端"
+    
+    process_patterns:
+      - "nextchat"
+      - "chatgpt-next-web"
+      - "next-chat"
+    
+    default_ports:
+      - 3000
+    
+    http_endpoints:
+      - path: "/api/config"
+        method: "GET"
+    
+    env_indicators:
+      - "NEXTCHAT_"
+
+  - name: "Kokoro TTS"
+    id: "kokoro-tts"
+    type: "deployment"
+    severity: "low"
+    description: "Kokoro 轻量高质量 TTS 引擎"
+    
+    process_patterns:
+      - "kokoro"
+      - "kokoro.*tts"
+      - "kokoro.*server"
+    
+    default_ports:
+      - 8880
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from kokoro import"
+          - "import kokoro"
+
+  - name: "Faster Whisper"
+    id: "faster-whisper"
+    type: "deployment"
+    severity: "low"
+    description: "faster-whisper / whisper.cpp 语音转文字服务"
+    
+    process_patterns:
+      - "faster-whisper"
+      - "faster_whisper"
+      - "whisper-server"
+      - "whisper\\.cpp"
+      - "whisper_cpp"
+      - "whisperx"
+    
+    default_ports:
+      - 8000
+      - 8080
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+# ==================== AI 网关/代理 ====================
+ai_gateways:
+  - name: "One API"
+    id: "one-api"
+    type: "llm_framework"
+    severity: "medium"
+    description: "One API LLM API 管理分发网关(支持多渠道)"
+    
+    process_patterns:
+      - "one-api"
+      - "oneapi"
+      - "songquanpeng/one-api"
+    
+    default_ports:
+      - 3000
+    
+    http_endpoints:
+      - path: "/api/status"
+        method: "GET"
+    
+    env_indicators:
+      - "ONEAPI_"
+      - "SQL_DSN"
+
+  - name: "New API"
+    id: "new-api"
+    type: "llm_framework"
+    severity: "medium"
+    description: "New API 统一 AI 模型聚合分发平台(One API 增强分支)"
+    
+    process_patterns:
+      - "new-api"
+      - "newapi"
+      - "quantumnous/new-api"
+    
+    default_ports:
+      - 3000
+    
+    http_endpoints:
+      - path: "/api/status"
+        method: "GET"
+      - path: "/api/about"
+        method: "GET"
+    
+    env_indicators:
+      - "NEWAPI_"
+
+  - name: "Bifrost"
+    id: "bifrost"
+    type: "llm_framework"
+    severity: "low"
+    description: "Bifrost 企业级高性能 AI 网关(Maxim HQ)"
+    
+    process_patterns:
+      - "\\bbifrost\\b"
+      - "bifrost.*gateway"
+      - "bifrost.*serve"
+    
+    default_ports:
+      - 8080
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+  - name: "agentgateway"
+    id: "agentgateway"
+    type: "agent_framework"
+    severity: "low"
+    description: "agentgateway 下一代 AI Agent/MCP 代理"
+    
+    process_patterns:
+      - "agentgateway"
+      - "agent-gateway"
+    
+    default_ports:
+      - 8080
+    
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
   - name: "OpenClaw"
@@ -981,6 +1531,53 @@ monitoring_tools:
     default_ports:
       - 8888
 
+  - name: "Promptfoo"
+    id: "promptfoo"
+    type: "monitoring"
+    severity: "low"
+    description: "Promptfoo LLM 评估/红队测试框架"
+    
+    process_patterns:
+      - "promptfoo"
+      - "promptfoo.*eval"
+    
+    env_indicators:
+      - "PROMPTFOO_"
+
+  - name: "DeepEval"
+    id: "deepeval"
+    type: "monitoring"
+    severity: "low"
+    description: "DeepEval LLM 输出评估框架"
+    
+    process_patterns:
+      - "\\bdeepeval\\b"
+      - "deepeval.*test"
+      - "python.*deepeval"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from deepeval import"
+          - "import deepeval"
+
+  - name: "Ragas"
+    id: "ragas"
+    type: "monitoring"
+    severity: "low"
+    description: "Ragas RAG 管道评估框架"
+    
+    process_patterns:
+      - "\\bragas\\b"
+      - "ragas.*eval"
+      - "python.*ragas"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from ragas import"
+          - "import ragas"
+
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
   - name: "OpenAI API Key"
@@ -1101,6 +1698,38 @@ api_key_patterns:
 
   - name: "OpenClaw Gateway Token"
     key: "OPENCLAW_GATEWAY_TOKEN"
+    severity: "high"
+
+  - name: "Voyage AI API Key"
+    key: "VOYAGE_API_KEY"
+    severity: "high"
+
+  - name: "Jina AI API Key"
+    key: "JINA_API_KEY"
+    severity: "high"
+
+  - name: "ElevenLabs API Key"
+    key: "ELEVENLABS_API_KEY"
+    severity: "high"
+
+  - name: "Replicate API Token"
+    key: "REPLICATE_API_TOKEN"
+    severity: "high"
+
+  - name: "Deepgram API Key"
+    key: "DEEPGRAM_API_KEY"
+    severity: "high"
+
+  - name: "Perplexity API Key"
+    key: "PERPLEXITY_API_KEY"
+    severity: "high"
+
+  - name: "Fireworks AI Key"
+    key: "FIREWORKS_API_KEY"
+    severity: "high"
+
+  - name: "Cohere API Key Alt"
+    key: "CO_API_KEY"
     severity: "high"
 
 # ==================== 全局配置 ====================
