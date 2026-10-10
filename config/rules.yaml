@@ -560,6 +560,47 @@ vector_databases:
       - path: "/ApplicationStatus"
         method: "GET"
 
+  - name: "Marqo"
+    id: "marqo"
+    type: "vector_database"
+    severity: "low"
+    description: "Marqo 多模态向量搜索引擎"
+    
+    process_patterns:
+      - "\\bmarqo\\b"
+      - "marqo.*search"
+      - "python.*marqo"
+    
+    default_ports:
+      - 8882
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/api/v2/health"
+        method: "GET"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import marqo"
+          - "from marqo import"
+
+  - name: "Vald"
+    id: "vald"
+    type: "vector_database"
+    severity: "low"
+    description: "Vald 云原生分布式向量搜索引擎"
+    
+    process_patterns:
+      - "vald.*agent"
+      - "vald.*gateway"
+      - "vdaas/vald"
+    
+    default_ports:
+      - 8081
+      - 8082
+
 # ==================== ML 框架 ====================
 ml_frameworks:
   - name: "Hugging Face Transformers"
@@ -621,6 +662,94 @@ ml_frameworks:
     process_patterns:
       - "onnxruntime.*server"
       - "onnxruntime"
+
+  # ========== 2026 新兴: LLM 微调框架 ==========
+  - name: "Unsloth"
+    id: "unsloth"
+    type: "ml_framework"
+    severity: "low"
+    description: "Unsloth 高效 LLM 微调框架(2-5x 提速降显存)"
+    
+    process_patterns:
+      - "unsloth"
+      - "python.*unsloth"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import unsloth"
+          - "from unsloth import"
+
+  - name: "LLaMA-Factory"
+    id: "llama-factory"
+    type: "ml_framework"
+    severity: "low"
+    description: "LLaMA-Factory 统一微调框架(100+ 模型,WebUI)"
+    
+    process_patterns:
+      - "llama[-_]factory"
+      - "llamafactory"
+      - "train_web"
+      - "python.*llamafactory"
+    
+    default_ports:
+      - 7860
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from llamafactory import"
+          - "import llamafactory"
+
+  - name: "Axolotl"
+    id: "axolotl"
+    type: "ml_framework"
+    severity: "low"
+    description: "Axolotl YAML 驱动 LLM 微调工具"
+    
+    process_patterns:
+      - "axolotl"
+      - "axolotl.*train"
+      - "python.*axolotl"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import axolotl"
+          - "from axolotl import"
+
+  - name: "TRL"
+    id: "trl"
+    type: "ml_framework"
+    severity: "low"
+    description: "HuggingFace TRL 强化学习微调库"
+    
+    process_patterns:
+      - "\\btrl\\b"
+      - "python.*trl"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import trl"
+          - "from trl import"
+
+  - name: "ms-swift"
+    id: "ms-swift"
+    type: "ml_framework"
+    severity: "low"
+    description: "ModelScope Swift 多模态微调/部署框架"
+    
+    process_patterns:
+      - "ms[-_]swift"
+      - "swift.*sft"
+      - "modelscope.*swift"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import swift"
+          - "from swift import"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -986,6 +1115,181 @@ agent_frameworks:
           - "import instructor"
           - "from instructor import"
 
+  # ========== 2026 新兴: AI 编码代理(第二波) ==========
+  - name: "Claude Code"
+    id: "claude-code"
+    type: "agent_framework"
+    severity: "low"
+    description: "Anthropic Claude Code 终端编码代理"
+    
+    process_patterns:
+      - "claude[-\\s]code"
+      - "@anthropic-ai/claude-code"
+      - "claude\\.code.*cli"
+      - "node.*claude-code"
+      - "claude-code.*\\.js"
+    
+    version_probe:
+      methods:
+        - type: "exec"
+          command: "--version"
+          parser: "v?([\\d.]+)"
+    
+    env_indicators:
+      - "CLAUDE_CODE_"
+      - "ANTHROPIC_API_KEY"
+
+  - name: "OpenHands"
+    id: "openhands"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenHands (原 OpenDevin) 开源自主编码代理"
+    
+    process_patterns:
+      - "openhands"
+      - "open-hands"
+      - "opendevin"
+      - "python.*openhands"
+    
+    default_ports:
+      - 3000
+      - 12000
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/api/v1/health"
+        method: "GET"
+    
+    env_indicators:
+      - "OPENHANDS_"
+
+  - name: "Roo Code"
+    id: "roo-code"
+    type: "agent_framework"
+    severity: "low"
+    description: "Roo Code 自主 AI 编码代理(Cline 分支)"
+    
+    process_patterns:
+      - "roo[-_\\s]code"
+      - "@roo-code"
+      - "roo.*cline"
+    
+    env_indicators:
+      - "ROO_CODE_"
+      - "ROO_"
+
+  - name: "Goose"
+    id: "goose"
+    type: "agent_framework"
+    severity: "low"
+    description: "Block Goose 开源 AI 编码/通用代理"
+    
+    process_patterns:
+      - "goose.*(run|agent|session)"
+      - "goose-cli"
+      - "block.*goose"
+      - "\\bgoose\\b.*(agent|recipe)"
+    
+    version_probe:
+      methods:
+        - type: "exec"
+          command: "--version"
+          parser: "v?([\\d.]+)"
+    
+    env_indicators:
+      - "GOOSE_"
+
+  # ========== 2026 新兴: Agent 记忆层 ==========
+  - name: "Letta"
+    id: "letta"
+    type: "agent_framework"
+    severity: "low"
+    description: "Letta (原 MemGPT) 有状态 AI Agent 框架/记忆服务"
+    
+    process_patterns:
+      - "\\bletta\\b"
+      - "letta.*server"
+      - "memgpt"
+      - "python.*letta"
+    
+    default_ports:
+      - 8283
+      - 8080
+    
+    http_endpoints:
+      - path: "/v1/health"
+        method: "GET"
+      - path: "/v1/agents"
+        method: "GET"
+    
+    env_indicators:
+      - "LETTA_"
+
+  - name: "Mem0"
+    id: "mem0"
+    type: "agent_framework"
+    severity: "low"
+    description: "Mem0 智能体持久记忆层"
+    
+    process_patterns:
+      - "mem0ai"
+      - "\\bmem0\\b"
+      - "python.*mem0"
+    
+    env_indicators:
+      - "MEM0_"
+
+  # ========== 2026 新兴: 浏览器自动化 Agent ==========
+  - name: "Browser Use"
+    id: "browser-use"
+    type: "agent_framework"
+    severity: "low"
+    description: "Browser Use AI 浏览器自动化 Agent"
+    
+    process_patterns:
+      - "browser[-_]use"
+      - "browseruse"
+      - "python.*browser_use"
+    
+    env_indicators:
+      - "BROWSER_USE_"
+
+  # ========== 2026 新兴: AI 安全/护栏 ==========
+  - name: "Guardrails AI"
+    id: "guardrails-ai"
+    type: "agent_framework"
+    severity: "low"
+    description: "Guardrails AI LLM 输出校验框架"
+    
+    process_patterns:
+      - "guardrails[-_]ai"
+      - "guardrails.*validate"
+      - "python.*guardrails"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import guardrails"
+          - "from guardrails import"
+
+  - name: "NeMo Guardrails"
+    id: "nemoguardrails"
+    type: "agent_framework"
+    severity: "low"
+    description: "NVIDIA NeMo Guardrails 对话护栏"
+    
+    process_patterns:
+      - "nemoguardrails"
+      - "nemo[-_]guardrails"
+      - "python.*nemoguardrails"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import nemoguardrails"
+          - "from nemoguardrails import"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -1321,6 +1625,309 @@ deployment_tools:
       - path: "/health"
         method: "GET"
 
+  # ========== 2026 新兴: 图像/视频生成服务 ==========
+  - name: "Stable Diffusion WebUI"
+    id: "sd-webui"
+    type: "deployment"
+    severity: "medium"
+    description: "Automatic1111 Stable Diffusion WebUI"
+    
+    process_patterns:
+      - "stable-diffusion-webui"
+      - "launch\\.py.*sd"
+      - "sd-webui"
+      - "webui\\.py"
+      - "auto1111"
+    
+    default_ports:
+      - 7860
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/sdapi/v1/options"
+    
+    http_endpoints:
+      - path: "/sdapi/v1/progress"
+        method: "GET"
+      - path: "/sdapi/v1/options"
+        method: "GET"
+    
+    env_indicators:
+      - "SD_WEBUI_"
+
+  - name: "InvokeAI"
+    id: "invokeai"
+    type: "deployment"
+    severity: "low"
+    description: "InvokeAI 专业图像生成工作台"
+    
+    process_patterns:
+      - "invokeai"
+      - "invoke-ai"
+      - "invokeai.*app"
+      - "python.*invokeai"
+    
+    default_ports:
+      - 9090
+      - 7860
+    
+    http_endpoints:
+      - path: "/api/v1/app/version"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+    
+    env_indicators:
+      - "INVOKEAI_"
+
+  - name: "Fooocus"
+    id: "fooocus"
+    type: "deployment"
+    severity: "low"
+    description: "Fooocus 简洁 Stable Diffusion 界面"
+    
+    process_patterns:
+      - "\\bfooocus\\b"
+      - "fooocus.*entry"
+      - "python.*fooocus"
+    
+    default_ports:
+      - 7865
+    
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+
+  - name: "KoboldCpp"
+    id: "koboldcpp"
+    type: "deployment"
+    severity: "low"
+    description: "KoboldCpp 本地 LLM/图像推理运行时"
+    
+    process_patterns:
+      - "koboldcpp"
+      - "kobold[-_]cpp"
+      - "koboldcpp\\.py"
+    
+    default_ports:
+      - 5001
+    
+    http_endpoints:
+      - path: "/api/v1/info/version"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+  - name: "Text Generation WebUI"
+    id: "textgen-webui"
+    type: "deployment"
+    severity: "low"
+    description: "oobabooga Text Generation WebUI"
+    
+    process_patterns:
+      - "oobabooga"
+      - "text-generation-webui"
+      - "textgen.*webui"
+      - "server\\.py.*--model"
+    
+    default_ports:
+      - 7860
+      - 5000
+    
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/api/v1/model"
+        method: "GET"
+
+  # ========== 2026 新兴: 自托管 AI 前端/运行时 ==========
+  - name: "LibreChat"
+    id: "librechat"
+    type: "deployment"
+    severity: "low"
+    description: "LibreChat 自托管多模型 AI 聊天平台"
+    
+    process_patterns:
+      - "librechat"
+      - "@librechat"
+      - "librechat-api"
+    
+    default_ports:
+      - 3080
+      - 80
+    
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+      - path: "/api/config"
+        method: "GET"
+    
+    env_indicators:
+      - "LIBRECHAT_"
+
+  - name: "AnythingLLM"
+    id: "anythingllm"
+    type: "deployment"
+    severity: "low"
+    description: "AnythingLLM 一体化自托管 RAG/聊天桌面+服务"
+    
+    process_patterns:
+      - "anythingllm"
+      - "anything[-_]llm"
+      - "mintplex-labs/anythingllm"
+    
+    default_ports:
+      - 3001
+    
+    http_endpoints:
+      - path: "/api/v1/health"
+        method: "GET"
+      - path: "/api/ping"
+        method: "GET"
+    
+    env_indicators:
+      - "ANYTHINGLLM_"
+
+  - name: "Jan"
+    id: "jan"
+    type: "deployment"
+    severity: "low"
+    description: "Jan 离线本地 AI 桌面运行时"
+    
+    process_patterns:
+      - "janhq"
+      - "jan[-_]app"
+      - "jan.*electron"
+    
+    default_ports:
+      - 1337
+      - 39291
+    
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+
+  - name: "Open Interpreter"
+    id: "open-interpreter"
+    type: "agent_framework"
+    severity: "low"
+    description: "Open Interpreter 本地代码执行 AI 代理"
+    
+    process_patterns:
+      - "open[-_]interpreter"
+      - "interpreter.*terminal"
+      - "python.*interpreter"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import interpreter"
+          - "from interpreter import"
+
+  # ========== 2026 新兴: 语音 AI 服务 ==========
+  - name: "Fish Audio"
+    id: "fish-audio"
+    type: "deployment"
+    severity: "low"
+    description: "Fish Audio/OpenAudio TTS/语音克隆服务"
+    
+    process_patterns:
+      - "fish[-_]audio"
+      - "fishaudio"
+      - "openaudio"
+      - "fish_speech"
+    
+    default_ports:
+      - 8080
+      - 8000
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/tts"
+        method: "GET"
+    
+    env_indicators:
+      - "FISH_"
+      - "OPENAUDIO_"
+
+  - name: "MeloTTS"
+    id: "melotts"
+    type: "deployment"
+    severity: "low"
+    description: "MeloTTS 多语言轻量 TTS"
+    
+    process_patterns:
+      - "melotts"
+      - "melo[-_]tts"
+      - "python.*melotts"
+    
+    default_ports:
+      - 8888
+
+  - name: "Ultravox"
+    id: "ultravox"
+    type: "agent_framework"
+    severity: "low"
+    description: "Ultravox 实时语音理解开源模型/框架"
+    
+    process_patterns:
+      - "\\bultravox\\b"
+      - "ultravox.*serve"
+      - "python.*ultravox"
+    
+    env_indicators:
+      - "ULTRAVOX_"
+
+  # ========== 2026 新兴: 网页数据提取 ==========
+  - name: "Crawl4AI"
+    id: "crawl4ai"
+    type: "rag_tool"
+    severity: "low"
+    description: "Crawl4AI 面向 LLM 的异步网页爬虫"
+    
+    process_patterns:
+      - "crawl4ai"
+      - "crawl[-_]4[-_]ai"
+      - "python.*crawl4ai"
+    
+    default_ports:
+      - 11235
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import crawl4ai"
+          - "from crawl4ai import"
+
+  - name: "Firecrawl"
+    id: "firecrawl"
+    type: "rag_tool"
+    severity: "low"
+    description: "Firecrawl 网页转 Markdown/结构化数据服务"
+    
+    process_patterns:
+      - "firecrawl"
+      - "firecrawl[-_]api"
+      - "python.*firecrawl"
+    
+    default_ports:
+      - 3002
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/scrape"
+        method: "GET"
+    
+    env_indicators:
+      - "FIRECRAWL_"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -1404,6 +2011,74 @@ ai_gateways:
     http_endpoints:
       - path: "/healthz"
         method: "GET"
+
+  - name: "LiteLLM Proxy"
+    id: "litellm-proxy"
+    type: "llm_framework"
+    severity: "medium"
+    description: "LiteLLM 统一 LLM API 代理/网关(100+ 模型)"
+    
+    process_patterns:
+      - "litellm"
+      - "litellm[-_]proxy"
+      - "litellm.*gateway"
+      - "python.*litellm"
+    
+    default_ports:
+      - 4000
+      - 8000
+    
+    version_probe:
+      methods:
+        - type: "http_api"
+          endpoint: "/version"
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+    
+    env_indicators:
+      - "LITELLM_"
+      - "LITELLM_MASTER_KEY"
+
+  - name: "Portkey Gateway"
+    id: "portkey-gateway"
+    type: "llm_framework"
+    severity: "low"
+    description: "Portkey AI 网关(路由/护栏/可观测)"
+    
+    process_patterns:
+      - "portkey.*gateway"
+      - "portkey[-_]ai"
+      - "portkey.*proxy"
+    
+    default_ports:
+      - 8787
+      - 8080
+    
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+    
+    env_indicators:
+      - "PORTKEY_"
+
+  - name: "LiteLLM Gateway Docker"
+    id: "litellm-docker"
+    type: "llm_framework"
+    severity: "low"
+    description: "LiteLLM Docker 容器部署"
+    
+    process_patterns:
+      - "ghcr\\.io/berriai/litellm"
+      - "docker.*litellm"
+    
+    default_ports:
+      - 4000
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
@@ -1578,6 +2253,124 @@ monitoring_tools:
           - "from ragas import"
           - "import ragas"
 
+  # ========== 2026 新兴: Agent 监控/可观测性补充 ==========
+  - name: "AgentOps"
+    id: "agentops"
+    type: "monitoring"
+    severity: "low"
+    description: "AgentOps AI Agent 运行时监控"
+    
+    process_patterns:
+      - "agentops"
+      - "agentops.*init"
+      - "python.*agentops"
+    
+    env_indicators:
+      - "AGENTOPS_API_KEY"
+      - "AGENTOPS_"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import agentops"
+          - "from agentops import"
+
+  - name: "Helicone"
+    id: "helicone"
+    type: "monitoring"
+    severity: "low"
+    description: "Helicone LLM 可观测性网关"
+    
+    process_patterns:
+      - "helicone"
+      - "helicone.*proxy"
+    
+    env_indicators:
+      - "HELICONE_API_KEY"
+      - "HELICONE_"
+
+  - name: "LangWatch"
+    id: "langwatch"
+    type: "monitoring"
+    severity: "low"
+    description: "LangWatch LLM 可观测性/分析平台"
+    
+    process_patterns:
+      - "langwatch"
+      - "langwatch.*app"
+    
+    env_indicators:
+      - "LANGWATCH_API_KEY"
+      - "LANGWATCH_"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import langwatch"
+          - "from langwatch import"
+
+  - name: "TruLens"
+    id: "trulens"
+    type: "monitoring"
+    severity: "low"
+    description: "TruLens LLM 应用评估/追踪"
+    
+    process_patterns:
+      - "trulens"
+      - "trulens[-_]eval"
+      - "python.*trulens"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import trulens"
+          - "from trulens import"
+
+  - name: "Opik"
+    id: "opik"
+    type: "monitoring"
+    severity: "low"
+    description: "Comet Opik LLM Tracing/评估平台"
+    
+    process_patterns:
+      - "\\bopik\\b"
+      - "opik.*server"
+      - "python.*opik"
+    
+    default_ports:
+      - 5173
+      - 8080
+    
+    env_indicators:
+      - "OPIK_"
+      - "OPIK_API_KEY"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import opik"
+          - "from opik import"
+
+  - name: "Giskard"
+    id: "giskard"
+    type: "monitoring"
+    severity: "low"
+    description: "Giskard AI 安全测试/评估平台"
+    
+    process_patterns:
+      - "\\bgiskard\\b"
+      - "giskard.*test"
+      - "python.*giskard"
+    
+    env_indicators:
+      - "GSK_API_KEY"
+    
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import giskard"
+          - "from giskard import"
+
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
   - name: "OpenAI API Key"
@@ -1730,6 +2523,67 @@ api_key_patterns:
 
   - name: "Cohere API Key Alt"
     key: "CO_API_KEY"
+    severity: "high"
+
+  # ========== 2026 新兴 API Key ==========
+  - name: "Tavily Search API Key"
+    key: "TAVILY_API_KEY"
+    severity: "high"
+
+  - name: "Exa Search API Key"
+    key: "EXA_API_KEY"
+    severity: "high"
+
+  - name: "E2B Code Interpreter API Key"
+    key: "E2B_API_KEY"
+    severity: "high"
+
+  - name: "Browserbase API Key"
+    key: "BROWSERBASE_API_KEY"
+    severity: "high"
+
+  - name: "Helicone API Key"
+    key: "HELICONE_API_KEY"
+    severity: "high"
+
+  - name: "LangWatch API Key"
+    key: "LANGWATCH_API_KEY"
+    severity: "high"
+
+  - name: "Mem0 Memory API Key"
+    key: "MEM0_API_KEY"
+    severity: "high"
+
+  - name: "Vapi Voice Agent API Key"
+    key: "VAPI_API_KEY"
+    severity: "high"
+
+  - name: "Vapi Private Key"
+    key: "VAPI_PRIVATE_KEY"
+    severity: "critical"
+
+  - name: "Cartesia TTS API Key"
+    key: "CARTESIA_API_KEY"
+    severity: "high"
+
+  - name: "AssemblyAI API Key"
+    key: "ASSEMBLYAI_API_KEY"
+    severity: "high"
+
+  - name: "Modal Token ID"
+    key: "MODAL_TOKEN_ID"
+    severity: "high"
+
+  - name: "AgentOps API Key"
+    key: "AGENTOPS_API_KEY"
+    severity: "high"
+
+  - name: "Comet Opik API Key"
+    key: "OPIK_API_KEY"
+    severity: "high"
+
+  - name: "Giskard API Key"
+    key: "GSK_API_KEY"
     severity: "high"
 
 # ==================== 全局配置 ====================
