@@ -354,6 +354,136 @@ llm_services:
       - path: "/health"
         method: "GET"
 
+  # ========== 2026-10 侦察: 推理引擎/本地运行时补充 ==========
+  - name: "TensorRT-LLM"
+    id: "tensorrt-llm"
+    type: "deployment"
+    severity: "medium"
+    description: "NVIDIA TensorRT-LLM 高性能 LLM 推理引擎"
+
+    process_patterns:
+      - "trtllm-serve"
+      - "trtllm-bench"
+      - "tensorrt[-_]llm"
+      - "python.*tensorrt_llm"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import tensorrt_llm"
+          - "from tensorrt_llm import"
+
+  - name: "LMDeploy"
+    id: "lmdeploy"
+    type: "deployment"
+    severity: "low"
+    description: "OpenMMLab LMDeploy/TurboMind LLM 推理服务"
+
+    process_patterns:
+      - "lmdeploy"
+      - "turbomind"
+      - "lmdeploy.*serve"
+
+    default_ports:
+      - 23333
+      - 7860
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "LMDEPLOY_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import lmdeploy"
+          - "from lmdeploy import"
+
+  - name: "OpenVINO"
+    id: "openvino"
+    type: "deployment"
+    severity: "low"
+    description: "Intel OpenVINO 模型推理工具包/模型服务器"
+
+    process_patterns:
+      - "ovms"
+      - "openvino"
+      - "python.*openvino"
+
+    default_ports:
+      - 9000
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import openvino"
+          - "from openvino import"
+
+  - name: "llamafile"
+    id: "llamafile"
+    type: "llm_framework"
+    severity: "low"
+    description: "Mozilla llamafile 单文件本地 LLM 运行时"
+
+    process_patterns:
+      - "llamafile"
+      - "llamafile\\.exe"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+  - name: "GPT4All"
+    id: "gpt4all"
+    type: "llm_framework"
+    severity: "low"
+    description: "Nomic GPT4All 本地 LLM 桌面运行时/本地服务器"
+
+    process_patterns:
+      - "gpt4all"
+      - "GPT4All"
+
+    default_ports:
+      - 4891
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "GPT4ALL_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from gpt4all import"
+          - "import gpt4all"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -750,6 +880,217 @@ ml_frameworks:
         patterns:
           - "import swift"
           - "from swift import"
+
+  # ========== 2026-10 侦察: 分布式训练框架 ==========
+  - name: "DeepSpeed"
+    id: "deepspeed"
+    type: "ml_framework"
+    severity: "low"
+    description: "Microsoft DeepSpeed 分布式深度学习训练框架"
+
+    process_patterns:
+      - "deepspeed"
+      - "ds[-_]elastic"
+      - "python.*deepspeed"
+
+    env_indicators:
+      - "DEEPSPEED_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import deepspeed"
+          - "from deepspeed import"
+
+  - name: "Megatron-LM"
+    id: "megatron-lm"
+    type: "ml_framework"
+    severity: "low"
+    description: "NVIDIA Megatron-LM 大规模语言模型训练框架"
+
+    process_patterns:
+      - "megatron"
+      - "pretrain_gpt"
+      - "python.*megatron"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import megatron"
+          - "from megatron import"
+
+  - name: "NeMo"
+    id: "nemo"
+    type: "ml_framework"
+    severity: "low"
+    description: "NVIDIA NeMo 对话式 AI/多模态模型训练框架"
+
+    process_patterns:
+      - "nemo_toolkit"
+      - "nemo\\.collections"
+      - "python.*nemo"
+
+    env_indicators:
+      - "NEMO_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import nemo"
+          - "from nemo import"
+
+  # ========== 2026-10 侦察: 国产深度学习框架 ==========
+  - name: "PaddlePaddle"
+    id: "paddlepaddle"
+    type: "ml_framework"
+    severity: "low"
+    description: "百度 PaddlePaddle 深度学习框架"
+
+    process_patterns:
+      - "paddle\\.distributed"
+      - "paddlepaddle"
+      - "python.*paddle"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import paddle"
+          - "from paddle import"
+
+  # ========== 2026-10 侦察: 计算机视觉工具链 ==========
+  - name: "Ultralytics"
+    id: "ultralytics"
+    type: "ml_framework"
+    severity: "low"
+    description: "Ultralytics YOLO 目标检测/分割/姿态估计框架"
+
+    process_patterns:
+      - "ultralytics"
+      - "\\byolo\\b"
+      - "yolo\\.py"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from ultralytics import"
+          - "import ultralytics"
+
+  - name: "PaddleOCR"
+    id: "paddleocr"
+    type: "ml_framework"
+    severity: "low"
+    description: "百度 PaddleOCR 文字识别工具库/服务"
+
+    process_patterns:
+      - "paddleocr"
+      - "ppocr"
+      - "paddle.*ocr"
+
+    default_ports:
+      - 5000
+      - 8866
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from paddleocr import"
+          - "import paddleocr"
+
+  - name: "MinerU"
+    id: "mineru"
+    type: "rag_tool"
+    severity: "low"
+    description: "OpenDataLab MinerU (magic-pdf) PDF/文档解析"
+
+    process_patterns:
+      - "mineru"
+      - "magic-pdf"
+      - "magic_pdf"
+
+    default_ports:
+      - 8888
+      - 7860
+
+    http_endpoints:
+      - path: "/docs"
+        method: "GET"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from magic_pdf import"
+          - "import magic_pdf"
+
+  - name: "FiftyOne"
+    id: "fiftyone"
+    type: "ml_framework"
+    severity: "low"
+    description: "Voxel51 FiftyOne 计算机视觉数据集管理平台"
+
+    process_patterns:
+      - "fiftyone"
+      - "python.*fiftyone"
+
+    default_ports:
+      - 5151
+
+    env_indicators:
+      - "FIFTYONE_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import fiftyone"
+          - "from fiftyone import"
+
+  - name: "Label Studio"
+    id: "label-studio"
+    type: "deployment"
+    severity: "low"
+    description: "Label Studio 数据标注平台(支持 AI 辅助标注)"
+
+    process_patterns:
+      - "label-studio"
+      - "labelstudio"
+      - "label_studio"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/api/version"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "LABEL_STUDIO_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import label_studio"
+
+  - name: "CVAT"
+    id: "cvat"
+    type: "deployment"
+    severity: "low"
+    description: "CVAT 计算机视觉视频/图像标注平台"
+
+    process_patterns:
+      - "cvat_server"
+      - "cvat.*server"
+      - "cvat-worker"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/api/server/about"
+        method: "GET"
+
+    env_indicators:
+      - "CVAT_"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -1289,6 +1630,296 @@ agent_frameworks:
         patterns:
           - "import nemoguardrails"
           - "from nemoguardrails import"
+
+  # ========== 2026-10 侦察: AI 编码 CLI(第三波) ==========
+  - name: "Gemini CLI"
+    id: "gemini-cli"
+    type: "agent_framework"
+    severity: "low"
+    description: "Google Gemini CLI 开源终端 AI 编码代理"
+
+    process_patterns:
+      - "gemini-cli"
+      - "@google/gemini-cli"
+      - "node.*gemini-cli"
+
+    env_indicators:
+      - "GEMINI_"
+
+  - name: "Qwen Code"
+    id: "qwen-code"
+    type: "agent_framework"
+    severity: "low"
+    description: "阿里 Qwen Code 终端 AI 编码代理(Gemini CLI 分支)"
+
+    process_patterns:
+      - "qwen-code"
+      - "@qwen-code"
+      - "node.*qwen[-_]code"
+
+    env_indicators:
+      - "QWEN_"
+
+  - name: "SWE-agent"
+    id: "swe-agent"
+    type: "agent_framework"
+    severity: "low"
+    description: "Princeton SWE-agent 软件工程自主代理"
+
+    process_patterns:
+      - "sweagent"
+      - "swe-agent"
+      - "swe_agent"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import sweagent"
+          - "from sweagent import"
+
+  # ========== 2026-10 侦察: Agent 框架(静态已覆盖,补运行时) ==========
+  - name: "smolagents"
+    id: "smolagents"
+    type: "agent_framework"
+    severity: "low"
+    description: "HuggingFace smolagents 轻量代码 Agent 框架"
+
+    process_patterns:
+      - "smolagents"
+      - "python.*smolagents"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from smolagents import"
+          - "import smolagents"
+
+  - name: "Pydantic AI"
+    id: "pydantic-ai"
+    type: "agent_framework"
+    severity: "low"
+    description: "Pydantic AI 类型安全 Agent 框架"
+
+    process_patterns:
+      - "pydantic-ai"
+      - "pydantic_ai"
+      - "python.*pydantic_ai"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from pydantic_ai import"
+          - "import pydantic_ai"
+
+  - name: "OpenAI Agents SDK"
+    id: "openai-agents-sdk"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenAI Agents SDK 轻量多 Agent 编排框架"
+
+    process_patterns:
+      - "openai-agents"
+      - "openai_agents"
+      - "python.*openai_agents"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "openai-agents"
+
+  - name: "Google ADK"
+    id: "google-adk"
+    type: "agent_framework"
+    severity: "low"
+    description: "Google Agent Development Kit 多 Agent 开发套件"
+
+    process_patterns:
+      - "google-adk"
+      - "google\\.adk"
+      - "adk run"
+      - "adk web"
+      - "python.*google.adk"
+
+    default_ports:
+      - 8000
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from google.adk import"
+          - "import google.adk"
+
+  - name: "Agno"
+    id: "agno"
+    type: "agent_framework"
+    severity: "low"
+    description: "Agno 轻量级多模态 Agent 框架(原 Phidata)"
+
+    process_patterns:
+      - "agno"
+      - "phidata"
+      - "python.*agno"
+
+    env_indicators:
+      - "AGNO_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from agno import"
+          - "import agno"
+
+  - name: "Camel AI"
+    id: "camel-ai"
+    type: "agent_framework"
+    severity: "low"
+    description: "Camel-AI 多智能体协作/角色扮演框架"
+
+    process_patterns:
+      - "camel-ai"
+      - "camelai"
+      - "python.*camel"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from camel import"
+          - "import camel"
+
+  - name: "Strands Agents"
+    id: "strands-agents"
+    type: "agent_framework"
+    severity: "low"
+    description: "AWS Strands Agents SDK AI Agent 框架"
+
+    process_patterns:
+      - "strands-agents"
+      - "strands_agents"
+      - "python.*strands"
+
+    env_indicators:
+      - "STRANDS_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from strands import"
+          - "import strands"
+
+  - name: "LangGraph"
+    id: "langgraph"
+    type: "agent_framework"
+    severity: "low"
+    description: "LangGraph 状态机式 Agent 工作流框架(含 LangGraph Server)"
+
+    process_patterns:
+      - "langgraph"
+      - "langgraph dev"
+      - "langgraph up"
+      - "python.*langgraph"
+
+    default_ports:
+      - 8000
+      - 8123
+
+    http_endpoints:
+      - path: "/ok"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from langgraph import"
+          - "import langgraph"
+
+  # ========== 2026-10 侦察: Agent 记忆层补充 ==========
+  - name: "Zep"
+    id: "zep"
+    type: "agent_framework"
+    severity: "low"
+    description: "Zep/Graphiti 时序知识图谱 Agent 记忆服务"
+
+    process_patterns:
+      - "zep"
+      - "graphiti"
+      - "python.*graphiti"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "ZEP_API_KEY"
+      - "ZEP_URL"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from zep_cloud import"
+          - "from graphiti import"
+          - "import graphiti"
+
+  # ========== 2026-10 侦察: AI 安全/红队工具 ==========
+  - name: "PyRIT"
+    id: "pyrit"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Microsoft PyRIT AI 红队测试框架"
+
+    process_patterns:
+      - "pyrit"
+      - "python.*pyrit"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from pyrit import"
+          - "import pyrit"
+
+  - name: "LLM Guard"
+    id: "llm-guard"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Protect AI LLM Guard 输入/输出安全扫描"
+
+    process_patterns:
+      - "llm_guard"
+      - "llmguard"
+      - "llm-guard"
+      - "python.*llm_guard"
+
+    default_ports:
+      - 8000
+      - 8080
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from llm_guard import"
+          - "import llm_guard"
+
+  - name: "garak"
+    id: "garak"
+    type: "agent_framework"
+    severity: "medium"
+    description: "NVIDIA garak LLM 漏洞扫描/安全探测工具"
+
+    process_patterns:
+      - "garak"
+      - "python.*garak"
+
+    env_indicators:
+      - "GARAK_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import garak"
 
 # ==================== 部署/推理 ====================
 deployment_tools:
@@ -1928,6 +2559,378 @@ deployment_tools:
     env_indicators:
       - "FIRECRAWL_"
 
+  # ========== 2026-10 侦察: RAG 应用/服务补充 ==========
+  - name: "Kotaemon"
+    id: "kotaemon"
+    type: "rag_tool"
+    severity: "low"
+    description: "Cinnamon Kotaemon 开源 RAG UI/文档问答"
+
+    process_patterns:
+      - "kotaemon"
+      - "python.*kotaemon"
+
+    default_ports:
+      - 7860
+      - 8501
+
+    http_endpoints:
+      - path: "/api/settings"
+        method: "GET"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import kotaemon"
+          - "from kotaemon import"
+
+  - name: "GPT Researcher"
+    id: "gpt-researcher"
+    type: "agent_framework"
+    severity: "low"
+    description: "GPT Researcher 自主深度研究 Agent"
+
+    process_patterns:
+      - "gpt-researcher"
+      - "gpt_researcher"
+      - "python.*gpt_researcher"
+
+    default_ports:
+      - 8000
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from gpt_researcher import"
+          - "import gpt_researcher"
+
+  - name: "Unstructured"
+    id: "unstructured"
+    type: "rag_tool"
+    severity: "low"
+    description: "Unstructured 通用文档解析/ETL 服务(API/开源)"
+
+    process_patterns:
+      - "unstructured-api"
+      - "unstructured.*serve"
+      - "python.*unstructured"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/healthcheck"
+        method: "GET"
+
+    env_indicators:
+      - "UNSTRUCTURED_API_KEY"
+      - "UNSTRUCTURED_URL"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from unstructured import"
+          - "import unstructured"
+
+  - name: "DB-GPT"
+    id: "db-gpt"
+    type: "agent_framework"
+    severity: "low"
+    description: "DB-GPT (eosphoros) 数据库原生 AI 数据应用框架"
+
+    process_patterns:
+      - "dbgpt"
+      - "db-gpt"
+      - "python.*dbgpt"
+
+    default_ports:
+      - 5000
+      - 8000
+
+    http_endpoints:
+      - path: "/api/v1/embeddings/health"
+        method: "GET"
+
+    env_indicators:
+      - "DBGPT_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from dbgpt import"
+          - "import dbgpt"
+
+  - name: "Vanna"
+    id: "vanna"
+    type: "rag_tool"
+    severity: "low"
+    description: "Vanna Text-to-SQL RAG 框架/服务"
+
+    process_patterns:
+      - "vanna"
+      - "python.*vanna"
+
+    default_ports:
+      - 5000
+      - 8501
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import vanna"
+          - "from vanna import"
+
+  - name: "Onyx"
+    id: "onyx"
+    type: "rag_tool"
+    severity: "low"
+    description: "Onyx (原 Danswer) 企业级开源 RAG 问答平台"
+
+    process_patterns:
+      - "danswer"
+      - "onyx"
+      - "onyx.*server"
+
+    default_ports:
+      - 3000
+      - 8080
+
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+
+    env_indicators:
+      - "ONYX_"
+
+  - name: "LightRAG"
+    id: "lightrag"
+    type: "rag_tool"
+    severity: "low"
+    description: "HKUDS LightRAG 轻量知识图谱增强 RAG 框架"
+
+    process_patterns:
+      - "lightrag"
+      - "python.*lightrag"
+
+    default_ports:
+      - 9621
+      - 8000
+
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from lightrag import"
+          - "import lightrag"
+
+  - name: "GraphRAG"
+    id: "graphrag"
+    type: "rag_tool"
+    severity: "low"
+    description: "Microsoft GraphRAG 知识图谱增强 RAG 工具链"
+
+    process_patterns:
+      - "graphrag"
+      - "graphrag.*index"
+      - "graphrag.*query"
+      - "python.*graphrag"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import graphrag"
+          - "from graphrag import"
+
+  - name: "Haystack"
+    id: "haystack"
+    type: "rag_tool"
+    severity: "low"
+    description: "deepset Haystack RAG 管道框架/Hayhooks 服务"
+
+    process_patterns:
+      - "hayhooks"
+      - "haystack"
+      - "python.*haystack"
+
+    default_ports:
+      - 1416
+
+    env_indicators:
+      - "HAYSTACK_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from haystack import"
+          - "import haystack"
+
+  # ========== 2026-10 侦察: 图像生成/处理工具链 ==========
+  - name: "Kohya_ss"
+    id: "kohya-ss"
+    type: "deployment"
+    severity: "low"
+    description: "Kohya_ss Stable Diffusion LoRA/LyCORIS 训练 GUI"
+
+    process_patterns:
+      - "kohya_gui"
+      - "kohya[-_]ss"
+      - "kohya.*gui"
+      - "train_network"
+
+    default_ports:
+      - 7860
+
+  - name: "Real-ESRGAN"
+    id: "realesrgan"
+    type: "deployment"
+    severity: "low"
+    description: "Real-ESRGAN 图像超分辨率放大工具"
+
+    process_patterns:
+      - "realesrgan"
+      - "real[-_]esrgan"
+      - "realesrgan-ncnn"
+
+  - name: "Rembg"
+    id: "rembg"
+    type: "deployment"
+    severity: "low"
+    description: "Rembg AI 图像背景移除服务"
+
+    process_patterns:
+      - "rembg"
+      - "python.*rembg"
+
+    default_ports:
+      - 5000
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from rembg import"
+          - "import rembg"
+
+  - name: "IOPaint"
+    id: "iopaint"
+    type: "deployment"
+    severity: "low"
+    description: "IOPaint (原 lama-cleaner) AI 图像修复/擦除"
+
+    process_patterns:
+      - "iopaint"
+      - "lama-cleaner"
+      - "lama_cleaner"
+
+    default_ports:
+      - 8080
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from iopaint import"
+          - "import iopaint"
+
+  # ========== 2026-10 侦察: 数字人/语音驱动视频 ==========
+  - name: "SadTalker"
+    id: "sadtalker"
+    type: "deployment"
+    severity: "low"
+    description: "SadTalker 单图语音驱动说话人脸生成"
+
+    process_patterns:
+      - "sadtalker"
+      - "python.*sadtalker"
+
+    default_ports:
+      - 7860
+
+  - name: "LivePortrait"
+    id: "liveportrait"
+    type: "deployment"
+    severity: "low"
+    description: "快手 LivePortrait 实时肖像动画驱动"
+
+    process_patterns:
+      - "liveportrait"
+      - "live-portrait"
+      - "python.*liveportrait"
+
+    default_ports:
+      - 8889
+      - 7860
+
+  # ========== 2026-10 侦察: 语音合成/克隆补充 ==========
+  - name: "GPT-SoVITS"
+    id: "gpt-sovits"
+    type: "deployment"
+    severity: "low"
+    description: "GPT-SoVITS 少样本语音克隆/TTS"
+
+    process_patterns:
+      - "gpt-sovits"
+      - "gpt_sovits"
+
+    default_ports:
+      - 9871
+      - 9872
+      - 9880
+
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+
+  - name: "CosyVoice"
+    id: "cosyvoice"
+    type: "deployment"
+    severity: "low"
+    description: "阿里 CosyVoice 多语言语音合成/克隆"
+
+    process_patterns:
+      - "cosyvoice"
+      - "cosy-voice"
+      - "python.*cosyvoice"
+
+    default_ports:
+      - 50000
+      - 7860
+
+  - name: "IndexTTS"
+    id: "indextts"
+    type: "deployment"
+    severity: "low"
+    description: "B站 IndexTTS 零样本语音合成"
+
+    process_patterns:
+      - "indextts"
+      - "index-tts"
+      - "index_tts"
+
+    default_ports:
+      - 7860
+      - 9871
+
+  # ========== 2026-10 侦察: AI 角色扮演前端 ==========
+  - name: "SillyTavern"
+    id: "sillytavern"
+    type: "deployment"
+    severity: "low"
+    description: "SillyTavern 本地 AI 角色扮演聊天前端"
+
+    process_patterns:
+      - "sillytavern"
+      - "silly[-_]tavern"
+      - "SillyTavern"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/api/settings"
+        method: "GET"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -2371,6 +3374,40 @@ monitoring_tools:
           - "import giskard"
           - "from giskard import"
 
+  # ========== 2026-10 侦察: LLM 可观测性补充 ==========
+  - name: "Arize Phoenix"
+    id: "arize-phoenix"
+    type: "monitoring"
+    severity: "low"
+    description: "Arize Phoenix LLM Tracing/评估/可观测性平台"
+
+    process_patterns:
+      - "phoenix.*server"
+      - "arize.*phoenix"
+      - "python.*phoenix"
+
+    default_ports:
+      - 6006
+      - 4317
+      - 4318
+
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+      - path: "/"
+        method: "GET"
+
+    env_indicators:
+      - "PHOENIX_"
+      - "ARIZE_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import phoenix"
+          - "from phoenix import"
+          - "import phoenix as px"
+
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
   - name: "OpenAI API Key"
@@ -2585,6 +3622,42 @@ api_key_patterns:
   - name: "Giskard API Key"
     key: "GSK_API_KEY"
     severity: "high"
+
+  - name: "Google Gemini API Key"
+    key: "GEMINI_API_KEY"
+    severity: "critical"
+
+  - name: "LlamaParse API Key"
+    key: "LLAMA_CLOUD_API_KEY"
+    severity: "high"
+
+  - name: "Weights & Biases API Key"
+    key: "WANDB_API_KEY"
+    severity: "high"
+
+  - name: "Braintrust API Key"
+    key: "BRAINTRUST_API_KEY"
+    severity: "high"
+
+  - name: "Arize Phoenix API Key"
+    key: "ARIZE_API_KEY"
+    severity: "medium"
+
+  - name: "fal.ai API Key"
+    key: "FAL_KEY"
+    severity: "high"
+
+  - name: "Cerebras API Key"
+    key: "CEREBRAS_API_KEY"
+    severity: "high"
+
+  - name: "Unstructured API Key"
+    key: "UNSTRUCTURED_API_KEY"
+    severity: "medium"
+
+  - name: "Brave Search API Key"
+    key: "BRAVE_API_KEY"
+    severity: "medium"
 
 # ==================== 全局配置 ====================
 global:
