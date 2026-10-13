@@ -731,6 +731,50 @@ vector_databases:
       - 8081
       - 8082
 
+  # ========== 2026-10-13 批次: 向量数据库补充 ==========
+  - name: "Turbopuffer"
+    id: "turbopuffer"
+    type: "vector_database"
+    severity: "low"
+    description: "Turbopuffer Serverless 向量数据库(对象存储架构)"
+
+    env_indicators:
+      - "TURBOPUFFER_API_KEY"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import turbopuffer"
+          - "from turbopuffer import"
+
+  - name: "Pgvecto.rs"
+    id: "pgvecto-rs"
+    type: "vector_database"
+    severity: "low"
+    description: "Pgvecto.rs (VectorChord) PostgreSQL Rust 向量扩展"
+
+    process_patterns:
+      - "pgvecto"
+      - "vectorchord"
+      - "vchord"
+
+    env_indicators:
+      - "PGVECTO_"
+
+  - name: "MongoDB Atlas Vector Search"
+    id: "mongodb-atlas-vector"
+    type: "vector_database"
+    severity: "low"
+    description: "MongoDB Atlas Vector Search 向量搜索"
+
+    process_patterns:
+      - "mongodb.*vector"
+      - "atlas.*search"
+
+    env_indicators:
+      - "MONGODB_URI"
+      - "MONGODB_ATLAS_"
+
 # ==================== ML 框架 ====================
 ml_frameworks:
   - name: "Hugging Face Transformers"
@@ -1921,6 +1965,107 @@ agent_frameworks:
         patterns:
           - "import garak"
 
+  # ========== 2026-10-13 批次: Agent 工具/基础设施 ==========
+  - name: "Composio"
+    id: "composio"
+    type: "agent_framework"
+    severity: "low"
+    description: "Composio AI Agent 工具集成平台(250+ 工具)"
+
+    process_patterns:
+      - "composio"
+      - "python.*composio"
+
+    env_indicators:
+      - "COMPOSIO_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import composio"
+          - "from composio import"
+
+  - name: "Temporal"
+    id: "temporal"
+    type: "agent_framework"
+    severity: "low"
+    description: "Temporal 持久化工作流引擎(AI Agent 编排)"
+
+    process_patterns:
+      - "temporal[-_]server"
+      - "temporal.*worker"
+      - "temporal[-_]cli"
+      - "tctl"
+
+    default_ports:
+      - 7233
+      - 8233
+      - 8080
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+  - name: "MCPHub"
+    id: "mcphub"
+    type: "agent_framework"
+    severity: "low"
+    description: "MCPHub MCP 服务器注册/管理中心"
+
+    process_patterns:
+      - "mcphub"
+      - "mcp[-_]hub"
+      - "mcphub.*server"
+
+    default_ports:
+      - 3000
+
+  - name: "ToolHive"
+    id: "toolhive"
+    type: "agent_framework"
+    severity: "low"
+    description: "Stacklok ToolHive MCP 工具安全管理/代理"
+
+    process_patterns:
+      - "toolhive"
+      - "thv"
+      - "toolhive.*proxy"
+
+  # ========== 2026-10-13 批次: AI 安全补充 ==========
+  - name: "LlamaFirewall"
+    id: "llamafirewall"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Meta LlamaFirewall AI Agent 安全护栏套件"
+
+    process_patterns:
+      - "llamafirewall"
+      - "llama[-_]firewall"
+      - "python.*llamafirewall"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import llamafirewall"
+          - "from llamafirewall import"
+
+  # ========== 2026-10-13 批次: 文档处理补充 ==========
+  - name: "MarkItDown"
+    id: "markitdown"
+    type: "rag_tool"
+    severity: "low"
+    description: "Microsoft MarkItDown 文档转 Markdown(PDF/Office/图片)"
+
+    process_patterns:
+      - "markitdown"
+      - "python.*markitdown"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import markitdown"
+          - "from markitdown import"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -2931,6 +3076,214 @@ deployment_tools:
       - path: "/api/settings"
         method: "GET"
 
+  # ========== 2026-10-13 批次: GPU 云/推理平台 ==========
+  - name: "SkyPilot"
+    id: "skypilot"
+    type: "deployment"
+    severity: "low"
+    description: "UC Berkeley SkyPilot 多云 GPU 任务调度框架"
+
+    process_patterns:
+      - "sky.launch"
+      - "skypilot"
+      - "sky serve"
+      - "sky spot"
+      - "python.*skypilot"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import sky"
+          - "from sky import"
+
+  - name: "Baseten"
+    id: "baseten"
+    type: "deployment"
+    severity: "low"
+    description: "Baseten 模型推理/部署平台(Truss)"
+
+    process_patterns:
+      - "baseten"
+      - "truss"
+      - "python.*baseten"
+
+    env_indicators:
+      - "BASETEN_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import baseten"
+          - "from baseten import"
+
+  - name: "DeepInfra"
+    id: "deepinfra"
+    type: "deployment"
+    severity: "low"
+    description: "DeepInfra Serverless LLM/Embedding 推理 API"
+
+    process_patterns:
+      - "deepinfra"
+      - "python.*deepinfra"
+
+    env_indicators:
+      - "DEEPINFRA_API_KEY"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import deepinfra"
+          - "from deepinfra import"
+
+  - name: "Hyperbolic"
+    id: "hyperbolic"
+    type: "deployment"
+    severity: "low"
+    description: "Hyperbolic GPU 云 LLM 推理服务"
+
+    process_patterns:
+      - "hyperbolic"
+      - "python.*hyperbolic"
+
+    env_indicators:
+      - "HYPERBOLIC_API_KEY"
+
+  # ========== 2026-10-13 批次: 图像/视频生成 ==========
+  - name: "SAM 2"
+    id: "sam2"
+    type: "deployment"
+    severity: "low"
+    description: "Meta SAM 2 Segment Anything 2 图像/视频分割"
+
+    process_patterns:
+      - "sam2"
+      - "sam[-_]2"
+      - "segment[-_]anything"
+      - "python.*sam2"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import sam2"
+          - "from sam2 import"
+
+  - name: "CogVideoX"
+    id: "cogvideox"
+    type: "deployment"
+    severity: "low"
+    description: "智谱 CogVideoX 开源视频生成模型"
+
+    process_patterns:
+      - "cogvideox"
+      - "cogvideo"
+      - "python.*cogvideo"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import diffusers"
+          - "from diffusers import"
+
+  - name: "HunyuanVideo"
+    id: "hunyuanvideo"
+    type: "deployment"
+    severity: "low"
+    description: "腾讯混元 HunyuanVideo 视频生成模型"
+
+    process_patterns:
+      - "hunyuanvideo"
+      - "hunyuan[-_]video"
+      - "python.*hunyuan"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import diffusers"
+          - "from diffusers import"
+
+  - name: "LTX-Video"
+    id: "ltx-video"
+    type: "deployment"
+    severity: "low"
+    description: "Lightricks LTX-Video 实时视频生成"
+
+    process_patterns:
+      - "ltx[-_]video"
+      - "ltxvideo"
+      - "python.*ltx"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import diffusers"
+          - "from diffusers import"
+
+  # ========== 2026-10-13 批次: 语音 AI 补充 ==========
+  - name: "F5-TTS"
+    id: "f5-tts"
+    type: "deployment"
+    severity: "low"
+    description: "F5-TTS 复旦+上海AI Lab 流匹配语音合成"
+
+    process_patterns:
+      - "f5[-_]tts"
+      - "f5_tts"
+      - "python.*f5"
+
+    default_ports:
+      - 7860
+
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+
+  - name: "OpenVoice"
+    id: "openvoice"
+    type: "deployment"
+    severity: "low"
+    description: "MyShell OpenVoice 语音克隆/TTS"
+
+    process_patterns:
+      - "openvoice"
+      - "python.*openvoice"
+
+    default_ports:
+      - 7860
+
+  - name: "SenseVoice"
+    id: "sensevoice"
+    type: "deployment"
+    severity: "low"
+    description: "阿里 SenseVoice 多语言语音识别/情感识别"
+
+    process_patterns:
+      - "sensevoice"
+      - "sense[-_]voice"
+      - "python.*sensevoice"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from funasr import"
+          - "import funasr"
+
+  - name: "FunASR"
+    id: "funasr"
+    type: "deployment"
+    severity: "low"
+    description: "阿里 FunASR/Paraformer 语音识别工具包"
+
+    process_patterns:
+      - "funasr"
+      - "paraformer"
+      - "python.*funasr"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import funasr"
+          - "from funasr import"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -3082,6 +3435,63 @@ ai_gateways:
     
     default_ports:
       - 4000
+
+  # ========== 2026-10-13 批次: AI 网关补充 ==========
+  - name: "Envoy AI Gateway"
+    id: "envoy-ai-gateway"
+    type: "llm_framework"
+    severity: "medium"
+    description: "Envoy AI Gateway Kubernetes LLM 流量网关"
+
+    process_patterns:
+      - "envoy.*ai[-_]gateway"
+      - "aigw"
+      - "envoy-gateway"
+
+    default_ports:
+      - 8080
+      - 80
+
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+
+  - name: "Kong AI Gateway"
+    id: "kong-ai-gateway"
+    type: "llm_framework"
+    severity: "medium"
+    description: "Kong AI Gateway LLM 代理/语义缓存/可观测"
+
+    process_patterns:
+      - "kong.*ai"
+      - "kong-gateway"
+      - "kong.*start"
+
+    default_ports:
+      - 8000
+      - 8001
+      - 8443
+
+    http_endpoints:
+      - path: "/status"
+        method: "GET"
+
+    env_indicators:
+      - "KONG_"
+
+  - name: "Cloudflare AI Gateway"
+    id: "cloudflare-ai-gateway"
+    type: "llm_framework"
+    severity: "low"
+    description: "Cloudflare AI Gateway 统一 LLM API 缓存/分析网关"
+
+    process_patterns:
+      - "cloudflare.*ai[-_]gateway"
+      - "ai-gateway.*cloudflare"
+
+    env_indicators:
+      - "CLOUDFLARE_API_TOKEN"
+      - "CLOUDFLARE_ACCOUNT_ID"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
@@ -3408,6 +3818,84 @@ monitoring_tools:
           - "from phoenix import"
           - "import phoenix as px"
 
+  # ========== 2026-10-13 批次: 评估框架补充 ==========
+  - name: "Inspect AI"
+    id: "inspect-ai"
+    type: "monitoring"
+    severity: "low"
+    description: "UK AISI Inspect AI 大模型评估框架(红队/安全基准)"
+
+    process_patterns:
+      - "inspect_ai"
+      - "inspect-ai"
+      - "inspect eval"
+      - "python.*inspect_ai"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import inspect_ai"
+          - "from inspect_ai import"
+
+  - name: "Galileo"
+    id: "galileo"
+    type: "monitoring"
+    severity: "low"
+    description: "Galileo AI 评估/可观测性平台(LLM/RAG/Agent)"
+
+    process_patterns:
+      - "galileo.*evaluate"
+      - "python.*galileo"
+      - "galileo[-_]observer"
+
+    env_indicators:
+      - "GALILEO_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import galileo"
+          - "from galileo import"
+
+  - name: "Confident AI"
+    id: "confident-ai"
+    type: "monitoring"
+    severity: "low"
+    description: "Confident AI 生产级 LLM 评估平台(DeepEval 云端)"
+
+    process_patterns:
+      - "confident[-_]ai"
+      - "deepeval.*cloud"
+
+    env_indicators:
+      - "CONFIDENT_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import deepeval"
+          - "from deepeval import"
+
+  - name: "WhyLabs LangKit"
+    id: "langkit"
+    type: "monitoring"
+    severity: "low"
+    description: "WhyLabs LangKit LLM 文本质量/安全监控"
+
+    process_patterns:
+      - "langkit"
+      - "whylabs"
+      - "python.*langkit"
+
+    env_indicators:
+      - "WHYLABS_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import langkit"
+          - "from langkit import"
+
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
   - name: "OpenAI API Key"
@@ -3657,6 +4145,43 @@ api_key_patterns:
 
   - name: "Brave Search API Key"
     key: "BRAVE_API_KEY"
+    severity: "medium"
+
+  # ========== 2026-10-13 批次 API Key ==========
+  - name: "Composio API Key"
+    key: "COMPOSIO_API_KEY"
+    severity: "high"
+
+  - name: "Hyperbolic API Key"
+    key: "HYPERBOLIC_API_KEY"
+    severity: "high"
+
+  - name: "DeepInfra API Key"
+    key: "DEEPINFRA_API_KEY"
+    severity: "high"
+
+  - name: "Baseten API Key"
+    key: "BASETEN_API_KEY"
+    severity: "high"
+
+  - name: "Turbopuffer API Key"
+    key: "TURBOPUFFER_API_KEY"
+    severity: "high"
+
+  - name: "Cloudflare API Token"
+    key: "CLOUDFLARE_API_TOKEN"
+    severity: "high"
+
+  - name: "Cloudflare Account ID"
+    key: "CLOUDFLARE_ACCOUNT_ID"
+    severity: "medium"
+
+  - name: "WhyLabs API Key"
+    key: "WHYLABS_API_KEY"
+    severity: "medium"
+
+  - name: "Galileo API Key"
+    key: "GALILEO_API_KEY"
     severity: "medium"
 
 # ==================== 全局配置 ====================

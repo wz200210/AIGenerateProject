@@ -1590,6 +1590,248 @@ var CommonAIFrameworks = []FrameworkInfo{
 		Severity:     SeverityLow,
 		Description:  "Nomic GPT4All 本地 LLM 运行时",
 	},
+
+	// ========== 2026-10-13 批次: GPU 云/推理平台 ==========
+	{
+		Name:         "SkyPilot",
+		Type:         TypeDeployment,
+		Patterns:     []string{"skypilot"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml", "sky.yaml"},
+		Severity:     SeverityLow,
+		Description:  "UC Berkeley SkyPilot 多云 GPU 任务调度框架",
+	},
+	{
+		Name:         "Baseten",
+		Type:         TypeDeployment,
+		Patterns:     []string{"baseten", "truss"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml", "truss.yaml"},
+		Severity:     SeverityLow,
+		Description:  "Baseten 模型推理/部署平台(Truss)",
+	},
+	{
+		Name:         "DeepInfra",
+		Type:         TypeDeployment,
+		Patterns:     []string{"deepinfra"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "DeepInfra Serverless LLM/Embedding 推理 API",
+	},
+	{
+		Name:         "Hyperbolic",
+		Type:         TypeDeployment,
+		Patterns:     []string{"hyperbolic"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Hyperbolic GPU 云 LLM 推理服务",
+	},
+
+	// ========== 2026-10-13 批次: 图像/视频生成 ==========
+	{
+		Name:         "SAM 2",
+		Type:         TypeDeployment,
+		Patterns:     []string{"sam2", "sam-2", "segment-anything"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Meta SAM 2 Segment Anything 2 图像/视频分割",
+	},
+	{
+		Name:         "CogVideoX",
+		Type:         TypeDeployment,
+		Patterns:     []string{"cogvideox", "cogvideo"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "智谱 CogVideoX 开源视频生成模型",
+	},
+	{
+		Name:         "HunyuanVideo",
+		Type:         TypeDeployment,
+		Patterns:     []string{"hunyuanvideo", "hunyuan-video"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "腾讯混元 HunyuanVideo 视频生成模型",
+	},
+	{
+		Name:         "LTX-Video",
+		Type:         TypeDeployment,
+		Patterns:     []string{"ltx-video", "ltxvideo"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Lightricks LTX-Video 实时视频生成",
+	},
+
+	// ========== 2026-10-13 批次: 语音 AI 补充 ==========
+	{
+		Name:         "F5-TTS",
+		Type:         TypeDeployment,
+		Patterns:     []string{"f5-tts", "f5_tts"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "F5-TTS 复旦+上海AI Lab 流匹配语音合成",
+	},
+	{
+		Name:         "OpenVoice",
+		Type:         TypeDeployment,
+		Patterns:     []string{"openvoice", "open-voice"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "MyShell OpenVoice 语音克隆/TTS",
+	},
+	{
+		Name:         "SenseVoice",
+		Type:         TypeDeployment,
+		Patterns:     []string{"sensevoice", "sense-voice"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "阿里 SenseVoice 多语言语音识别/情感识别",
+	},
+	{
+		Name:         "FunASR",
+		Type:         TypeDeployment,
+		Patterns:     []string{"funasr", "paraformer"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "阿里 FunASR/Paraformer 语音识别工具包",
+	},
+
+	// ========== 2026-10-13 批次: 向量数据库补充 ==========
+	{
+		Name:         "Turbopuffer",
+		Type:         TypeVectorDB,
+		Patterns:     []string{"turbopuffer"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Turbopuffer Serverless 向量数据库(对象存储架构)",
+	},
+	{
+		Name:         "Pgvecto.rs",
+		Type:         TypeVectorDB,
+		Patterns:     []string{"pgvecto", "vectorchord"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml", "go.mod"},
+		Severity:     SeverityLow,
+		Description:  "Pgvecto.rs (VectorChord) PostgreSQL Rust 向量扩展",
+	},
+	{
+		Name:         "MongoDB Atlas Vector Search",
+		Type:         TypeVectorDB,
+		Patterns:     []string{"pymongo", "mongodb-atlas", "atlas-vector"},
+		FilePatterns: []string{"requirements.txt", "package.json", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "MongoDB Atlas Vector Search 向量搜索",
+	},
+
+	// ========== 2026-10-13 批次: Agent 工具/基础设施 ==========
+	{
+		Name:         "Composio",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"composio"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml", "package.json"},
+		Severity:     SeverityLow,
+		Description:  "Composio AI Agent 工具集成平台(250+ 工具)",
+	},
+	{
+		Name:         "Temporal",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"temporalio", "temporal-io"},
+		FilePatterns: []string{"requirements.txt", "package.json", "go.mod", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Temporal 持久化工作流引擎(AI Agent 编排)",
+	},
+	{
+		Name:         "MCPHub",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"mcphub", "mcp-hub"},
+		FilePatterns: []string{"package.json", "requirements.txt"},
+		Severity:     SeverityLow,
+		Description:  "MCPHub MCP 服务器注册/管理中心",
+	},
+	{
+		Name:         "ToolHive",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"toolhive"},
+		FilePatterns: []string{"go.mod", "package.json"},
+		Severity:     SeverityLow,
+		Description:  "Stacklok ToolHive MCP 工具安全管理/代理",
+	},
+
+	// ========== 2026-10-13 批次: AI 安全补充 ==========
+	{
+		Name:         "LlamaFirewall",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"llamafirewall", "llama-firewall"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityMedium,
+		Description:  "Meta LlamaFirewall AI Agent 安全护栏套件",
+	},
+
+	// ========== 2026-10-13 批次: 文档处理补充 ==========
+	{
+		Name:         "MarkItDown",
+		Type:         TypeRAGTool,
+		Patterns:     []string{"markitdown"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Microsoft MarkItDown 文档转 Markdown(PDF/Office/图片)",
+	},
+
+	// ========== 2026-10-13 批次: AI 网关补充 ==========
+	{
+		Name:         "Envoy AI Gateway",
+		Type:         TypeLLMFramework,
+		Patterns:     []string{"envoy-ai-gateway", "envoyproxy/ai-gateway"},
+		FilePatterns: []string{"go.mod", "docker-compose.yaml"},
+		Severity:     SeverityMedium,
+		Description:  "Envoy AI Gateway Kubernetes LLM 流量网关",
+	},
+	{
+		Name:         "Kong AI Gateway",
+		Type:         TypeLLMFramework,
+		Patterns:     []string{"kong-ai", "kong.*ai-gateway"},
+		FilePatterns: []string{"docker-compose.yaml", "kong.yml", "kong.yaml"},
+		Severity:     SeverityMedium,
+		Description:  "Kong AI Gateway LLM 代理/语义缓存/可观测",
+	},
+	{
+		Name:         "Cloudflare AI Gateway",
+		Type:         TypeLLMFramework,
+		Patterns:     []string{"cloudflare-ai-gateway", "@cloudflare/ai-gateway"},
+		FilePatterns: []string{"package.json", "wrangler.toml"},
+		Severity:     SeverityLow,
+		Description:  "Cloudflare AI Gateway 统一 LLM API 缓存/分析网关",
+	},
+
+	// ========== 2026-10-13 批次: 评估/监控补充 ==========
+	{
+		Name:         "Inspect AI",
+		Type:         TypeMonitoring,
+		Patterns:     []string{"inspect-ai", "inspect_ai"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "UK AISI Inspect AI 大模型评估框架(红队/安全基准)",
+	},
+	{
+		Name:         "Galileo",
+		Type:         TypeMonitoring,
+		Patterns:     []string{"galileo-evaluate", "galileo-observer"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml", "package.json"},
+		Severity:     SeverityLow,
+		Description:  "Galileo AI 评估/可观测性平台(LLM/RAG/Agent)",
+	},
+	{
+		Name:         "Confident AI",
+		Type:         TypeMonitoring,
+		Patterns:     []string{"confident-ai"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Confident AI 生产级 LLM 评估平台(DeepEval 云端)",
+	},
+	{
+		Name:         "WhyLabs LangKit",
+		Type:         TypeMonitoring,
+		Patterns:     []string{"langkit", "whylabs"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "WhyLabs LangKit LLM 文本质量/安全监控",
+	},
 }
 
 // CommonModelFiles 常见 AI 模型文件
@@ -1677,6 +1919,15 @@ var APIKeyPatterns = map[string]string{
 	"CEREBRAS_API_KEY":       "Cerebras API Key",
 	"UNSTRUCTURED_API_KEY":   "Unstructured API Key",
 	"BRAVE_API_KEY":          "Brave Search API Key",
+	"COMPOSIO_API_KEY":       "Composio API Key",
+	"HYPERBOLIC_API_KEY":     "Hyperbolic API Key",
+	"DEEPINFRA_API_KEY":      "DeepInfra API Key",
+	"BASETEN_API_KEY":        "Baseten API Key",
+	"TURBOPUFFER_API_KEY":    "Turbopuffer API Key",
+	"CLOUDFLARE_API_TOKEN":   "Cloudflare API Token",
+	"CLOUDFLARE_ACCOUNT_ID":  "Cloudflare Account ID",
+	"WHYLABS_API_KEY":        "WhyLabs API Key",
+	"GALILEO_API_KEY":        "Galileo API Key",
 }
 
 // GetComponentStats 返回各类组件数量统计
