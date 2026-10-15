@@ -484,6 +484,41 @@ llm_services:
           - "from gpt4all import"
           - "import gpt4all"
 
+# ==================== 2026-10-14 批次: LLM 接口/路由框架 ====================
+  - name: "aisuite"
+    id: "aisuite"
+    type: "llm_framework"
+    severity: "low"
+    description: "Andrew Ng aisuite 多提供商统一 LLM 接口(OpenAI/Anthropic/Google 等)"
+
+    process_patterns:
+      - "aisuite"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import aisuite"
+          - "from aisuite import"
+
+  - name: "NotDiamond"
+    id: "notdiamond"
+    type: "llm_framework"
+    severity: "low"
+    description: "NotDiamond 自动 LLM 模型路由/选择优化 API"
+
+    process_patterns:
+      - "notdiamond"
+      - "python.*notdiamond"
+
+    env_indicators:
+      - "NOTDIAMOND_API_KEY"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import notdiamond"
+          - "from notdiamond import"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -774,6 +809,63 @@ vector_databases:
     env_indicators:
       - "MONGODB_URI"
       - "MONGODB_ATLAS_"
+
+# ==================== 2026-10-14 批次: 嵌入式向量扩展 ====================
+  - name: "Infinity"
+    id: "infinity"
+    type: "vector_database"
+    severity: "low"
+    description: "InfiniFlow Infinity Embedding/Rerank 向量服务(与 RAGFlow 配套)"
+
+    process_patterns:
+      - "infinity_emb_server"
+      - "infinity[-_]emb"
+      - "python.*infinity"
+
+    default_ports:
+      - 7997
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "INFINITY_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import infinity_emb"
+          - "from infinity_emb import"
+
+  - name: "SQLite-VEC"
+    id: "sqlite-vec"
+    type: "vector_database"
+    severity: "low"
+    description: "SQLite-VEC SQLite 向量搜索扩展(嵌入式)"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import sqlite_vec"
+          - "from sqlite_vec import"
+
+  # ========== 2026-10-15 批次: 向量搜索补充 ==========
+  - name: "DuckDB VSS"
+    id: "duckdb-vss"
+    type: "vector_database"
+    severity: "low"
+    description: "DuckDB VSS 向量相似度搜索扩展(OLAP+向量一体)"
+
+    process_patterns:
+      - "duckdb.*vss"
+      - "vss[-_]duckdb"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import duckdb"
+          - "from duckdb import"
 
 # ==================== ML 框架 ====================
 ml_frameworks:
@@ -1135,6 +1227,106 @@ ml_frameworks:
 
     env_indicators:
       - "CVAT_"
+
+# ==================== 2026-10-14 批次: 模型优化库 ====================
+  - name: "NVIDIA Model-Optimizer"
+    id: "modelopt"
+    type: "ml_framework"
+    severity: "low"
+    description: "NVIDIA Model-Optimizer 量化/蒸馏/剪枝/投机解码优化库"
+
+    process_patterns:
+      - "modelopt"
+      - "nvidia-modelopt"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import modelopt"
+          - "from modelopt import"
+
+  # ========== 2026-10-15 批次: 推理引擎/生成模型库 ==========
+  - name: "tilelang"
+    id: "tilelang"
+    type: "ml_framework"
+    severity: "low"
+    description: "TileLang GPU/CPU/加速器高性能算子 DSL(月趋势榜)"
+
+    process_patterns:
+      - "tilelang"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import tilelang"
+          - "from tilelang import"
+
+  - name: "CTranslate2"
+    id: "ctranslate2"
+    type: "ml_framework"
+    severity: "low"
+    description: "CTranslate2 CPU/GPU 快速推理引擎(翻译/Whisper 常用)"
+
+    process_patterns:
+      - "ct2[-_]translate"
+      - "ctranslate2"
+      - "ct2[-_]server"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import ctranslate2"
+          - "from ctranslate2 import"
+
+  - name: "IPEX-LLM"
+    id: "ipex-llm"
+    type: "ml_framework"
+    severity: "low"
+    description: "Intel IPEX-LLM CPU/GPU 本地 LLM 加速库"
+
+    process_patterns:
+      - "ipex[-_]llm"
+      - "ipex_llm"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import ipex_llm"
+          - "from ipex_llm import"
+
+  - name: "Kolors"
+    id: "kolors"
+    type: "ml_framework"
+    severity: "low"
+    description: "快手 Kolors 可图图像生成模型/推理库"
+
+    process_patterns:
+      - "kolors"
+      - "kwai[-_]kolors"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from kolors"
+          - "import kolors"
+
+  - name: "Wan2.2"
+    id: "wan22"
+    type: "ml_framework"
+    severity: "low"
+    description: "阿里 Wan2.2 通义万相视频生成模型(T2V/I2V)"
+
+    process_patterns:
+      - "wan2\\."
+      - "wan_t2v"
+      - "wan_i2v"
+      - "wanx"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from wan"
+          - "import wan"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -2065,6 +2257,594 @@ agent_frameworks:
         patterns:
           - "import markitdown"
           - "from markitdown import"
+
+  # ========== 2026-10-14 批次: Agent 框架(GitHub Trending 侦察) ==========
+  - name: "MetaGPT"
+    id: "metagpt"
+    type: "agent_framework"
+    severity: "low"
+    description: "MetaGPT 多智能体协作软件公司框架(DeepWisdom)"
+
+    process_patterns:
+      - "metagpt"
+      - "python.*metagpt"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import metagpt"
+          - "from metagpt import"
+
+  - name: "OpenManus"
+    id: "openmanus"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenManus 开源通用 AI Agent 框架(Manus 复刻)"
+
+    process_patterns:
+      - "openmanus"
+      - "open[-_]manus"
+      - "python.*openmanus"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import openmanus"
+          - "from openmanus import"
+
+  - name: "AgentScope"
+    id: "agentscope"
+    type: "agent_framework"
+    severity: "low"
+    description: "阿里 AgentScope 多智能体分布式框架(支持 Actor 模式)"
+
+    process_patterns:
+      - "agentscope"
+      - "python.*agentscope"
+
+    env_indicators:
+      - "AGENTSCOPE_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import agentscope"
+          - "from agentscope import"
+
+  - name: "TaskWeaver"
+    id: "taskweaver"
+    type: "agent_framework"
+    severity: "low"
+    description: "Microsoft TaskWeaver 代码优先数据分析 Agent 框架"
+
+    process_patterns:
+      - "taskweaver"
+      - "python.*taskweaver"
+
+    default_ports:
+      - 5000
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import taskweaver"
+          - "from taskweaver import"
+
+  - name: "FastMCP"
+    id: "fastmcp"
+    type: "agent_framework"
+    severity: "low"
+    description: "FastMCP 极简 MCP 服务器/客户端 Python 框架"
+
+    process_patterns:
+      - "fastmcp"
+      - "fastmcp.*run"
+      - "python.*fastmcp"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import fastmcp"
+          - "from fastmcp import"
+
+  - name: "mcpm"
+    id: "mcpm"
+    type: "agent_framework"
+    severity: "low"
+    description: "mcpm MCP 服务器包管理器(跨 IDE/Agent 配置同步)"
+
+    process_patterns:
+      - "mcpm"
+
+    env_indicators:
+      - "MCPM_"
+
+  - name: "mcpo"
+    id: "mcpo"
+    type: "agent_framework"
+    severity: "low"
+    description: "mcpo MCP 服务器转 OpenAPI HTTP 代理(Open WebUI 团队)"
+
+    process_patterns:
+      - "\\bmcpo\\b"
+      - "mcpo.*--port"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/docs"
+        method: "GET"
+
+  - name: "langmem"
+    id: "langmem"
+    type: "agent_framework"
+    severity: "low"
+    description: "LangChain langmem Agent 长期记忆/记忆优化 SDK"
+
+    process_patterns:
+      - "langmem"
+      - "python.*langmem"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import langmem"
+          - "from langmem import"
+
+  - name: "engram"
+    id: "engram"
+    type: "agent_framework"
+    severity: "low"
+    description: "engram AI 编码代理持久记忆服务(SQLite+FTS5+MCP Server+HTTP)"
+
+    process_patterns:
+      - "\\bengram\\b"
+      - "engram.*(mcp|server|daemon)"
+
+    env_indicators:
+      - "ENGRAM_"
+
+  - name: "Hindsight"
+    id: "hindsight"
+    type: "agent_framework"
+    severity: "low"
+    description: "Vectorize Hindsight 可学习 Agent 记忆服务(API/自托管)"
+
+    process_patterns:
+      - "hindsight.*(server|agent|memory)"
+
+    env_indicators:
+      - "HINDSIGHT_"
+      - "VECTORIZE_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import hindsight"
+
+  - name: "WeKnora"
+    id: "weknora"
+    type: "rag_tool"
+    severity: "low"
+    description: "腾讯 WeKnora 开源 LLM 知识库/RAG 平台(检索+推理 Agent+Wiki)"
+
+    process_patterns:
+      - "weknora"
+      - "we[-_]knora"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+  - name: "PageIndex"
+    id: "pageindex"
+    type: "rag_tool"
+    severity: "low"
+    description: "Vectify PageIndex 无向量推理式文档索引 RAG(Vectorless RAG)"
+
+    process_patterns:
+      - "pageindex"
+      - "page[-_]index"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import pageindex"
+          - "from pageindex import"
+
+  - name: "CLI-Anything"
+    id: "cli-anything"
+    type: "agent_framework"
+    severity: "low"
+    description: "HKUDS CLI-Anything 任意软件 Agent 化 CLI 工具集(CLI-Hub)"
+
+    process_patterns:
+      - "cli-anything"
+      - "cli_anything"
+
+  - name: "pentagi"
+    id: "pentagi"
+    type: "agent_framework"
+    severity: "medium"
+    description: "vxcontrol PentAGI 全自主渗透测试 AI Agent 系统(多专家推理)"
+
+    process_patterns:
+      - "pentagi"
+
+    default_ports:
+      - 8080
+
+    env_indicators:
+      - "PENTAGI_"
+
+  # ========== 2026-10-14 批次: AI 编码 CLI(第四波) ==========
+  - name: "Cursor CLI"
+    id: "cursor-cli"
+    type: "agent_framework"
+    severity: "low"
+    description: "Cursor Agent 终端 AI 编码代理(Anysphere)"
+
+    process_patterns:
+      - "cursor-agent"
+      - "cursor.*agent.*cli"
+      - "node.*cursor"
+
+    env_indicators:
+      - "CURSOR_API_KEY"
+
+  - name: "Amp"
+    id: "amp"
+    type: "agent_framework"
+    severity: "low"
+    description: "Sourcegraph Amp AI 编码代理 CLI"
+
+    process_patterns:
+      - "amp-agent"
+      - "sourcegraph.*amp"
+
+    env_indicators:
+      - "AMP_"
+
+  - name: "Windsurf CLI"
+    id: "windsurf-cli"
+    type: "agent_framework"
+    severity: "low"
+    description: "Windsurf CLI 终端 AI 编码代理(Codeium)"
+
+    process_patterns:
+      - "windsurf.*agent"
+      - "windsurf.*cli"
+
+    env_indicators:
+      - "WINDSURF_API_KEY"
+      - "CODEIUM_API_KEY"
+
+  # ========== 2026-10-14 批次: AI 工作流引擎 ==========
+  - name: "Inngest"
+    id: "inngest"
+    type: "agent_framework"
+    severity: "low"
+    description: "Inngest 事件驱动 AI 工作流引擎(durable execution/步进函数)"
+
+    process_patterns:
+      - "inngest"
+      - "inngest-cli"
+      - "inngest.*dev"
+
+    default_ports:
+      - 8288
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "INNGEST_EVENT_KEY"
+      - "INNGEST_SIGNING_KEY"
+
+  - name: "Trigger.dev"
+    id: "trigger-dev"
+    type: "agent_framework"
+    severity: "low"
+    description: "Trigger.dev 后台任务/AI Agent 工作流平台(v3 CLI+自托管)"
+
+    process_patterns:
+      - "trigger[-.]dev"
+      - "trigger.*worker"
+
+    default_ports:
+      - 3040
+      - 3030
+
+    env_indicators:
+      - "TRIGGER_SECRET_KEY"
+
+  # ========== 2026-10-14 批次: Agent 安全/工具扫描 ==========
+  - name: "SkillSpector"
+    id: "skillspector"
+    type: "agent_framework"
+    severity: "low"
+    description: "NVIDIA SkillSpector AI Agent Skill 安全扫描器(提示注入/供应链)"
+
+    process_patterns:
+      - "skillspector"
+      - "skill[-_]spector"
+
+  - name: "mcp-scan"
+    id: "mcp-scan"
+    type: "agent_framework"
+    severity: "low"
+    description: "Invariant Labs mcp-scan MCP 服务器安全扫描工具(投毒检测)"
+
+    process_patterns:
+      - "mcp[-_]scan"
+
+  - name: "docker-agent"
+    id: "docker-agent"
+    type: "agent_framework"
+    severity: "low"
+    description: "Docker Agent 容器化 AI Agent 构建/运行时(Docker 官方)"
+
+    process_patterns:
+      - "docker-agent"
+      - "docker.*agent.*run"
+
+  # ========== 2026-10-15 批次: Agent 框架/运行时(月度 Trending 侦察) ==========
+  - name: "AG2"
+    id: "ag2"
+    type: "agent_framework"
+    severity: "low"
+    description: "AG2 (原 AutoGen 分支) 多智能体对话编排框架"
+
+    process_patterns:
+      - "\\bag2\\b"
+      - "python.*\\bag2\\b"
+
+    env_indicators:
+      - "AG2_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import ag2"
+          - "from ag2 import"
+          - "from autogen.agentchat import"
+
+  - name: "Langroid"
+    id: "langroid"
+    type: "agent_framework"
+    severity: "low"
+    description: "Langroid 多智能体 LLM 编程框架(Tasks/Agents)"
+
+    process_patterns:
+      - "langroid"
+      - "python.*langroid"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import langroid"
+          - "from langroid import"
+
+  - name: "SuperAGI"
+    id: "superagi"
+    type: "agent_framework"
+    severity: "low"
+    description: "SuperAGI 自主 AI Agent 平台(自托管)"
+
+    process_patterns:
+      - "superagi"
+      - "python.*superagi"
+
+    default_ports:
+      - 3000
+      - 8000
+
+    env_indicators:
+      - "SUPERAGI_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import superagi"
+          - "from superagi import"
+
+  - name: "cognee"
+    id: "cognee"
+    type: "agent_framework"
+    severity: "low"
+    description: "cognee AI 记忆平台(Agent 长期记忆/知识图谱)"
+
+    process_patterns:
+      - "cognee"
+      - "python.*cognee"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "COGNEE_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import cognee"
+          - "from cognee import"
+
+  - name: "claude-mem"
+    id: "claude-mem"
+    type: "agent_framework"
+    severity: "low"
+    description: "claude-mem Agent 跨会话持久上下文/记忆注入工具"
+
+    process_patterns:
+      - "claude[-_]mem"
+      - "claude.*mem.*hook"
+
+    env_indicators:
+      - "CLAUDE_MEM_"
+
+  - name: "NVIDIA OpenShell"
+    id: "openshell"
+    type: "agent_framework"
+    severity: "low"
+    description: "NVIDIA OpenShell 自主 AI Agent 安全私有运行时"
+
+    process_patterns:
+      - "openshell"
+      - "open[-_]shell.*agent"
+
+    env_indicators:
+      - "OPENSHELL_"
+
+  - name: "cua"
+    id: "cua"
+    type: "agent_framework"
+    severity: "low"
+    description: "trycua cua Computer-Use 2.0 Agent 框架(跨 OS 桌面操控)"
+
+    process_patterns:
+      - "cua-agent"
+      - "cua.*computer[-_]use"
+      - "trycua"
+
+    env_indicators:
+      - "CUA_"
+
+  - name: "paperclip"
+    id: "paperclip"
+    type: "agent_framework"
+    severity: "low"
+    description: "Paperclip 企业级 Agent 任务管理/编排平台"
+
+    process_patterns:
+      - "paperclip"
+      - "paperclipai"
+
+    default_ports:
+      - 3000
+      - 8080
+
+  - name: "BrowserSkill"
+    id: "browser-skill"
+    type: "agent_framework"
+    severity: "low"
+    description: "腾讯 BrowserSkill 复用真实登录浏览器的 Agent 自动化 CLI"
+
+    process_patterns:
+      - "browser[-_]skill"
+      - "browserskill"
+
+  - name: "univer"
+    id: "univer"
+    type: "agent_framework"
+    severity: "low"
+    description: "Univer Office Harness(Agent 电子表格/文档/幻灯片运行时)"
+
+    process_patterns:
+      - "univer[-_]server"
+      - "univer.*agent"
+
+    default_ports:
+      - 3010
+      - 3000
+
+  - name: "Orca"
+    id: "orca"
+    type: "agent_framework"
+    severity: "low"
+    description: "Stably Orca 并行 Agent 舰队 ADE(桌面/移动端/远程运行时)"
+
+    process_patterns:
+      - "orca.*agent"
+      - "stablyai"
+
+    env_indicators:
+      - "ORCA_"
+
+  - name: "gh-aw"
+    id: "gh-aw"
+    type: "agent_framework"
+    severity: "low"
+    description: "GitHub Agentic Workflows(gh aw)仓库级 Agent 工作流"
+
+    process_patterns:
+      - "gh[-_]aw"
+      - "gh.*aw.*workflow"
+
+  - name: "Google Artemis"
+    id: "artemis"
+    type: "agent_framework"
+    severity: "low"
+    description: "Google Artemis Android 自动化 Agent(NL 指令→端到端操作)"
+
+    process_patterns:
+      - "artemis.*android"
+      - "google/artemis"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import artemis"
+
+  - name: "Agent-Reach"
+    id: "agent-reach"
+    type: "agent_framework"
+    severity: "low"
+    description: "Agent-Reach Agent 互联网访问 CLI(Twitter/Reddit/YouTube/GitHub)"
+
+    process_patterns:
+      - "agent[-_]reach"
+      - "agentreach"
+
+  - name: "context-mode"
+    id: "context-mode"
+    type: "agent_framework"
+    severity: "low"
+    description: "context-mode 编码 Agent 上下文窗口优化(沙箱工具输出/MCP 路由)"
+
+    process_patterns:
+      - "context[-_]mode"
+
+    env_indicators:
+      - "CONTEXT_MODE_"
+
+  - name: "gentle-ai"
+    id: "gentle-ai"
+    type: "agent_framework"
+    severity: "low"
+    description: "Gentle-AI 多 Agent(Claude Code/Cursor/Codex/OpenCode)统一配置器"
+
+    process_patterns:
+      - "gentle[-_]ai"
+      - "gentleai"
+
+  - name: "Agent Substrate"
+    id: "substrate"
+    type: "agent_framework"
+    severity: "low"
+    description: "Agent Substrate Agent 核心运行时系统"
+
+    process_patterns:
+      - "agent[-_]substrate"
+      - "substrate.*agent"
 
 # ==================== 部署/推理 ====================
 deployment_tools:
@@ -3284,6 +4064,300 @@ deployment_tools:
           - "import funasr"
           - "from funasr import"
 
+  # ========== 2026-10-14 批次: AI 聊天 UI/语音/爬虫服务 ==========
+  - name: "Chainlit"
+    id: "chainlit"
+    type: "deployment"
+    severity: "low"
+    description: "Chainlit 开源 LLM 聊天应用框架(快速构建对话 UI)"
+
+    process_patterns:
+      - "chainlit.*run"
+      - "chainlit"
+      - "python.*chainlit"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "CHAINLIT_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import chainlit"
+          - "from chainlit import"
+
+  - name: "Kyutai Moshi"
+    id: "kyutai-moshi"
+    type: "deployment"
+    severity: "low"
+    description: "Kyutai Moshi 全双工实时语音对话模型/服务器(Rust+Python)"
+
+    process_patterns:
+      - "moshi.*server"
+      - "kyutai"
+      - "moshi_mimi"
+
+    default_ports:
+      - 8998
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "KYUTAI_"
+      - "MOSHI_"
+
+  - name: "Lunary"
+    id: "lunary"
+    type: "monitoring"
+    severity: "low"
+    description: "Lunary 开源 LLM 可观测性/提示词管理/用户反馈分析(自托管)"
+
+    process_patterns:
+      - "lunary"
+      - "lunary.*server"
+
+    default_ports:
+      - 3000
+
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+
+    env_indicators:
+      - "LUNARY_API_KEY"
+      - "LUNARY_"
+
+  - name: "Scrapling"
+    id: "scrapling"
+    type: "rag_tool"
+    severity: "low"
+    description: "Scrapling 自适应反屏蔽网页抓取框架(LLM/Agent 数据管道)"
+
+    process_patterns:
+      - "scrapling"
+      - "python.*scrapling"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import scrapling"
+          - "from scrapling import"
+
+  - name: "R2R"
+    id: "r2r"
+    type: "rag_tool"
+    severity: "low"
+    description: "SciPhi R2R 全栈 RAG 引擎(文档摄入/混合检索/知识图谱/Agent)"
+
+    process_patterns:
+      - "\\br2r\\b"
+      - "r2r.*serve"
+      - "python.*r2r"
+
+    default_ports:
+      - 7272
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v2/health"
+        method: "GET"
+
+    env_indicators:
+      - "R2R_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import r2r"
+          - "from r2r import"
+
+  - name: "Apify"
+    id: "apify"
+    type: "rag_tool"
+    severity: "low"
+    description: "Apify 网页数据提取/爬虫平台(Actor 运行时)"
+
+    process_patterns:
+      - "apify.*run"
+      - "actor.*apify"
+
+    env_indicators:
+      - "APIFY_TOKEN"
+      - "APIFY_API_KEY"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import apify"
+          - "from apify import"
+
+  # ========== 2026-10-15 批次: 部署/推理/RAG(Trending 侦察) ==========
+  - name: "Modular MAX"
+    id: "modular-max"
+    type: "deployment"
+    severity: "low"
+    description: "Modular MAX/Mojo 高性能模型服务引擎"
+
+    process_patterns:
+      - "max[-_]serve"
+      - "modular.*max"
+      - "max.*serve.*model"
+
+    default_ports:
+      - 8000
+
+    env_indicators:
+      - "MODULAR_"
+
+  - name: "KServe"
+    id: "kserve"
+    type: "deployment"
+    severity: "low"
+    description: "KServe K8s 模型推理服务框架(企业标准)"
+
+    process_patterns:
+      - "kserve"
+      - "kserve[-_]controller"
+
+    env_indicators:
+      - "KSERVE_"
+
+  - name: "VoiceStudio"
+    id: "voicestudio"
+    type: "deployment"
+    severity: "low"
+    description: "VoiceStudio 全本地开源语音平台(克隆/配音/转写, ElevenLabs 替代)"
+
+    process_patterns:
+      - "voicestudio"
+      - "voice[-_]studio"
+
+    default_ports:
+      - 7860
+      - 8000
+
+    env_indicators:
+      - "VOICESTUDIO_"
+
+  - name: "OpenCreator"
+    id: "opencreator"
+    type: "deployment"
+    severity: "low"
+    description: "KrillinAI/OpenCreator 视频翻译/配音创作者工作区"
+
+    process_patterns:
+      - "krillinai"
+      - "opencreator"
+      - "krillin"
+
+    default_ports:
+      - 8899
+      - 7860
+
+  - name: "hyperframes"
+    id: "hyperframes"
+    type: "deployment"
+    severity: "low"
+    description: "HeyGen hyperframes HTML→视频渲染引擎(Agent 视频生成)"
+
+    process_patterns:
+      - "hyperframes"
+      - "heygen.*hyperframes"
+
+  - name: "DocETL"
+    id: "docetl"
+    type: "rag_tool"
+    severity: "low"
+    description: "Stanford DocETL 文档 ETL/RAG 处理管道优化"
+
+    process_patterns:
+      - "docetl"
+      - "python.*docetl"
+
+    env_indicators:
+      - "DOCETL_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import docetl"
+          - "from docetl import"
+
+  - name: "Khoj"
+    id: "khoj"
+    type: "deployment"
+    severity: "low"
+    description: "Khoj 自托管 AI 副驾驶(搜索/笔记/RAG)"
+
+    process_patterns:
+      - "khoj"
+      - "python.*khoj"
+
+    default_ports:
+      - 42110
+
+    env_indicators:
+      - "KHOJ_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from khoj"
+          - "import khoj"
+
+  - name: "Cognita"
+    id: "cognita"
+    type: "rag_tool"
+    severity: "low"
+    description: "TrueFoundry Cognita RAG 框架(数据湖+可定制组件)"
+
+    process_patterns:
+      - "cognita"
+      - "python.*cognita"
+
+    default_ports:
+      - 8000
+      - 3000
+
+    env_indicators:
+      - "COGNITA_"
+
+  - name: "open-code-review"
+    id: "open-code-review"
+    type: "deployment"
+    severity: "low"
+    description: "阿里 open-code-review LLM+规则混合代码评审工具"
+
+    process_patterns:
+      - "open[-_]code[-_]review"
+      - "code[-_]review.*agent"
+
+  - name: "freellmapi"
+    id: "freellmapi"
+    type: "deployment"
+    severity: "low"
+    description: "freellmapi 多免费 LLM 提供商聚合网关(统一 /v1 端点)"
+
+    process_patterns:
+      - "freellmapi"
+      - "free[-_]llm[-_]api"
+
+    default_ports:
+      - 3000
+      - 8787
+
+    env_indicators:
+      - "FREELLMAPI_"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -3896,6 +4970,66 @@ monitoring_tools:
           - "import langkit"
           - "from langkit import"
 
+  # ========== 2026-10-14 批次: LLM Tracing 补充 ==========
+  - name: "Langtrace"
+    id: "langtrace"
+    type: "monitoring"
+    severity: "low"
+    description: "Langtrace LLM Tracing/可观测性(OTel 原生,自托管 API)"
+
+    process_patterns:
+      - "langtrace"
+      - "langtrace.*api"
+
+    env_indicators:
+      - "LANGTRACE_API_KEY"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import langtrace"
+          - "from langtrace import"
+
+  # ========== 2026-10-15 批次: 评估/可观测性补充 ==========
+  - name: "Keywords AI"
+    id: "keywords-ai"
+    type: "monitoring"
+    severity: "low"
+    description: "Keywords AI LLM 可观测性/提示管理/评估平台"
+
+    process_patterns:
+      - "keywordsai"
+      - "keywords[-_]ai"
+
+    env_indicators:
+      - "KEYWORDS_AI_API_KEY"
+      - "KEYWORDSAI_API_KEY"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import keywordsai"
+          - "from keywordsai import"
+
+  - name: "Patronus AI"
+    id: "patronus"
+    type: "monitoring"
+    severity: "low"
+    description: "Patronus AI LLM 评估/幻觉检测/PII 扫描"
+
+    process_patterns:
+      - "patronus"
+      - "python.*patronus"
+
+    env_indicators:
+      - "PATRONUS_API_KEY"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import patronus"
+          - "from patronus import"
+
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
   - name: "OpenAI API Key"
@@ -4183,6 +5317,84 @@ api_key_patterns:
   - name: "Galileo API Key"
     key: "GALILEO_API_KEY"
     severity: "medium"
+
+  # ========== 2026-10-14 批次 API Key(GPU 云/工作流/编码代理/语音) ==========
+  - name: "RunPod GPU Cloud API Key"
+    key: "RUNPOD_API_KEY"
+    severity: "high"
+
+  - name: "Apify API Token"
+    key: "APIFY_TOKEN"
+    severity: "high"
+
+  - name: "Apify API Key"
+    key: "APIFY_API_KEY"
+    severity: "high"
+
+  - name: "NotDiamond API Key"
+    key: "NOTDIAMOND_API_KEY"
+    severity: "medium"
+
+  - name: "Langtrace API Key"
+    key: "LANGTRACE_API_KEY"
+    severity: "medium"
+
+  - name: "Lunary API Key"
+    key: "LUNARY_API_KEY"
+    severity: "medium"
+
+  - name: "Inngest Event Key"
+    key: "INNGEST_EVENT_KEY"
+    severity: "high"
+
+  - name: "Inngest Signing Key"
+    key: "INNGEST_SIGNING_KEY"
+    severity: "critical"
+
+  - name: "Trigger.dev Secret Key"
+    key: "TRIGGER_SECRET_KEY"
+    severity: "high"
+
+  - name: "Cursor API Key"
+    key: "CURSOR_API_KEY"
+    severity: "high"
+
+  - name: "Windsurf API Key"
+    key: "WINDSURF_API_KEY"
+    severity: "high"
+
+  - name: "LiveKit API Key"
+    key: "LIVEKIT_API_KEY"
+    severity: "high"
+
+  - name: "LiveKit URL"
+    key: "LIVEKIT_URL"
+    severity: "medium"
+
+  # ========== 2026-10-15 批次: 语音 Agent/评估/安全 API Key ==========
+  - name: "Retell AI API Key"
+    key: "RETELL_API_KEY"
+    severity: "high"
+
+  - name: "Bland AI API Key"
+    key: "BLAND_API_KEY"
+    severity: "high"
+
+  - name: "Synthflow API Key"
+    key: "SYNTHFLOW_API_KEY"
+    severity: "high"
+
+  - name: "Keywords AI API Key"
+    key: "KEYWORDS_AI_API_KEY"
+    severity: "high"
+
+  - name: "Patronus API Key"
+    key: "PATRONUS_API_KEY"
+    severity: "high"
+
+  - name: "Lakera API Key"
+    key: "LAKERA_API_KEY"
+    severity: "high"
 
 # ==================== 全局配置 ====================
 global:
