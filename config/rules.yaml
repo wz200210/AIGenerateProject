@@ -2846,6 +2846,98 @@ agent_frameworks:
       - "agent[-_]substrate"
       - "substrate.*agent"
 
+  # ========== 2026-10-16 批次: GitHub Trending 月榜侦察 ==========
+  - name: "Octop"
+    id: "octop"
+    type: "agent_framework"
+    severity: "low"
+    description: "腾讯 Octop 自托管多用户/多智能体 AI 助手"
+
+    process_patterns:
+      - "\\boctop\\b"
+      - "octop.*server"
+      - "octop.*agent"
+
+    default_ports:
+      - 8080
+      - 3000
+
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "OCTOP_"
+
+  - name: "elizaOS"
+    id: "eliza"
+    type: "agent_framework"
+    severity: "low"
+    description: "elizaOS Eliza AI Agent 框架运行时"
+
+    process_patterns:
+      - "elizaos"
+      - "eliza.*agent"
+      - "node.*@elizaos"
+      - "@elizaos/core"
+
+    default_ports:
+      - 3000
+
+    env_indicators:
+      - "ELIZA_"
+
+    semantic_analyzers:
+      - type: "node_import"
+        patterns:
+          - "@elizaos/core"
+          - "@elizaos/adapter"
+
+  - name: "GPT-Pilot"
+    id: "gpt-pilot"
+    type: "agent_framework"
+    severity: "low"
+    description: "Pythagora GPT-Pilot AI 全栈开发代理"
+
+    process_patterns:
+      - "gpt[-_]pilot"
+      - "gptpilot"
+      - "pythagora"
+
+    env_indicators:
+      - "GPT_PILOT_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import gpt_pilot"
+          - "from gpt_pilot"
+
+  - name: "Memobase"
+    id: "memobase"
+    type: "agent_framework"
+    severity: "low"
+    description: "Memobase 面向 AI 应用的用户级持久记忆服务"
+
+    process_patterns:
+      - "memobase"
+      - "memovai"
+
+    default_ports:
+      - 8080
+      - 8000
+
+    env_indicators:
+      - "MEMOBASE_API_KEY"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import memobase"
+          - "from memobase"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -4358,6 +4450,93 @@ deployment_tools:
     env_indicators:
       - "FREELLMAPI_"
 
+  # ========== 2026-10-16 批次: GitHub Trending 月榜侦察 ==========
+  - name: "Tabby"
+    id: "tabby"
+    type: "deployment"
+    severity: "low"
+    description: "TabbyML Tabby 自托管 AI 代码补全/编码助手"
+
+    process_patterns:
+      - "\\btabby\\b"
+      - "tabby.*server"
+      - "tabby.*serve"
+
+    default_ports:
+      - 8080
+
+    version_probe:
+      methods:
+        - type: "cli_arg"
+          patterns:
+            - "--version[=\\s]*([\\d.]+)"
+
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+      - path: "/v1/health"
+        method: "GET"
+      - path: "/v1/completions"
+        method: "POST"
+
+  - name: "Daytona"
+    id: "daytona"
+    type: "deployment"
+    severity: "low"
+    description: "Daytona AI Agent 安全开发环境/沙箱运行时"
+
+    process_patterns:
+      - "\\bdaytona\\b"
+      - "daytona.*sandbox"
+
+    default_ports:
+      - 3986
+      - 3000
+
+    version_probe:
+      methods:
+        - type: "exec"
+          command: "--version"
+          parser: "v?([\\d.]+)"
+
+    env_indicators:
+      - "DAYTONA_API_KEY"
+      - "DAYTONA_TARGET"
+
+  - name: "STORM"
+    id: "storm"
+    type: "deployment"
+    severity: "low"
+    description: "Stanford STORM 自主研究/知识整理 Agent"
+
+    process_patterns:
+      - "knowledge[-_]storm"
+      - "storm.*stanford"
+
+    env_indicators:
+      - "STORM_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import knowledge_storm"
+          - "from knowledge_storm"
+
+  - name: "Rakazo"
+    id: "rakazo"
+    type: "deployment"
+    severity: "low"
+    description: "Rakazo 开源自托管 Grok Bot 替代(多模型/沙箱)"
+
+    process_patterns:
+      - "rakazo"
+
+    default_ports:
+      - 3000
+
+    env_indicators:
+      - "RAKAZO_"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -5030,6 +5209,26 @@ monitoring_tools:
           - "import patronus"
           - "from patronus import"
 
+  # ========== 2026-10-16 批次: K8s AI 运维侦察 ==========
+  - name: "K8sGPT"
+    id: "k8sgpt"
+    type: "monitoring"
+    severity: "low"
+    description: "K8sGPT Kubernetes AI 故障诊断/分析"
+
+    process_patterns:
+      - "k8sgpt"
+      - "k8s[-_]gpt"
+
+    env_indicators:
+      - "K8SGPT_"
+
+    version_probe:
+      methods:
+        - type: "exec"
+          command: "version"
+          parser: "v?([\\d.]+)"
+
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
   - name: "OpenAI API Key"
@@ -5394,6 +5593,27 @@ api_key_patterns:
 
   - name: "Lakera API Key"
     key: "LAKERA_API_KEY"
+    severity: "high"
+
+  # ========== 2026-10-16 批次: Agent 沙箱/记忆/生成 API Key ==========
+  - name: "Daytona API Key"
+    key: "DAYTONA_API_KEY"
+    severity: "high"
+
+  - name: "Memobase API Key"
+    key: "MEMOBASE_API_KEY"
+    severity: "high"
+
+  - name: "Supermemory API Key"
+    key: "SUPERMEMORY_API_KEY"
+    severity: "high"
+
+  - name: "Suno API Key"
+    key: "SUNO_API_KEY"
+    severity: "high"
+
+  - name: "Meshy API Key"
+    key: "MESHY_API_KEY"
     severity: "high"
 
 # ==================== 全局配置 ====================
