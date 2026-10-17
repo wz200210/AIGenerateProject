@@ -1328,6 +1328,27 @@ ml_frameworks:
           - "from wan"
           - "import wan"
 
+  # ========== 2026-10-17 批次: AI 训练/推理基础设施侦察 ==========
+  - name: "Oumi"
+    id: "oumi"
+    type: "ml_framework"
+    severity: "low"
+    description: "Oumi 开源模型训练/评估/推理一体化平台(原 OpenLearn)"
+
+    process_patterns:
+      - "\\boumi\\b"
+      - "oumi.(train|eval|infer)"
+      - "python.*oumi"
+
+    env_indicators:
+      - "OUMI_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import oumi"
+          - "from oumi"
+
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
   - name: "LangChain"
@@ -2938,6 +2959,102 @@ agent_frameworks:
           - "import memobase"
           - "from memobase"
 
+  # ========== 2026-10-17 批次: AI 搜索/自动化/语音 Agent 侦察 ==========
+  - name: "Perplexica"
+    id: "perplexica"
+    type: "rag_tool"
+    severity: "low"
+    description: "Perplexica 开源自托管 AI 搜索引擎(Perplexity 替代)"
+
+    process_patterns:
+      - "perplexica"
+      - "perplexica[-_]backend"
+      - "itzcrazykns/perplexica"
+
+    default_ports:
+      - 3000
+      - 3001
+
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "PERPLEXICA_"
+      - "SEARXNG_"
+
+  - name: "Activepieces"
+    id: "activepieces"
+    type: "agent_framework"
+    severity: "low"
+    description: "Activepieces 开源 AI 自动化/工作流平台(n8n 替代)"
+
+    process_patterns:
+      - "activepieces"
+      - "activepieces/activepieces"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/api/v1/flags"
+        method: "GET"
+
+    env_indicators:
+      - "AP_"
+
+    semantic_analyzers:
+      - type: "node_import"
+        patterns:
+          - "@activepieces/pieces-framework"
+
+  - name: "Vocode"
+    id: "vocode"
+    type: "agent_framework"
+    severity: "low"
+    description: "Vocode 开源语音 Agent/电话客服平台"
+
+    process_patterns:
+      - "vocode"
+      - "vocode[-_]streaming"
+      - "python.*vocode"
+
+    default_ports:
+      - 3000
+      - 8080
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import vocode"
+          - "from vocode"
+          - "vocode_streaming"
+
+  - name: "Suna"
+    id: "suna"
+    type: "agent_framework"
+    severity: "low"
+    description: "Kortix Suna 开源通用 AI Agent(自托管 autonomous agent)"
+
+    process_patterns:
+      - "\\bsuna\\b"
+      - "kortix.*suna"
+      - "suna.*agent"
+
+    default_ports:
+      - 3000
+      - 8000
+
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+
+    env_indicators:
+      - "SUNA_"
+      - "KORTIX_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -4537,6 +4654,100 @@ deployment_tools:
     env_indicators:
       - "RAKAZO_"
 
+  # ========== 2026-10-17 批次: GPU 集群/分布式推理/K8s AI 基础设施侦察 ==========
+  - name: "GPUStack"
+    id: "gpustack"
+    type: "deployment"
+    severity: "medium"
+    description: "GPUStack 开源 GPU 集群管理器(vLLM/SGLang/TensorRT-LLM 模型服务)"
+
+    process_patterns:
+      - "gpustack"
+      - "gpustack/gpustack"
+      - "gpustack.*server"
+      - "gpustack.*worker"
+
+    default_ports:
+      - 80
+      - 8080
+
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "GPUSTACK_"
+
+  - name: "NVIDIA Dynamo"
+    id: "dynamo"
+    type: "deployment"
+    severity: "medium"
+    description: "NVIDIA Dynamo 数据中心级分布式推理编排框架(vLLM/SGLang/TRT-LLM 上层)"
+
+    process_patterns:
+      - "ai[-_]dynamo"
+      - "dynamo[-_]frontend"
+      - "dynamo[-_]worker"
+      - "dynamo.*router"
+      - "dynamo.*planner"
+      - "dynamo.*serve"
+      - "nvidia/ai-dynamo"
+
+    default_ports:
+      - 8000
+      - 8080
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "DYNAMO_"
+      - "ETCD_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import ai_dynamo"
+          - "from ai_dynamo"
+          - "dynamo_sdk"
+
+  - name: "Kaito"
+    id: "kaito"
+    type: "deployment"
+    severity: "low"
+    description: "Microsoft Kaito Kubernetes AI 模型部署 Operator(自动调优推理)"
+
+    process_patterns:
+      - "kaito.*controller"
+      - "kaito.*workspace"
+      - "aks/kaito"
+      - "mcr.*kaito"
+
+    env_indicators:
+      - "KAITO_"
+
+  - name: "AIBrix"
+    id: "aibrix"
+    type: "deployment"
+    severity: "low"
+    description: "字节 AIBrix Kubernetes LLM 推理基础设施(网关/调度/自动扩缩容)"
+
+    process_patterns:
+      - "aibrix"
+      - "aibrix/controller"
+      - "aibrix.*gateway"
+
+    default_ports:
+      - 8080
+
+    env_indicators:
+      - "AIBRIX_"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -4745,6 +4956,36 @@ ai_gateways:
     env_indicators:
       - "CLOUDFLARE_API_TOKEN"
       - "CLOUDFLARE_ACCOUNT_ID"
+
+  # ========== 2026-10-17 批次: Rust LLMOps 网关侦察 ==========
+  - name: "TensorZero"
+    id: "tensorzero"
+    type: "llm_framework"
+    severity: "medium"
+    description: "TensorZero 开源 LLMOps 平台(Rust 高性能统一 LLM 网关+可观测+评估)"
+
+    process_patterns:
+      - "tensorzero"
+      - "tensorzero[-_]gateway"
+      - "tensorzero/tensorzero"
+
+    default_ports:
+      - 3000
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/openai/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "TENSORZERO_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import tensorzero"
+          - "from tensorzero"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
@@ -5614,6 +5855,14 @@ api_key_patterns:
 
   - name: "Meshy API Key"
     key: "MESHY_API_KEY"
+    severity: "high"
+
+  - name: "TensorZero API Key"
+    key: "TENSORZERO_API_KEY"
+    severity: "high"
+
+  - name: "GPUStack API Key"
+    key: "GPUSTACK_API_KEY"
     severity: "high"
 
 # ==================== 全局配置 ====================

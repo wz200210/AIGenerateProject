@@ -2592,6 +2592,96 @@ var CommonAIFrameworks = []FrameworkInfo{
 		Severity:     SeverityLow,
 		Description:  "DuckDB VSS 向量相似度搜索扩展(OLAP+向量一体)",
 	},
+
+	// ========== 2026-10-17 批次: AI 训练/推理基础设施侦察(GPU 集群/分布式推理/LLMOps/语音/搜索) ==========
+	{
+		Name:         "GPUStack",
+		Type:         TypeDeployment,
+		Patterns:     []string{"gpustack"},
+		FilePatterns: []string{"docker-compose.yaml", "docker-compose.yml"},
+		Severity:     SeverityMedium,
+		Description:  "GPUStack 开源 GPU 集群管理器(vLLM/SGLang/TensorRT-LLM 模型服务编排)",
+	},
+	{
+		Name:         "NVIDIA Dynamo",
+		Type:         TypeDeployment,
+		Patterns:     []string{"ai-dynamo", "ai_dynamo"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml", "docker-compose.yaml"},
+		Severity:     SeverityMedium,
+		Description:  "NVIDIA Dynamo 数据中心级分布式推理编排框架(前缀/解码分离/KV 感知路由)",
+	},
+	{
+		Name:         "TensorZero",
+		Type:         TypeLLMFramework,
+		Patterns:     []string{"tensorzero"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml", "package.json", "docker-compose.yaml"},
+		Severity:     SeverityMedium,
+		Description:  "TensorZero Rust 高性能 LLM 网关/LLMOps 平台(网关+可观测+评估+优化)",
+	},
+	{
+		Name:         "LMCache",
+		Type:         TypeMLFramework,
+		Patterns:     []string{"lmcache"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "LMCache LLM KV Cache 复用/卸载层(vLLM/SGLang 扩展,降 TTFT)",
+	},
+	{
+		Name:         "Oumi",
+		Type:         TypeMLFramework,
+		Patterns:     []string{"oumi-ai", "oumi"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Oumi 开源模型训练/评估/推理一体化平台(原 OpenLearn)",
+	},
+	{
+		Name:         "BAML",
+		Type:         TypeLLMFramework,
+		Patterns:     []string{"baml-py", "baml_client", "@boundaryml/baml"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml", "package.json"},
+		Severity:     SeverityLow,
+		Description:  "BAML Boundary ML 类型安全 LLM 函数调用 DSL(结构化输出)",
+	},
+	{
+		Name:         "Perplexica",
+		Type:         TypeRAGTool,
+		Patterns:     []string{"perplexica"},
+		FilePatterns: []string{"docker-compose.yaml", "package.json"},
+		Severity:     SeverityLow,
+		Description:  "Perplexica 开源自托管 AI 搜索引擎(Perplexity 替代,SearXNG+LLM)",
+	},
+	{
+		Name:         "SearXNG",
+		Type:         TypeRAGTool,
+		Patterns:     []string{"searxng"},
+		FilePatterns: []string{"docker-compose.yaml", "docker-compose.yml"},
+		Severity:     SeverityLow,
+		Description:  "SearXNG 元搜索引擎(Agent/RAG 栈高频私有搜索基础设施)",
+	},
+	{
+		Name:         "Activepieces",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"activepieces"},
+		FilePatterns: []string{"docker-compose.yaml", "package.json"},
+		Severity:     SeverityLow,
+		Description:  "Activepieces 开源 AI 自动化/工作流平台(n8n 替代,AP_ 环境变量)",
+	},
+	{
+		Name:         "Vocode",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"vocode-streaming", "vocode"},
+		FilePatterns: []string{"requirements.txt", "pyproject.toml"},
+		Severity:     SeverityLow,
+		Description:  "Vocode 开源语音 Agent/电话客服平台(实时语音对话编排)",
+	},
+	{
+		Name:         "Suna",
+		Type:         TypeAgentFramework,
+		Patterns:     []string{"kortix", "kortix-ai/suna"},
+		FilePatterns: []string{"docker-compose.yaml", "package.json"},
+		Severity:     SeverityLow,
+		Description:  "Kortix Suna 开源通用自托管 AI Agent(多工具 autonomous agent)",
+	},
 }
 
 // CommonModelFiles 常见 AI 模型文件
@@ -2706,6 +2796,8 @@ var APIKeyPatterns = map[string]string{
 	"SUPERMEMORY_API_KEY":    "Supermemory API Key",
 	"SUNO_API_KEY":           "Suno AI Music API Key",
 	"MESHY_API_KEY":          "Meshy 3D Generation API Key",
+	"TENSORZERO_API_KEY":     "TensorZero API Key",
+	"GPUSTACK_API_KEY":       "GPUStack API Key",
 }
 
 // GetComponentStats 返回各类组件数量统计
