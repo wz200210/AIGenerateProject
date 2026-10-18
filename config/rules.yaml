@@ -867,6 +867,25 @@ vector_databases:
           - "import duckdb"
           - "from duckdb import"
 
+  - name: "OpenViking"
+    id: "openviking"
+    type: "vector_database"
+    severity: "medium"
+    description: "字节跳动 Volcengine OpenViking AI Agent 上下文数据库(Agent 记忆+RAG+技能统一虚拟文件系统)"
+
+    process_patterns:
+      - "openviking"
+      - "openviking[-_]entrypoint"
+      - "openviking[-_]server"
+      - "volcengine/openviking"
+
+    default_ports:
+      - 1933
+      - 1934
+
+    env_indicators:
+      - "OPENVIKING_"
+
 # ==================== ML 框架 ====================
 ml_frameworks:
   - name: "Hugging Face Transformers"
@@ -3055,6 +3074,112 @@ agent_frameworks:
       - "SUNA_"
       - "KORTIX_"
 
+  - name: "MemPalace"
+    id: "mempalace"
+    type: "agent_framework"
+    severity: "low"
+    description: "MemPalace 开源 AI Agent 记忆系统(CLI+MCP Server,基准测试领先)"
+
+    process_patterns:
+      - "mempalace"
+      - "mempalace[-_]mcp"
+      - "mempalace.*server"
+
+    env_indicators:
+      - "MEMPALACE_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import mempalace"
+          - "from mempalace import"
+
+  - name: "Trail Code"
+    id: "trail-code"
+    type: "agent_framework"
+    severity: "low"
+    description: "Trail Code 代码库图谱加速(为 Claude Code/Codex 预建 repo 地图,减少重复探索)"
+
+    process_patterns:
+      - "trail-code"
+      - "trailhq"
+      - "@trailhq/trail-code"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "trail-code"
+
+  - name: "Omnigent"
+    id: "omnigent"
+    type: "agent_framework"
+    severity: "low"
+    description: "Omnigent 开源 AI Agent 编排元框架(统一编排 Claude Code/Codex/Cursor,策略与沙箱)"
+
+    process_patterns:
+      - "omnigent"
+      - "omnigent.*harness"
+      - "omnigent[-_]orchestrat"
+
+    env_indicators:
+      - "OMNIGENT_"
+
+  - name: "Apache Maka"
+    id: "maka"
+    type: "agent_framework"
+    severity: "low"
+    description: "Apache Maka (Incubating) 高性能 Agent 工作区(事件溯源,完整行为记录)"
+
+    process_patterns:
+      - "apache/maka"
+      - "maka.*agent"
+      - "maka.*harness"
+      - "\\bmaka\\b"
+
+    env_indicators:
+      - "MAKA_"
+
+  - name: "OpenHarness"
+    id: "openharness"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenHarness 编码 Agent 统一指挥中枢(多 Agent 多机器单点管理)"
+
+    process_patterns:
+      - "openharness"
+      - "open[-_]harness"
+
+    env_indicators:
+      - "OPENHARNESS_"
+
+  - name: "TencentDB Agent Memory"
+    id: "tencentdb-agent-memory"
+    type: "agent_framework"
+    severity: "low"
+    description: "腾讯云 TencentDB Agent Memory 团队级 Agent 记忆中心(符号化短期+分层长期记忆)"
+
+    process_patterns:
+      - "tencentdb-agent-memory"
+      - "memory-tencentdb"
+      - "@tencentdb-agent-memory"
+
+    env_indicators:
+      - "TENCENTDB_"
+
+  - name: "Reef"
+    id: "reef"
+    type: "agent_framework"
+    severity: "low"
+    description: "Reef 持续自我改进 Agent 基础设施(Human-Agent-Society)"
+
+    process_patterns:
+      - "reef.*agent"
+      - "human-agent-society"
+      - "reef.*self[-_]improv"
+
+    env_indicators:
+      - "REEF_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -4748,6 +4873,62 @@ deployment_tools:
     env_indicators:
       - "AIBRIX_"
 
+  - name: "Graphify"
+    id: "graphify"
+    type: "deployment"
+    severity: "low"
+    description: "Graphify 代码库知识图谱构建(确定性 AST 解析为 Agent 提供可查询图谱,无向量库)"
+
+    process_patterns:
+      - "graphify"
+      - "graphify[-_]mcp"
+      - "Graphify-Labs"
+
+  - name: "Browser Harness"
+    id: "browser-harness"
+    type: "deployment"
+    severity: "low"
+    description: "browser-use Browser Harness(让 Claude Code/Codex/Cursor 使用真实已登录 Chrome,CDP+MCP)"
+
+    process_patterns:
+      - "browser-harness"
+      - "browser[-_]use[-_]harness"
+      - "browser-harness.*mcp"
+
+    env_indicators:
+      - "BROWSER_HARNESS_"
+
+  - name: "VoiceMem"
+    id: "voicemem"
+    type: "deployment"
+    severity: "low"
+    description: "VoiceMem 语音 Agent 记忆基础设施(为下一代语音 Agent 提供通用记忆)"
+
+    process_patterns:
+      - "voicemem"
+      - "voice[-_]mem"
+      - "voicemem.*server"
+
+    env_indicators:
+      - "VOICEMEM_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import voicemem"
+          - "from voicemem import"
+
+  - name: "Knowhere"
+    id: "knowhere"
+    type: "deployment"
+    severity: "low"
+    description: "Knowhere RAG 文档解析/结构化分块(为 AI Agent 与 RAG 输出结构化 chunks)"
+
+    process_patterns:
+      - "knowhere"
+      - "knowhere[-_]serve"
+      - "Ontos-AI"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -4986,6 +5167,23 @@ ai_gateways:
         patterns:
           - "import tensorzero"
           - "from tensorzero"
+
+  - name: "Magpie"
+    id: "magpie"
+    type: "llm_framework"
+    severity: "low"
+    description: "Magpie 本地 AI 网关(为 Claude Code/Codex 等编码 Agent 统一调度订阅模型,菜单栏管理)"
+
+    process_patterns:
+      - "magpie"
+      - "usemagpie"
+      - "magpie.*gateway"
+
+    default_ports:
+      - 3425
+
+    env_indicators:
+      - "MAGPIE_"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
