@@ -519,6 +519,50 @@ llm_services:
           - "import notdiamond"
           - "from notdiamond import"
 
+  # ========== 2026-10-19 批次: 本地推理/语音运行时侦察 ==========
+  - name: "MTPLX"
+    id: "mtplx"
+    type: "llm_framework"
+    severity: "low"
+    description: "MTPLX Apple Silicon 本地 LLM 推理服务器(MTP 投机解码, OpenAI/Anthropic 兼容)"
+
+    process_patterns:
+      - "\\bmtplx\\b"
+      - "mtplx.*serve"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "MTPLX_"
+
+  - name: "audio.cpp"
+    id: "audio-cpp"
+    type: "llm_framework"
+    severity: "low"
+    description: "audio.cpp 纯 C++ 音频模型推理引擎(TTS/STT/VAD/语音转换/音乐生成, ggml)"
+
+    process_patterns:
+      - "audio\\.cpp"
+      - "audiocpp"
+      - "audio-cpp"
+
+  - name: "Qwen Audio Agent"
+    id: "qwen-audio-agent"
+    type: "llm_framework"
+    severity: "low"
+    description: "Qwen Audio Agent 实时语音运行时(Agent 实时语音交互 runtime)"
+
+    process_patterns:
+      - "qwen-audio-agent"
+      - "qwen_audio_agent"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -885,6 +929,46 @@ vector_databases:
 
     env_indicators:
       - "OPENVIKING_"
+
+  # ========== 2026-10-19 批次: AI 搜索/记忆存储侦察 ==========
+  - name: "Xerj"
+    id: "xerj"
+    type: "vector_database"
+    severity: "low"
+    description: "Xerj AI 数据自动索引/搜索(代码/文档/日志/PDF 一键索引, RAG/Agent 记忆/安全审计)"
+
+    process_patterns:
+      - "\\bxerj\\b"
+      - "xerj.*index"
+      - "xerj.*serve"
+
+  - name: "PixelRAG"
+    id: "pixelrag"
+    type: "vector_database"
+    severity: "low"
+    description: "PixelRAG 像素级原生 Web/RAG 搜索引擎(替代传统 Web 解析)"
+
+    process_patterns:
+      - "pixelrag"
+      - "pixel-rag"
+
+  - name: "DeepMem"
+    id: "deepmem"
+    type: "vector_database"
+    severity: "low"
+    description: "DeepMem AI 记忆层(Mem0 API 完全兼容, 2x 检索提速 10x 降本, 可自托管)"
+
+    process_patterns:
+      - "deepmem"
+      - "langdeepmem/deepmem"
+      - "docker.*deepmem"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
 
 # ==================== ML 框架 ====================
 ml_frameworks:
@@ -3180,6 +3264,76 @@ agent_frameworks:
     env_indicators:
       - "REEF_"
 
+  # ========== 2026-10-19 批次: Agent 运行时/记忆/浏览器侦察 ==========
+  - name: "Kun"
+    id: "kun"
+    type: "agent_framework"
+    severity: "low"
+    description: "Kun 本地优先 AI Agent 工作台(编码/写作/设计/研究/自动化, 桌面 GUI + TUI)"
+
+    process_patterns:
+      - "kun-agent"
+      - "KunAgent"
+      - "\\bkun\\b.*agent"
+
+  - name: "Ego Lite"
+    id: "ego-lite"
+    type: "agent_framework"
+    severity: "low"
+    description: "ego-lite AI Agent 专用浏览器(与 Agent 共享已登录浏览器状态, 零成本浏览器自动化)"
+
+    process_patterns:
+      - "ego-lite"
+      - "egolite"
+      - "citrolabs/ego-lite"
+
+  - name: "deja-vu"
+    id: "deja-vu"
+    type: "agent_framework"
+    severity: "low"
+    description: "deja-vu 编码 Agent 记忆(基于本地会话历史, 本地检索 + MCP + hooks, Go 单二进制)"
+
+    process_patterns:
+      - "deja-vu"
+      - "dejavu.*mcp"
+
+  - name: "OKF Agent Memory"
+    id: "okf-agent-memory"
+    type: "agent_framework"
+    severity: "low"
+    description: "OKF Agent Memory Git 原生持久记忆(Google OKF v0.2, 内存 BM25 检索, 内嵌 MCP, Go)"
+
+    process_patterns:
+      - "okf-agent-memory"
+      - "okf_memory"
+
+  - name: "ProjectMem"
+    id: "projectmem"
+    type: "agent_framework"
+    severity: "low"
+    description: "ProjectMem 编码 Agent 记忆(记录问题/尝试/修复/决策并预警重复踩坑, 原生 MCP)"
+
+    process_patterns:
+      - "projectmem"
+
+  - name: "OpenSquilla"
+    id: "opensquilla"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenSquilla 令牌高效 AI Agent(同预算更高智能密度)"
+
+    process_patterns:
+      - "opensquilla"
+
+  - name: "Ripwire"
+    id: "ripwire"
+    type: "agent_framework"
+    severity: "low"
+    description: "Ripwire AI 上下文搜索(ripgrep of AI context, 代码库签名检索, CLI + MCP, Red Hat ET)"
+
+    process_patterns:
+      - "ripwire"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -5185,6 +5339,63 @@ ai_gateways:
     env_indicators:
       - "MAGPIE_"
 
+  # ========== 2026-10-19 批次: LLM 网关/代理侦察 ==========
+  - name: "OpenCodex Proxy"
+    id: "opencodex-proxy"
+    type: "llm_framework"
+    severity: "low"
+    description: "opencodex 通用提供商代理(OpenAI Codex / Claude Code 接入任意 LLM: Claude/Gemini/Grok/DeepSeek/Ollama)"
+
+    process_patterns:
+      - "opencodex"
+      - "open-codex.*proxy"
+      - "ligde-jun/opencodex"
+
+    default_ports:
+      - 8080
+
+  - name: "Otari"
+    id: "otari"
+    type: "llm_framework"
+    severity: "low"
+    description: "Mozilla Otari 自托管 OpenAI 兼容 LLM 网关(虚拟密钥/预算/用量追踪, 40+ 提供商)"
+
+    process_patterns:
+      - "\\botari\\b"
+      - "otari.*gateway"
+      - "mozilla-ai/otari"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "OTARI_"
+
+  - name: "AISIX"
+    id: "aisix"
+    type: "llm_framework"
+    severity: "low"
+    description: "AISIX Rust 原生开源 AI 网关(API7 / Apache APISIX 原作者, 路由/护栏/缓存/限流/观测)"
+
+    process_patterns:
+      - "\\baisix\\b"
+      - "api7/aisix"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
   - name: "OpenClaw"
@@ -5667,6 +5878,38 @@ monitoring_tools:
         - type: "exec"
           command: "version"
           parser: "v?([\\d.]+)"
+
+  # ========== 2026-10-19 批次: Agent 可观测性/评估侦察 ==========
+  - name: "FailproofAI"
+    id: "failproofai"
+    type: "monitoring"
+    severity: "low"
+    description: "FailproofAI AI Agent Harness 可观测性与策略执行(捕获每次运行, 运行时可靠性)"
+
+    process_patterns:
+      - "failproofai"
+      - "failproof-ai"
+      - "failproof.*agent"
+
+  - name: "Future AGI"
+    id: "future-agi"
+    type: "monitoring"
+    severity: "low"
+    description: "Future AGI LLM/Agent 评估观测平台(Tracing/Evals/仿真/数据集/网关/护栏, 自托管)"
+
+    process_patterns:
+      - "future-agi"
+      - "futureagi"
+
+  - name: "AgentAcct"
+    id: "agentacct"
+    type: "monitoring"
+    severity: "low"
+    description: "AgentAcct 编码 Agent 用量/成本本地仪表盘(Claude Code/Codex/OpenCode 等, 无登录无遥测)"
+
+    process_patterns:
+      - "agentacct"
+      - "agent-acct"
 
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
