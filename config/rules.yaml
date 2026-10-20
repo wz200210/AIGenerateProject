@@ -563,6 +563,77 @@ llm_services:
       - "qwen-audio-agent"
       - "qwen_audio_agent"
 
+  - name: "Splash"
+    id: "splash"
+    type: "llm_framework"
+    severity: "low"
+    description: "Splash Apple Silicon 本地 LLM 推理引擎(C++/Metal, DFlash 2 投机解码, OpenAI/Anthropic 兼容, incoai)"
+
+    process_patterns:
+      - "\\bsplash\\b"
+      - "splash serve"
+      - "incoai/tap/splash"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/v1/chat/completions"
+        method: "POST"
+
+    env_indicators:
+      - "SPLASH_"
+
+  - name: "TensorFold"
+    id: "tensorfold"
+    type: "llm_framework"
+    severity: "low"
+    description: "TensorFold Zig 单二进制 LLM 推理引擎(Apple Metal / NVIDIA CUDA, 无需 Python)"
+
+    process_patterns:
+      - "\\btensorfold\\b"
+      - "tensorfold-native"
+      - "tensorfold serve"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/v1/chat/completions"
+        method: "POST"
+
+    env_indicators:
+      - "TENSORFOLD_"
+
+  - name: "Atlas Inference"
+    id: "atlas-inference"
+    type: "llm_framework"
+    severity: "low"
+    description: "Atlas 纯 Rust LLM 推理引擎(单二进制 ~75MB, 手写 CUDA 核, NVFP4/FP8 量化, 投机解码, OpenAI/Anthropic/Responses API, Avarok)"
+
+    process_patterns:
+      - "avarok/atlas"
+      - "atlas-gb10"
+      - "atlas serve"
+      - "\\batlas\\b.*--port"
+
+    default_ports:
+      - 8888
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "ATLAS_INFERENCE"
+      - "AVAROK_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -3334,6 +3405,93 @@ agent_frameworks:
     process_patterns:
       - "ripwire"
 
+  - name: "OpenSwarm"
+    id: "openswarm"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenSwarm Agent 化 CI/CD 门禁(PM 评审/修复/再评审/确定性验证, 支持 Claude Code/Codex/OpenRouter/本地模型, Intrect)"
+
+    process_patterns:
+      - "\\bopenswarm\\b"
+      - "@intrect/openswarm"
+
+    default_ports:
+      - 3847
+
+    env_indicators:
+      - "OPENSWARM_"
+
+  - name: "Sandbase Harness"
+    id: "sandbase-harness"
+    type: "agent_framework"
+    severity: "low"
+    description: "Sandbase 本地优先自托管 AI Agent runtime + MCP 桥(沙箱会话/记忆/凭证管理/审计回放, npm managed-agents)"
+
+    process_patterns:
+      - "sandbase"
+      - "managed-agents"
+
+    default_ports:
+      - 3000
+
+    env_indicators:
+      - "SANDBASE_"
+
+  - name: "Memory OS"
+    id: "memory-os"
+    type: "agent_framework"
+    severity: "low"
+    description: "Memory OS Hermes Agent 七层记忆操作系统(Qdrant 持久记忆/结构化事实/自动 wiki/上下文注入, 任意 LLM 提供商)"
+
+    process_patterns:
+      - "memory-os"
+      - "memory_os"
+
+    env_indicators:
+      - "MEMORY_OS_"
+
+  - name: "HyperResearch"
+    id: "hyperresearch"
+    type: "agent_framework"
+    severity: "low"
+    description: "HyperResearch Deep Research Agent(收集/检索/综合网络研究为可持久化可搜索 wiki, MCP + Hosted API)"
+
+    process_patterns:
+      - "\\bhyperresearch\\b"
+
+    env_indicators:
+      - "HYPERRESEARCH_"
+
+  - name: "AiSOC"
+    id: "aisoc"
+    type: "agent_framework"
+    severity: "low"
+    description: "AiSOC 开源 AI 安全运营中心(告警融合/LLM Agent 分诊/MITRE ATT&CK 调查/可回放决策账本, 内置 MCP Server)"
+
+    process_patterns:
+      - "\\baisoc\\b"
+
+    default_ports:
+      - 8081
+
+    env_indicators:
+      - "AISOC_"
+
+  - name: "OpenLive"
+    id: "openlive"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenLive 端侧语音+视觉层 for AI Agent(全本地 VAD/STT/TTS/barge-in 语音闭环, 对标 ElevenLabs Agents/Gemini Live/OpenAI Realtime 的开源替代)"
+
+    process_patterns:
+      - "\\bopenlive\\b"
+
+    default_ports:
+      - 3000
+
+    env_indicators:
+      - "OPENLIVE_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -5083,6 +5241,52 @@ deployment_tools:
       - "knowhere[-_]serve"
       - "Ontos-AI"
 
+  - name: "Semble"
+    id: "semble"
+    type: "deployment"
+    severity: "low"
+    description: "Semble Agent 代码搜索(比 grep+read 少 99% token, Python MCP Server, MinishLab)"
+
+    process_patterns:
+      - "\\bsemble\\b"
+      - "minish"
+
+    env_indicators:
+      - "SEMBLE_"
+
+  - name: "Wigolo"
+    id: "wigolo"
+    type: "deployment"
+    severity: "low"
+    description: "Wigolo AI 编码 Agent 的本地优先 Web 层(搜索/抓取/爬取/研究, MCP, 免 API key 零云端成本)"
+
+    process_patterns:
+      - "\\bwigolo\\b"
+      - "knockoutez/wigolo"
+
+    default_ports:
+      - 3333
+
+    env_indicators:
+      - "WIGOLO_"
+
+  - name: "Open Connector"
+    id: "open-connector"
+    type: "deployment"
+    severity: "low"
+    description: "Open Connector 开源认证网关(通过 SDK/CLI/MCP/HTTP/OpenAPI 连接 1500+ SaaS 提供商到 AI Agent, OOMOL Lab)"
+
+    process_patterns:
+      - "open-connector"
+      - "@oomol-lab/open-connector"
+
+    default_ports:
+      - 3000
+
+    env_indicators:
+      - "OPEN_CONNECTOR_"
+      - "OOMOL_"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -5395,6 +5599,122 @@ ai_gateways:
         method: "GET"
       - path: "/health"
         method: "GET"
+
+  - name: "Weave Router"
+    id: "weave-router"
+    type: "llm_framework"
+    severity: "low"
+    description: "Weave Router 模型路由器(Go, 端上嵌入模型按 action 路由, Anthropic/OpenAI/Gemini 三协议, BYOK, OTLP 可观测)"
+
+    process_patterns:
+      - "weave-os/router"
+      - "weave.?router"
+      - "router-warmup"
+      - "workweave"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/ui/dashboard"
+        method: "GET"
+
+    env_indicators:
+      - "WEAVE_ROUTER_"
+      - "WORKWEAVE_"
+
+  - name: "HarnessRouter"
+    id: "harnessrouter"
+    type: "llm_framework"
+    severity: "low"
+    description: "HarnessRouter Agent harness 统一接口(社区版, UHP 统一 harness 协议, OpenAI Responses 兼容, 26 种 harness: Codex/Claude Code/Hermes/Pi/DSH 等)"
+
+    process_patterns:
+      - "\\bharnessrouter\\b"
+      - "harness-router"
+      - "harnessrouter/harnessrouter"
+
+    default_ports:
+      - 3000
+      - 3100
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "HARNESSROUTER_"
+
+  - name: "OrcaRouter Lite"
+    id: "orcarouter"
+    type: "llm_framework"
+    severity: "low"
+    description: "OrcaRouter Lite 自托管 LLM 路由(OpenAI 兼容, BYOK, 单工作区, 流式, 带托管安全网)"
+
+    process_patterns:
+      - "orcarouter"
+      - "orca-router"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "ORCAROUTER_"
+
+  - name: "TokenHub"
+    id: "tokenhub"
+    type: "llm_framework"
+    severity: "low"
+    description: "TokenHub 企业级 AI 模型访问治理私有网关(统一访问/治理/成本归因, astaxie)"
+
+    process_patterns:
+      - "\\btokenhub\\b"
+
+    default_ports:
+      - 3000
+      - 8080
+
+    env_indicators:
+      - "TOKENHUB_"
+
+  - name: "ThinkWatch"
+    id: "thinkwatch"
+    type: "llm_framework"
+    severity: "low"
+    description: "ThinkWatch 自托管 AI API + MCP 网关(SSO/RBAC, MCP 工具调用按用户身份, PII 脱敏/工具调用护栏/限流/预算/审计日志, Rust)"
+
+    process_patterns:
+      - "thinkwatch"
+
+    env_indicators:
+      - "THINKWATCH_"
+
+  - name: "Misceo"
+    id: "misceo"
+    type: "llm_framework"
+    severity: "low"
+    description: "Misceo 本地 Anthropic 兼容 AI 网关(廉价优先路由 + 质量门 + 安全模型切换, 保护 Agent 会话状态, npm @misceo/cli)"
+
+    process_patterns:
+      - "\\bmisceo\\b"
+      - "@misceo/cli"
+
+    default_ports:
+      - 4141
+      - 5141
+
+    env_indicators:
+      - "MISCEO_"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
