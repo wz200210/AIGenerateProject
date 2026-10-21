@@ -634,6 +634,38 @@ llm_services:
       - "ATLAS_INFERENCE"
       - "AVAROK_"
 
+  # ========== 2026-10-21 批次: 语音/音频推理与模型服务 ==========
+  - name: "MOSS-TTS-Nano"
+    id: "moss-tts-nano"
+    type: "llm_framework"
+    severity: "low"
+    description: "MOSS-TTS-Nano 100M 参数多语言 TTS 模型(CPU 实时推理/语音克隆/48kHz 立体声, OpenMOSS)"
+
+    process_patterns:
+      - "moss-tts"
+      - "moss_tts"
+      - "MOSS-TTS-Nano"
+      - "python.*moss.*tts"
+
+    env_indicators:
+      - "MOSS_TTS_"
+      - "MOSS-TTS-"
+
+  - name: "HyperQwen"
+    id: "hyperqwen"
+    type: "llm_framework"
+    severity: "low"
+    description: "HyperQwen 消费级 GPU 上的大 Qwen 模型快速服务(24GB 单卡 Qwen3.8-27B, 投机解码, 基于 vLLM)"
+
+    process_patterns:
+      - "hyperqwen"
+      - "HyperQwen"
+      - "hyper-qwen"
+      - "python.*hyperqwen"
+
+    env_indicators:
+      - "HYPERQWEN_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -3492,6 +3524,101 @@ agent_frameworks:
     env_indicators:
       - "OPENLIVE_"
 
+  # ========== 2026-10-21 批次: Agent 工作台/编码代理/控制面 ==========
+  - name: "Open Science"
+    id: "open-science"
+    type: "agent_framework"
+    severity: "low"
+    description: "Open Science 开源 AI 科研工作台(科学研究+Agent工作流, Local-first桌面应用, 可扩展Skill/MCP, aipoch)"
+
+    process_patterns:
+      - "open-science"
+      - "open-science-app"
+      - "aipoch"
+      - "openscience"
+
+    env_indicators:
+      - "OPEN_SCIENCE_"
+      - "AIP0CH_"
+      - "AIPOCH_"
+
+  - name: "KiroCrew"
+    id: "kirocrew"
+    type: "agent_framework"
+    severity: "low"
+    description: "KiroCrew 自改进持久化开发工作区(开发工作跨会话延续, kirodotdev)"
+
+    process_patterns:
+      - "kirocrew"
+      - "kiro-crew"
+      - "KiroCrew"
+
+    env_indicators:
+      - "KIROCREW_"
+      - "KIRO_CREW_"
+
+  - name: "Tutti"
+    id: "tutti"
+    type: "agent_framework"
+    severity: "low"
+    description: "Tutti 人与 Agent 协作共建平台(Agent编排/共享上下文/桌面应用, tutti-os)"
+
+    process_patterns:
+      - "\\btutti\\b"
+      - "tutti-app"
+      - "tutti.*agent"
+
+    default_ports:
+      - 3000
+      - 5173
+
+    env_indicators:
+      - "TUTTI_"
+
+  - name: "Fuxi"
+    id: "fuxi"
+    type: "agent_framework"
+    severity: "low"
+    description: "FuXi 终端 AI 编码 Agent(自包含/编辑代码/执行命令/驱动工具, 成本感知路由, fuxicodex)"
+
+    process_patterns:
+      - "\\bfuxi\\b"
+      - "fuxi-agent"
+      - "fuxicode"
+
+    env_indicators:
+      - "FUXI_"
+      - "FUXICODE_"
+
+  - name: "Zeron"
+    id: "zeron"
+    type: "agent_framework"
+    severity: "low"
+    description: "Zeron 编码 Agent 原生控制面(Claude Code/Codex/Cursor/Devin 统一控制, Rust+GPUI, zeronsh)"
+
+    process_patterns:
+      - "\\bzeron\\b"
+      - "zeron-sh"
+      - "zeron.*agent"
+
+    env_indicators:
+      - "ZERON_"
+
+  - name: "Waku Agent"
+    id: "waku-agent"
+    type: "agent_framework"
+    severity: "low"
+    description: "Waku Agent 本地优先 AI Agent Harness(循环/记忆/评估, 代码可读, ShenSeanChen)"
+
+    process_patterns:
+      - "waku-agent"
+      - "waku_agent"
+      - "waku.*harness"
+
+    env_indicators:
+      - "WAKU_AGENT_"
+      - "WAKU_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -5287,6 +5414,51 @@ deployment_tools:
       - "OPEN_CONNECTOR_"
       - "OOMOL_"
 
+  # ========== 2026-10-21 批次: 端侧多模态/音频工作室/AI搜索 ==========
+  - name: "Parlor"
+    id: "parlor"
+    type: "deployment"
+    severity: "low"
+    description: "Parlor 端侧实时多模态 AI(GPT-Live 类似功能, Apple Silicon+MLX, 语音识别+TTS, fikrikarim)"
+
+    process_patterns:
+      - "\\bparlor\\b"
+      - "parlor.*mlx"
+      - "parlor.*voice"
+
+    env_indicators:
+      - "PARLOR_"
+
+  - name: "YoVoice"
+    id: "yovoice"
+    type: "deployment"
+    severity: "low"
+    description: "YoVoice 开源本地 AI 音频与音乐工作室(TTS/语音克隆/歌词歌曲/多轨乐谱, 100%离线, macOS/Windows)"
+
+    process_patterns:
+      - "yovoice"
+      - "yo-voice"
+      - "YoVoice"
+
+    env_indicators:
+      - "YOVICE_"
+      - "YOVOICE_"
+
+  - name: "SearchCLI"
+    id: "searchcli"
+    type: "deployment"
+    severity: "low"
+    description: "SearchCLI 火山引擎开源 AI 搜索 CLI(集成 AI 搜索/推荐/对话式检索到 Agent 系统, volcengine)"
+
+    process_patterns:
+      - "searchcli"
+      - "search-cli"
+      - "SearchCLI"
+
+    env_indicators:
+      - "SEARCHCLI_"
+      - "SEARCH_CLI_"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -5715,6 +5887,80 @@ ai_gateways:
 
     env_indicators:
       - "MISCEO_"
+
+  # ========== 2026-10-21 批次: Agent 控制面/企业网关/成本优化 ==========
+  - name: "LiteLLM Agent Control Plane"
+    id: "litellm-agent-cp"
+    type: "llm_framework"
+    severity: "low"
+    description: "LiteLLM Agent Control Plane 统一 Agent 调用平面(OpenCode/Hermes/Claude Managed Agents/Cursor Agents API/DeepAgents, Rust, LiteLLM-Labs)"
+
+    process_patterns:
+      - "litellm-agent"
+      - "agent-control-plane"
+      - "litellm.*control.*plane"
+
+    default_ports:
+      - 4000
+      - 8080
+
+    env_indicators:
+      - "LITELLM_AGENT_"
+
+  - name: "AIHelms"
+    id: "aihelms"
+    type: "llm_framework"
+    severity: "low"
+    description: "AIHelms 企业级 AI 资源纳管平台(统一AI网关/Token调度/MCP工具与Skill注册分发/成本归因/统一身份认证, FastAPI+Vue3)"
+
+    process_patterns:
+      - "aihelms"
+      - "ai-helms"
+      - "AIHelms"
+
+    default_ports:
+      - 8000
+      - 8080
+
+    env_indicators:
+      - "AIHELM"
+      - "WEB_PORT"
+
+  - name: "Busbar"
+    id: "busbar"
+    type: "llm_framework"
+    severity: "low"
+    description: "Busbar AI Agent 执行控制面(验证/治理/路由每个模型请求/MCP工具调用/A2A委托, Rust静态二进制, GetBusbar)"
+
+    process_patterns:
+      - "\\bbusbar\\b"
+      - "busbar.*proxy"
+      - "busbar.*gateway"
+
+    default_ports:
+      - 8080
+      - 8443
+
+    env_indicators:
+      - "BUSBAR_"
+
+  - name: "llmtrim"
+    id: "llmtrim"
+    type: "llm_framework"
+    severity: "low"
+    description: "llmtrim 本地 LLM API 请求压缩代理(裁剪冗余Token降低API成本, 答案不变, Rust, fkiene)"
+
+    process_patterns:
+      - "llmtrim"
+      - "llm-trim"
+      - "llmtrim.*proxy"
+
+    default_ports:
+      - 8080
+      - 11435
+
+    env_indicators:
+      - "LLMTRIM_"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
@@ -6230,6 +6476,26 @@ monitoring_tools:
     process_patterns:
       - "agentacct"
       - "agent-acct"
+
+  # ========== 2026-10-21 批次: Agent CI/CD/回归测试 ==========
+  - name: "Tracely"
+    id: "tracely"
+    type: "monitoring"
+    severity: "low"
+    description: "Tracely AI Agent Trace原生CI/CD(生产Trace评分/失败聚类/冻结为可回放回归测试/阻断退化PR, ClickHouse, jwuthri-cloud)"
+
+    process_patterns:
+      - "tracely"
+      - "tracely-ai"
+      - "tracely.*agent"
+
+    default_ports:
+      - 3000
+      - 8080
+      - 8123
+
+    env_indicators:
+      - "TRACELY_"
 
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
