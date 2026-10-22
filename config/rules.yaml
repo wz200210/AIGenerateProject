@@ -666,6 +666,39 @@ llm_services:
     env_indicators:
       - "HYPERQWEN_"
 
+  # ========== 2026-10-22 批次: 语音生成基础模型/多语言TTS ==========
+  - name: "AuK"
+    id: "auk"
+    type: "llm_framework"
+    severity: "low"
+    description: "腾讯混元 AuK 开源语音生成与编辑基础模型(零样本TTS/语音分离/增强/编辑, 支持 audio.cpp GGUF/vLLM-Omni/SGLang-Omni/MLX, Tencent-Hunyuan)"
+
+    process_patterns:
+      - "\\bauk\\b"
+      - "hunyuan.*auk"
+      - "auk[-_]flash"
+      - "python.*auk"
+
+    env_indicators:
+      - "AUK_"
+      - "HUNYUAN_AUK"
+
+  - name: "Confucius4-TTS"
+    id: "confucius4-tts"
+    type: "llm_framework"
+    severity: "low"
+    description: "网易有道 Confucius4-TTS 多语言跨语言零样本TTS引擎(语音编码器+LLM架构, 14语言, 支持vLLM部署, netease-youdao)"
+
+    process_patterns:
+      - "confucius4"
+      - "confucius[-_]tts"
+      - "confuciustts"
+      - "python.*confucius"
+
+    env_indicators:
+      - "CONFUCIUS4_"
+      - "CONFUCIUSTTS_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -3619,6 +3652,95 @@ agent_frameworks:
       - "WAKU_AGENT_"
       - "WAKU_"
 
+  # ========== 2026-10-22 批次: Agent记忆运行时/知识库/可视化MCP ==========
+  - name: "Agent Memory"
+    id: "agent-memory"
+    type: "agent_framework"
+    severity: "low"
+    description: "tigerless Agent Memory 长期记忆运行时(Markdown为源/本地排序检索/睡眠期Manage层, Claude Code/Codex CLI/Muse Code宿主, MCP+mem CLI)"
+
+    process_patterns:
+      - "agent[-_]memory"
+      - "agent_memory"
+      - "agent-memory-workspace"
+
+    env_indicators:
+      - "AGENT_MEMORY_"
+      - "MEMORY_STORE"
+
+  - name: "OpenLore"
+    id: "openlore"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenLore Agent原生知识仓库(共享上下文保持最新可审查, Web+MCP+SSH多传输, 二进制lore, aakarim)"
+
+    process_patterns:
+      - "openlore"
+      - "lore.*serve"
+      - "lore.*mcp"
+
+    default_ports:
+      - 8080
+      - 2222
+
+    env_indicators:
+      - "OPENLORE_"
+      - "LORE_"
+
+  - name: "OpenKB"
+    id: "openkb"
+    type: "agent_framework"
+    severity: "low"
+    description: "VectifyAI OpenKB 开放知识库(PageIndex无向量推理式长文档检索, 文档编译为互联wiki, CLI openkb, VectifyAI)"
+
+    process_patterns:
+      - "\\bopenkb\\b"
+      - "open-kb"
+      - "pageindex"
+
+    env_indicators:
+      - "OPENKB_"
+
+  - name: "Flint Chart"
+    id: "flint-chart"
+    type: "agent_framework"
+    severity: "low"
+    description: "微软 Flint 可视化语言(MCP Server让AI Agent可靠生成表现力图表, 人类可编辑图表规格, flint-chart-mcp/flint-mcp, microsoft)"
+
+    process_patterns:
+      - "flint[-_]chart"
+      - "flint[-_]mcp"
+      - "flint-chart-mcp"
+
+    env_indicators:
+      - "FLINT_"
+
+  - name: "Apowerb"
+    id: "apowerb"
+    type: "agent_framework"
+    severity: "low"
+    description: "Apowerb 开源 Agentic 框架(构建/编排/运行生产级AI Agent流水线, Python, apowerb)"
+
+    process_patterns:
+      - "apowerb"
+      - "apowerb.*agent"
+
+    env_indicators:
+      - "APOWERB_"
+
+  - name: "ZizkaDB"
+    id: "zizkadb"
+    type: "agent_framework"
+    severity: "low"
+    description: "ZizkaDB AI Agent 审计追踪数据库(防篡改/校验和支撑决策记录, Python, ZIZKA-AI-SL)"
+
+    process_patterns:
+      - "zizkadb"
+      - "zizka[-_]db"
+
+    env_indicators:
+      - "ZIZKADB_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -5962,6 +6084,63 @@ ai_gateways:
     env_indicators:
       - "LLMTRIM_"
 
+  # ========== 2026-10-22 批次: 本地Agent网关/模型路由/隐私网关 ==========
+  - name: "AstrLink"
+    id: "astrlink"
+    type: "llm_framework"
+    severity: "low"
+    description: "AstrLink 本地 AI Agent 网关(统一订阅与API提供商/智能路由/端侧隐私保护与PII脱敏, OpenAI兼容 /v1, Go+桌面sidecar, 默认端口8317, Calcium-Ion)"
+
+    process_patterns:
+      - "astrlink"
+      - "astr[-_]link"
+      - "AstrLink"
+
+    default_ports:
+      - 8317
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "ASTRLINK_"
+
+  - name: "HiRoute"
+    id: "hiroute"
+    type: "llm_framework"
+    severity: "low"
+    description: "HiRoute 本地模型路由(Codex/Claude Code/Qoder/Pi/DeepSeek Harness 订阅增效, 难度路由+缓存复用, Rust, hiroute/hiroute-daemon 二进制, higress-group)"
+
+    process_patterns:
+      - "hiroute"
+      - "hiroute[-_]daemon"
+      - "hiroute[-_]cli"
+      - "HiRoute"
+
+    env_indicators:
+      - "HIROUTE_"
+
+  - name: "privacy-filter"
+    id: "privacy-filter"
+    type: "llm_framework"
+    severity: "low"
+    description: "privacy-filter Go LLM隐私网关(毫秒级PII/密钥脱敏, HTTP+gRPC双协议, 可嵌入网关核心包, PF_PORT/PF_GRPC_PORT, packyme)"
+
+    process_patterns:
+      - "privacy[-_]filter"
+      - "privacyfilter"
+      - "privacy-filter.*gateway"
+
+    default_ports:
+      - 8088
+      - 8089
+
+    env_indicators:
+      - "PF_PORT"
+      - "PF_GRPC_PORT"
+      - "PRIVACY_FILTER_"
+
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
   - name: "OpenClaw"
@@ -6496,6 +6675,20 @@ monitoring_tools:
 
     env_indicators:
       - "TRACELY_"
+
+  # ========== 2026-10-22 批次: LLM成本分析 ==========
+  - name: "Frugon"
+    id: "frugon"
+    type: "monitoring"
+    severity: "low"
+    description: "Frugon 免费本地LLM成本分析器(账单泄漏定位/用量归因, 无需上传数据, CLI frugon, Rodiun)"
+
+    process_patterns:
+      - "frugon"
+      - "frugon.*cli"
+
+    env_indicators:
+      - "FRUGON_"
 
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
