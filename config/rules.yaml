@@ -699,6 +699,85 @@ llm_services:
       - "CONFUCIUS4_"
       - "CONFUCIUSTTS_"
 
+  # ========== 2026-10-24 批次: 推理服务/边缘推理侦察 ==========
+  - name: "KVarN"
+    id: "kvarn"
+    type: "llm_framework"
+    severity: "low"
+    description: "KVarN vLLM KV缓存量化后端(3-5x更长上下文agent负载, 原生vLLM插件, huawei-csl)"
+
+    process_patterns:
+      - "\\bkvarn\\b"
+      - "python.*kvarn"
+
+    env_indicators:
+      - "KVARN_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import kvarn"
+          - "from kvarn"
+
+  - name: "OlliteRT"
+    id: "ollitert"
+    type: "llm_framework"
+    severity: "low"
+    description: "OlliteRT Android手机OpenAI兼容LLM推理服务器(LiteRT-LM, 多模态/推理/工具调用, NightMean)"
+
+    process_patterns:
+      - "ollitert"
+      - "ollite.*rt.*serve"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "OLLITERT_"
+
+  - name: "backburner"
+    id: "backburner"
+    type: "llm_framework"
+    severity: "low"
+    description: "backburner iPhone+Mac分布式推理(prefill/writing拆分, llama.cpp fork, Apple Silicon speculative decoding, StayLameBro)"
+
+    process_patterns:
+      - "\\bbackburner\\b"
+      - "backburner.*serve"
+      - "llama.*backburner"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "BACKBURNER_"
+
+  - name: "slotstream"
+    id: "slotstream"
+    type: "llm_framework"
+    severity: "low"
+    description: "slotstream macOS原生MoE模型流式推理(超出内存的大模型分片流式加载, MLX, OpenAI兼容, carloslfu)"
+
+    process_patterns:
+      - "\\bslotstream\\b"
+      - "slotstream.*serve"
+      - "slotstream.*server"
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "SLOTSTREAM_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -1587,6 +1666,26 @@ ml_frameworks:
         patterns:
           - "import oumi"
           - "from oumi"
+
+  # ========== 2026-10-24 批次: Apple Silicon推理加速侦察 ==========
+  - name: "mlx-dspark"
+    id: "mlx-dspark"
+    type: "ml_framework"
+    severity: "low"
+    description: "mlx-dspark DeepSeek Spark解码Apple Silicon无损加速(最高4x解码提速, 原生MLX移植, ARahim3)"
+
+    process_patterns:
+      - "mlx[-_]dspark"
+      - "dspark.*mlx"
+
+    env_indicators:
+      - "DSPARK_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import mlx_dspark"
+          - "from mlx_dspark"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -3741,6 +3840,117 @@ agent_frameworks:
     env_indicators:
       - "ZIZKADB_"
 
+  # ========== 2026-10-24 批次: Agent运行时/基础设施侦察 ==========
+  - name: "Agentlas-OS"
+    id: "agentlas-os"
+    type: "agent_framework"
+    severity: "low"
+    description: "Agentlas Agent OS 智能体中心+临时编排器(每任务spin orchestrator, A2A/MCP/skills, Python, agentlas-ai)"
+
+    process_patterns:
+      - "agentlas"
+      - "agentlas[-_]os"
+      - "agentlas.*orchestrat"
+
+    env_indicators:
+      - "AGENTLAS_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import agentlas"
+          - "from agentlas"
+
+  - name: "semantix"
+    id: "semantix"
+    type: "agent_framework"
+    severity: "low"
+    description: "semantix 语义Agent内核(harness无关, 消息重写/会话提取hooks, 自演化语义缓存, Gnosil)"
+
+    process_patterns:
+      - "\\bsemantix\\b"
+      - "semantix.*kernel"
+      - "python.*semantix"
+
+    env_indicators:
+      - "SEMANTIX_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import semantix"
+          - "from semantix"
+
+  - name: "reticle"
+    id: "reticle"
+    type: "agent_framework"
+    severity: "low"
+    description: "reticle 编码Agent代码理解MCP(运行中应用感知, @reticlehq/server, Node.js 20.11+, reticlehq)"
+
+    process_patterns:
+      - "@reticlehq/server"
+      - "reticlehq"
+      - "reticle.*mcp"
+
+    env_indicators:
+      - "RETICLE_"
+
+  - name: "ongrid"
+    id: "ongrid"
+    type: "agent_framework"
+    severity: "low"
+    description: "ongrid 基础设施运维AI Agent(根因定位/自动修复, 单二进制Linux服务器部署, MCP服务器注册, ongridio)"
+
+    process_patterns:
+      - "\\bongrid\\b"
+      - "ongrid.*agent"
+      - "ongrid.*server"
+
+    env_indicators:
+      - "ONGRID_"
+
+  - name: "OpenExecutive"
+    id: "openexecutive"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenExecutive AI虚拟高管团队(8个专业角色组成统一执行人格, MCP端点, 支出审批/数字分身, SenteLabsAI)"
+
+    process_patterns:
+      - "openexecutive"
+      - "open[-_]executive"
+      - "uvicorn.*openexecutive"
+
+    default_ports:
+      - 8000
+      - 3000
+
+    http_endpoints:
+      - path: "/mcp"
+        method: "GET"
+
+    env_indicators:
+      - "OPENEXECUTIVE_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import openexecutive"
+          - "from openexecutive"
+
+  - name: "invisible_playwright_mcp"
+    id: "invisible-playwright-mcp"
+    type: "agent_framework"
+    severity: "low"
+    description: "invisible_playwright_mcp 反检测Playwright MCP(绕过反bot/验证码, AI Agent隐身浏览, feder-cr)"
+
+    process_patterns:
+      - "invisible[-_]playwright"
+      - "invisible_playwright_mcp"
+      - "invisibleplaywright"
+
+    env_indicators:
+      - "INVISIBLE_PLAYWRIGHT_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -5581,6 +5791,20 @@ deployment_tools:
       - "SEARCHCLI_"
       - "SEARCH_CLI_"
 
+  # ========== 2026-10-24 批次: 自托管LLM栈管理侦察 ==========
+  - name: "llmaker"
+    id: "llmaker"
+    type: "deployment"
+    severity: "low"
+    description: "llmaker 自托管现代LLM栈CLI(终端管理整个LLM舰队, raiyanyahya)"
+
+    process_patterns:
+      - "\\bllmaker\\b"
+      - "llmaker.*stack"
+
+    env_indicators:
+      - "LLMAKER_"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -6140,6 +6364,49 @@ ai_gateways:
       - "PF_PORT"
       - "PF_GRPC_PORT"
       - "PRIVACY_FILTER_"
+
+  # ========== 2026-10-24 批次: AI网关管理面板侦察 ==========
+  - name: "CPA-Manager-Plus"
+    id: "cpa-manager-plus"
+    type: "llm_framework"
+    severity: "low"
+    description: "CPA-Manager-Plus CLIProxyAPI管理面板/可观测性(Go, 轻量面板模式+全量持久化模式, 请求历史/成本分析, seakee)"
+
+    process_patterns:
+      - "cpa[-_]manager"
+      - "cpamp"
+      - "cpa-manager-plus"
+
+    default_ports:
+      - 18317
+      - 8317
+
+    http_endpoints:
+      - path: "/management.html"
+        method: "GET"
+
+    env_indicators:
+      - "CPAMP_"
+      - "CPA_MANAGEMENT_KEY"
+
+  - name: "oh-my-cpa"
+    id: "oh-my-cpa"
+    type: "llm_framework"
+    severity: "low"
+    description: "oh-my-cpa CLIProxyAPI自托管控制平面/用量可观测控制台(React+Go+SQLite, WizisCool)"
+
+    process_patterns:
+      - "oh[-_]my[-_]cpa"
+      - "omc.*cpa"
+      - "ohmycpa"
+
+    default_ports:
+      - 8080
+      - 8317
+
+    env_indicators:
+      - "OMC_"
+      - "OMCPA_"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
