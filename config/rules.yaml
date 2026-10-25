@@ -778,6 +778,49 @@ llm_services:
     env_indicators:
       - "SLOTSTREAM_"
 
+  # ========== 2026-10-25 批次: 推理服务侦察 ==========
+  - name: "Project Maya"
+    id: "project-maya"
+    type: "llm_framework"
+    severity: "low"
+    description: "Project Maya 私有化超大MoE推理引擎(GLM-5.3-Flash 321B/DeepSeek-V4.1-Flash 748B, OpenAI+Anthropic兼容API, 自动GPU分层调度, maya.py, mw00/PeasantSmith)"
+
+    process_patterns:
+      - "project[-_]maya"
+      - "maya\\.py"
+      - "python.*maya"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "MAYA_"
+
+  - name: "Paritok"
+    id: "paritok"
+    type: "llm_framework"
+    severity: "low"
+    description: "Paritok AI编码Agent内容压缩网关(4B本地模型压缩工具输出/系统提示注入, 降低25%+ token消耗, Ollama驱动, paritok up 一键启动, Paritok-official)"
+
+    process_patterns:
+      - "\\bparitok\\b"
+      - "paritok.*serve"
+      - "paritok.*up"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/chat/completions"
+        method: "POST"
+
+    env_indicators:
+      - "PARITOK_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -1184,6 +1227,26 @@ vector_databases:
     http_endpoints:
       - path: "/health"
         method: "GET"
+
+  # ========== 2026-10-25 批次: 向量存储侦察 ==========
+  - name: "LodeDB"
+    id: "lodedb"
+    type: "vector_database"
+    severity: "low"
+    description: "LodeDB 极速嵌入式向量数据库(进程内/磁盘持久化, 精确搜索默认, LangChain/LlamaIndex/mem0 即插后端, pip install lodedb, Egoist-Machines)"
+
+    process_patterns:
+      - "lodedb"
+      - "lode[-_]db"
+
+    env_indicators:
+      - "LODEDB_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import lodedb"
+          - "from lodedb import"
 
 # ==================== ML 框架 ====================
 ml_frameworks:
@@ -3951,6 +4014,51 @@ agent_frameworks:
     env_indicators:
       - "INVISIBLE_PLAYWRIGHT_"
 
+  # ========== 2026-10-25 批次: Agent记忆/工具侦察 ==========
+  - name: "Compartment"
+    id: "compartment"
+    type: "agent_framework"
+    severity: "low"
+    description: "Compartment 加密离线Agent记忆(GUI记忆地图, 一键安装, 固定重要性分层+冲突合并, integrate claude/codex, MaxFreedomPollard)"
+
+    process_patterns:
+      - "\\bcompartment\\b"
+      - "compartment.*memory"
+      - "compartment.*integrate"
+
+    env_indicators:
+      - "COMPARTMENT_"
+
+  - name: "treg"
+    id: "treg"
+    type: "agent_framework"
+    severity: "low"
+    description: "treg Agent工具注册中心(OpenRouter for agent tools, 统一工具目录+凭据注入+厂商CLI代理, npx skills add superdesigndev/treg)"
+
+    process_patterns:
+      - "\\btreg\\b"
+      - "treg.*catalog"
+      - "treg.*serve"
+      - "superdesigndev/treg"
+
+    env_indicators:
+      - "TREG_"
+
+  - name: "OpenReverseLab"
+    id: "open-reverselab"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenReverseLab 开源AI逆向工程Agent平台(MCP server驱动Ghidra/Frida, 样本分析链+报告生成, LING71671)"
+
+    process_patterns:
+      - "open[-_]reverselab"
+      - "reverse[-_]lab[-_]tools"
+      - "reverselab.*mcp"
+
+    env_indicators:
+      - "REVERSALAB_"
+      - "OPENREVERSELAB_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -6408,6 +6516,117 @@ ai_gateways:
       - "OMC_"
       - "OMCPA_"
 
+  # ========== 2026-10-25 批次: AI网关侦察 ==========
+  - name: "Antirion"
+    id: "antirion"
+    type: "llm_framework"
+    severity: "low"
+    description: "Antirion 高性能开源AI网关(单Rust二进制+内置管理控制台, 数据面8080/管理面8081分离, 回退链/预算/护栏, 亚毫秒开销, eliasbiondo)"
+
+    process_patterns:
+      - "\\bantirion\\b"
+      - "antirion.*gateway"
+      - "antirion.*serve"
+      - "eliasbiondo/antirion"
+
+    default_ports:
+      - 8080
+      - 8081
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "ANTIRION_"
+
+  - name: "Respan Gateway"
+    id: "respan-gateway"
+    type: "llm_framework"
+    severity: "low"
+    description: "Respan Gateway 统一LLM供应商网关(单Rust二进制, OpenAI/Anthropic/Gemini/Bedrock多协议互译, 内置Web UI, ghcr.io/respanai/respan-gateway)"
+
+    process_patterns:
+      - "respan[-_]gateway"
+      - "respan.*gateway"
+      - "respanai/respan"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/ui/"
+        method: "GET"
+
+    env_indicators:
+      - "RESPAN_"
+
+  - name: "yolorouter"
+    id: "yolorouter"
+    type: "llm_framework"
+    severity: "low"
+    description: "yolorouter 自托管OpenAI兼容LLM网关(Go, 多供应商故障转移/负载均衡, 成本控制+工具输出压缩, 内置可观测性控制台)"
+
+    process_patterns:
+      - "\\byolorouter\\b"
+      - "yolo[-_]router"
+      - "yolorouter/yolorouter"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "YOLOROUTER_"
+
+  - name: "gemini-web2api-go"
+    id: "gemini-web2api-go"
+    type: "llm_framework"
+    severity: "low"
+    description: "gemini-web2api-go Gemini网页转OpenAI兼容API(Go, 自托管免API Key, 管理后台/admin, --port指定端口, zexadev)"
+
+    process_patterns:
+      - "gemini[-_]web2api"
+      - "gemini.*web2api"
+      - "web2api.*gemini"
+
+    default_ports:
+      - 8083
+
+    http_endpoints:
+      - path: "/v1/chat/completions"
+        method: "POST"
+      - path: "/admin"
+        method: "GET"
+
+    env_indicators:
+      - "GEMINI_WEB2API_"
+
+  - name: "Serein"
+    id: "serein"
+    type: "agent_framework"
+    severity: "low"
+    description: "Serein 自托管AI长期记忆与聊天网关(记忆核心+页面服务双端口, Markdown证据记忆+语义召回, Python CLI, 中文社区, Yinglianchun)"
+
+    process_patterns:
+      - "\\bserein\\b"
+      - "serein\\.cli"
+      - "python.*serein"
+
+    http_endpoints:
+      - path: "/ready"
+        method: "GET"
+
+    env_indicators:
+      - "SEREIN_"
+
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
   - name: "OpenClaw"
@@ -7394,6 +7613,61 @@ monitoring_tools:
 
     env_indicators:
       - "CLAWMETRY_"
+
+  # ========== 2026-10-25 批次: Agent可观测性/MCP调试侦察 ==========
+  - name: "Agenttrail"
+    id: "agenttrail"
+    type: "monitoring"
+    severity: "low"
+    description: "Agenttrail AI编码Agent本地可观测性(Codex/Claude Code活动实时视图, 项目结构/任务/交付追踪, 浏览器仪表盘, sodiumsun)"
+
+    process_patterns:
+      - "agenttrail"
+      - "agent[-_]trail"
+      - "agenttrail.*watch"
+
+    default_ports:
+      - 4780
+
+    http_endpoints:
+      - path: "/"
+        method: "GET"
+
+    env_indicators:
+      - "AGENTTRAIL_"
+
+  - name: "AgentGlass"
+    id: "agentglass"
+    type: "monitoring"
+    severity: "low"
+    description: "AgentGlass 机器上所有AI编码Agent统一监控屏(实时成本/令牌/工具调用, Docker/端口/日志面板, 插件扩展, bun运行时, SirAllap)"
+
+    process_patterns:
+      - "agentglass"
+      - "agent[-_]glass"
+      - "bun.*agentglass"
+
+    default_ports:
+      - 4000
+
+    env_indicators:
+      - "AGENTGLASS_"
+
+  - name: "mcpsnoop"
+    id: "mcpsnoop"
+    type: "monitoring"
+    severity: "low"
+    description: "mcpsnoop MCP流量抓包/透明代理(Wireshark for MCP, 会话录制回放, OTLP导出, Prometheus指标, kerlenton)"
+
+    process_patterns:
+      - "mcpsnoop"
+      - "mcp[-_]snoop"
+
+    default_ports:
+      - 7000
+
+    env_indicators:
+      - "MCPSNOOP_"
 
   # --- 代码执行/浏览器自动化 ---
   - name: "OpenGUI"
