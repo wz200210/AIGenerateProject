@@ -4059,6 +4059,44 @@ agent_frameworks:
       - "REVERSALAB_"
       - "OPENREVERSELAB_"
 
+  - name: "Ruflo"
+    id: "ruflo"
+    type: "agent_framework"
+    severity: "low"
+    description: "Ruflo (原Claude Flow) Agent harness(rUv, 100+专业化Agent/swarm编排/自学习记忆/零信任联邦mTLS+ed25519, MCP server+CLI, npx ruflo, Claude Code/Codex插件市场)"
+
+    process_patterns:
+      - "\\bruflo\\b"
+      - "ruflo.*(mcp|init|tui)"
+      - "claude[-_]flow"
+      - "node.*ruflo"
+
+    env_indicators:
+      - "RUFLO_"
+      - "CLAUDE_FLOW_"
+
+  - name: "ai-memory"
+    id: "ai-memory"
+    type: "agent_framework"
+    severity: "low"
+    description: "ai-memory 跨Agent长期记忆服务器(akitaonrails, Rust单二进制, git-backed markdown wiki+SQLite FTS5/实体/图检索, 49374端口, 20+编码Agent harness互通, MCP+hooks自动捕获, Docker akitaonrails/ai-memory)"
+
+    process_patterns:
+      - "ai[-_]memory"
+      - "ai-memory.*(serve|mcp|run)"
+
+    default_ports:
+      - 49374
+
+    http_endpoints:
+      - path: "/api/v1"
+        method: "GET"
+      - path: "/web"
+        method: "GET"
+
+    env_indicators:
+      - "AI_MEMORY_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -5912,6 +5950,22 @@ deployment_tools:
 
     env_indicators:
       - "LLMAKER_"
+
+  - name: "T3 Code"
+    id: "t3code"
+    type: "deployment"
+    severity: "low"
+    description: "T3 Code Agent harness控制面(pingdotgg/T3Stack, 桌面/Web/移动端统一控制Claude Code/Codex/Cursor/Grok/OpenCode/Antigravity, 本地server+远程访问, MCP接入外部Agent, t3 CLI, npx t3)"
+
+    process_patterns:
+      - "t3code"
+      - "t3-code"
+      - "t3.*(service|serve)"
+      - "node.*t3@"
+
+    env_indicators:
+      - "T3CODE_"
+      - "T3_SERVICE"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
