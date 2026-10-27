@@ -4097,6 +4097,130 @@ agent_frameworks:
     env_indicators:
       - "AI_MEMORY_"
 
+  # ========== 2026-10-27 批次: Agent浏览器/沙箱/IM框架/MCP工具 侦察 ==========
+  - name: "moli"
+    id: "moli"
+    type: "agent_framework"
+    severity: "low"
+    description: "moli AI Agent专用headless浏览器(Rust单二进制, Lite/Fast/高兼容, Playwright/Puppeteer协议兼容, lexmount, 21k⭐)"
+
+    process_patterns:
+      - "\\bmoli\\b"
+      - "moli.*(browser|serve|agent)"
+      - "lexmount.*moli"
+
+    env_indicators:
+      - "MOLI_"
+
+  - name: "impeccable"
+    id: "impeccable"
+    type: "agent_framework"
+    severity: "low"
+    description: "impeccable AI编码Agent设计技能CLI(npx impeccable install, 24命令+62确定性设计检测规则, PRODUCT.md/DESIGN.md, pbakaus, 89k⭐)"
+
+    process_patterns:
+      - "impeccable"
+      - "npx.*impeccable"
+
+    env_indicators:
+      - "IMPECCABLE_"
+
+  - name: "AstrBot"
+    id: "astrbot"
+    type: "agent_framework"
+    severity: "low"
+    description: "AstrBot 多平台IM AI Agent助手开发框架(QQ/微信/飞书/钉钉/Telegram/Slack, 内置Agent沙箱+WebUI, AstrBotDevs, 44k⭐)"
+
+    process_patterns:
+      - "astrbot"
+      - "AstrBot"
+
+    default_ports:
+      - 6185
+
+    http_endpoints:
+      - path: "/api"
+        method: "GET"
+
+    env_indicators:
+      - "ASTRBOT_"
+
+  - name: "WhatsApp MCP"
+    id: "whatsapp-mcp"
+    type: "agent_framework"
+    severity: "low"
+    description: "whatsapp-mcp WhatsApp MCP Server(Go whatsapp-bridge+Python MCP, 收发消息/语音/图片/群管理, lharries, 6.7k⭐)"
+
+    process_patterns:
+      - "whatsapp[-_]mcp"
+      - "whatsapp[-_]mcp[-_]bridge"
+      - "whatsapp.*mcp.*bridge"
+
+    env_indicators:
+      - "WHATSAPP_"
+
+  - name: "agent-beacon"
+    id: "agent-beacon"
+    type: "agent_framework"
+    severity: "low"
+    description: "agent-beacon (Beacon) 跨harness自改进Agent记忆层(JSONL本地优先可移植, 多Agent工作流学习, brew install beacon, Asymptote-Labs, 2.9k⭐)"
+
+    process_patterns:
+      - "agent[-_]beacon"
+      - "beacon.*(mcp|agent|memory)"
+
+    env_indicators:
+      - "BEACON_"
+
+  - name: "Blender MCP"
+    id: "blender-mcp"
+    type: "agent_framework"
+    severity: "low"
+    description: "blender-mcp Blender 3D MCP插件(自然语言控制Blender建模/材质/动画/渲染, socket服务, ahujasid, 32k⭐)"
+
+    process_patterns:
+      - "blender[-_]mcp"
+      - "blender.*mcp.*addon"
+
+    default_ports:
+      - 9876
+
+    env_indicators:
+      - "BLENDER_MCP_"
+
+  - name: "Monty"
+    id: "monty"
+    type: "agent_framework"
+    severity: "low"
+    description: "Monty pydantic安全Python沙箱(Rust实现, 运行AI生成代码, OSS包pydantic-monty + Full Monty WebSocket服务, <1ms启动)"
+
+    process_patterns:
+      - "pydantic[-_]monty"
+      - "full[-_]monty.*server"
+      - "monty.*sandbox.*server"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "pydantic_monty"
+          - "from pydantic_monty import"
+
+    env_indicators:
+      - "MONTY_"
+
+  - name: "clawk"
+    id: "clawk"
+    type: "agent_framework"
+    severity: "low"
+    description: "clawk 编码Agent一次性Linux VM沙箱(给coding agent用一次性虚拟机而非本地环境, microVM隔离, clawkwork)"
+
+    process_patterns:
+      - "\\bclawk\\b"
+      - "clawk.*vm"
+
+    env_indicators:
+      - "CLAWK_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -5966,6 +6090,20 @@ deployment_tools:
     env_indicators:
       - "T3CODE_"
       - "T3_SERVICE"
+
+  # ========== 2026-10-27 批次: AI数据库客户端/MCP工具 侦察 ==========
+  - name: "dbx"
+    id: "dbx"
+    type: "deployment"
+    severity: "low"
+    description: "dbx 25MB轻量多数据库客户端(100+数据库MySQL/PG/SQLite/Redis/MongoDB/达梦, 内置AI助手+MCP Server+CLI+Docker桌面端, t8y2, 28k⭐)"
+
+    process_patterns:
+      - "\\bdbx\\b"
+      - "dbx.*(mcp|serve)"
+
+    env_indicators:
+      - "DBX_"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
