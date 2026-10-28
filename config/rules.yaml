@@ -4221,6 +4221,44 @@ agent_frameworks:
     env_indicators:
       - "CLAWK_"
 
+  - name: "TradingAgents"
+    id: "tradingagents"
+    type: "agent_framework"
+    severity: "low"
+    description: "TradingAgents 多Agent LLM金融交易框架(分析师/研究员/交易员/风控多角色辩论, LangGraph驱动, SEC EDGAR数据, TauricResearch)"
+
+    process_patterns:
+      - "\\btradingagents\\b"
+      - "tradingagents.*(cli|main)"
+      - "python.*tradingagents"
+
+    env_indicators:
+      - "TRADINGAGENTS_"
+      - "TRADINGAGENTS_LLM_PROVIDER"
+      - "TRADINGAGENTS_DATA_DIR"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from tradingagents import"
+          - "import tradingagents"
+          - "from tradingagents.graph"
+
+  - name: "AWS Agent Toolkit"
+    id: "aws-agent-toolkit"
+    type: "agent_framework"
+    severity: "low"
+    description: "AWS Agent Toolkit AWS官方MCP服务器/技能/插件集(300+服务API, 沙箱脚本执行, CloudTrail审计, Claude Code/Codex/Cursor/Devin兼容, aws/agent-toolkit-for-aws)"
+
+    process_patterns:
+      - "mcp-proxy-for-aws-cli"
+      - "aws-mcp"
+      - "agent-toolkit-for-aws"
+
+    env_indicators:
+      - "AWS_REGION"
+      - "AWS_DEFAULT_REGION"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -6105,6 +6143,31 @@ deployment_tools:
     env_indicators:
       - "DBX_"
 
+  - name: "EAGLE-4"
+    id: "eagle-4"
+    type: "deployment"
+    severity: "low"
+    description: "EAGLE-4 投机解码LLM推理加速(eagle-harness包, 适配SGLang/vLLM/TokenSpeed, 最多3.4x加速, Docker镜像eagle-4-sglang, eagle-hq)"
+
+    process_patterns:
+      - "eagle.harness"
+      - "eagle-harness"
+      - "eagle_4"
+      - "EAGLE_HARNESS"
+
+    default_ports:
+      - 30000
+
+    docker_images:
+      - "ghcr.io/eagle-hq/eagle-4-sglang"
+      - "eagle-hq/eagle-4"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import eagle_harness"
+          - "from eagle_harness import"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -6818,6 +6881,59 @@ ai_gateways:
 
     env_indicators:
       - "SEREIN_"
+
+  - name: "OpenCodex"
+    id: "opencodex"
+    type: "agent_framework"
+    severity: "medium"
+    description: "OpenCodex 通用Provider代理(Codex/Claude Code/Claude Desktop/Grok Build用任意LLM, 40+Provider, ChatGPT账号池, 端口10100, npm @bitkyc08/opencodex, lidge-jun, 18k⭐)"
+
+    process_patterns:
+      - "\\bocx\\b"
+      - "opencodex"
+      - "@bitkyc08/opencodex"
+
+    default_ports:
+      - 10100
+
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+      - path: "/readyz"
+        method: "GET"
+
+    env_indicators:
+      - "OPENCODEX_"
+      - "OPENCODEX_BIND_ADDRESS"
+      - "OPENCODEX_API_AUTH_TOKEN"
+
+  - name: "AI-FW"
+    id: "aifw"
+    type: "agent_framework"
+    severity: "medium"
+    description: "AI-FW AI Agent身份访问管理与推理防火墙(提示词/响应检查, mTLS/Kerberos/OIDC SSO, 审计日志, SIEM导出, 端口80/443/8080, securetron-gh)"
+
+    process_patterns:
+      - "\\baifw\\b"
+      - "aifw.gateway"
+      - "aifw-server"
+
+    default_ports:
+      - 8080
+      - 443
+      - 80
+
+    http_endpoints:
+      - path: "/v1/chat/completions"
+        method: "POST"
+
+    docker_images:
+      - "ghcr.io/securetron-gh/aifw"
+      - "securetron/aifw"
+
+    env_indicators:
+      - "AIFW_TAG"
+      - "ConnectionStrings__PostgreSQL"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
