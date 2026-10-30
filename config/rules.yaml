@@ -4259,6 +4259,78 @@ agent_frameworks:
       - "AWS_REGION"
       - "AWS_DEFAULT_REGION"
 
+  - name: "multica"
+    id: "multica"
+    type: "agent_framework"
+    severity: "low"
+    description: "multica 人机协作AI团队平台(自托管Go服务+Next.js前端,54k⭐, multica-ai/multica)"
+
+    process_patterns:
+      - "\\bmultica\\b"
+      - "multica-server"
+      - "bin/multica"
+
+    default_ports:
+      - 8080
+      - 3000
+
+    docker_images:
+      - "multica"
+      - "multica-ai"
+
+    env_indicators:
+      - "MULTICA_DATABASE_STARTUP_TIMEOUT"
+      - "MULTICA_DATABASE_CONNECT_TIMEOUT"
+      - "APP_ENV"
+
+  - name: "superplane"
+    id: "superplane"
+    type: "agent_framework"
+    severity: "low"
+    description: "superplane 开源AI软件工程工厂(Go,一次性工程+Agent编排,8.4k⭐, superplanehq/superplane)"
+
+    process_patterns:
+      - "superplane"
+      - "superplane-server"
+      - "superplane-runner"
+      - "fleetmanager"
+
+    default_ports:
+      - 8000
+
+    docker_images:
+      - "superplane"
+
+    env_indicators:
+      - "PUBLIC_API_PORT"
+      - "SUPERPLANE_"
+
+  - name: "SafeLine WAF"
+    id: "safeline-waf"
+    type: "deployment"
+    severity: "medium"
+    description: "SafeLine 自托管WAF/反向代理(Go,AI服务流量防护,23k⭐, chaitin/SafeLine)"
+
+    process_patterns:
+      - "safeline-mgt"
+      - "safeline-tengine"
+      - "safeline-ce"
+
+    default_ports:
+      - 9443
+      - 1443
+
+    docker_images:
+      - "safeline-mgt"
+      - "safeline-tengine"
+      - "safeline-postgres"
+
+    env_indicators:
+      - "SAFELINE_DIR"
+      - "MGT_PORT"
+      - "SUBNET_PREFIX"
+      - "IMAGE_TAG"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
