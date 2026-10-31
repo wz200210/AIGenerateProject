@@ -821,6 +821,76 @@ llm_services:
     env_indicators:
       - "PARITOK_"
 
+  # ========== 2026-10-31 批次: 推理服务/决策模型/向量KV ==========
+  - name: "Ollaya"
+    id: "ollaya"
+    type: "llm_framework"
+    severity: "low"
+    description: "Ollaya 决策模型推理服务器(Ollama for decision models, Jev兼容/v1/systemone API, 29模型族Laya/Clef/Winnow, Rust, ollaya-dev, 1.4k⭐)"
+
+    process_patterns:
+      - "\\bollaya\\b"
+      - "ollaya.*serve"
+      - "ollaya.*run"
+
+    http_endpoints:
+      - path: "/v1/systemone"
+        method: "POST"
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "OLLAYA_"
+
+  - name: "Paddock"
+    id: "paddock"
+    type: "llm_framework"
+    severity: "low"
+    description: "Paddock Rust原生推理服务器(NVIDIA/Apple Silicon, OpenAI+Anthropic兼容API, GGUF/safetensors/MLX, FP8/NVFP4, 内置Studio, truespar)"
+
+    process_patterns:
+      - "\\bpaddock\\b"
+      - "paddock[-_]runner"
+      - "paddock.*serve"
+
+    default_ports:
+      - 11540
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "PADDOCK_"
+
+  - name: "audio.cpp WebUI"
+    id: "audio-cpp-webui"
+    type: "llm_framework"
+    severity: "low"
+    description: "audio.cpp WebUI 纯C++音频模型推理引擎(ggml驱动, TTS/ASR/VAD/声纹/音乐生成, 零Python依赖, kigner)"
+
+    process_patterns:
+      - "audio[-.]cpp.*webui"
+      - "audiocpp.*webui"
+      - "audio[-_]cpp[-_]server"
+
+    env_indicators:
+      - "AUDIO_CPP_"
+
+  - name: "Janas"
+    id: "janas"
+    type: "llm_framework"
+    severity: "low"
+    description: "Janas 纯C CPU/GPU LLM推理(超RAM模型SSD流式, 37tok/s Qwen3-80B on 32GB, 比llama.cpp快, prabanta-dev, 533⭐)"
+
+    process_patterns:
+      - "\\bjanas\\b"
+      - "janas.*serve"
+      - "janas.*run"
+
+    env_indicators:
+      - "JANAS_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -1247,6 +1317,27 @@ vector_databases:
         patterns:
           - "import lodedb"
           - "from lodedb import"
+
+  # ========== 2026-10-31 批次: Rust向量KV/Redis替代 ==========
+  - name: "KiviDB"
+    id: "kividb"
+    type: "vector_database"
+    severity: "medium"
+    description: "KiviDB Rust多线程Redis/Valkey替代(内置全文+向量搜索, RESP2/3协议兼容, 21M GET/s, Docker kividb/kividb, kividbio, 939⭐)"
+
+    process_patterns:
+      - "\\bkividb\\b"
+      - "kivi[-_]db"
+      - "kividb.*server"
+
+    default_ports:
+      - 6380
+
+    docker_images:
+      - "kividb/kividb"
+
+    env_indicators:
+      - "KIVIDB_"
 
 # ==================== ML 框架 ====================
 ml_frameworks:
@@ -4330,6 +4421,216 @@ agent_frameworks:
       - "MGT_PORT"
       - "SUBNET_PREFIX"
       - "IMAGE_TAG"
+
+  # ========== 2026-10-31 批次: Agent框架/MCP/知识平台侦察 ==========
+  - name: "Utopia"
+    id: "utopia"
+    type: "rag_tool"
+    severity: "low"
+    description: "Utopia 企业世界模型(开源企业知识底座, 双时序知识图谱+本体论+pgvector, 自治理自学习, Rust, deeplethe, 8.6k⭐)"
+
+    process_patterns:
+      - "\\butopia\\b"
+      - "utopia.*serve"
+      - "utopia.*server"
+
+    default_ports:
+      - 3000
+
+    env_indicators:
+      - "UTOPIA_"
+
+  - name: "HelixDB Foundry"
+    id: "helixdb-foundry"
+    type: "rag_tool"
+    severity: "low"
+    description: "HelixDB Foundry 企业知识图谱平台(Agent自动本体草图→图加载→探索问答, Go, HelixDB, 1.9k⭐)"
+
+    process_patterns:
+      - "helix[-_]foundry"
+      - "helixdb.*foundry"
+      - "helix[-_]db"
+
+    env_indicators:
+      - "HELIXDB_"
+      - "HELIX_"
+
+  - name: "Reason Network"
+    id: "reason-network"
+    type: "agent_framework"
+    severity: "low"
+    description: "Reason Network 团队编码Agent P2P网络(Agent间直接通信, iroh P2P+MCP, Rust, reason-machines, 1.4k⭐)"
+
+    process_patterns:
+      - "reason[-_]network"
+      - "reason.*network"
+      - "reason-network.*serve"
+
+    env_indicators:
+      - "REASON_"
+
+  - name: "nanoMuse"
+    id: "nanomuse"
+    type: "agent_framework"
+    severity: "low"
+    description: "nanoMuse 跨设备个人Agent(Android/iOS/Desktop/Browser, 后台持续运行, 记忆+主动执行, MCP, nano-muse, 2.9k⭐)"
+
+    process_patterns:
+      - "nanomuse"
+      - "nano[-_]muse"
+
+    env_indicators:
+      - "NANOMUSE_"
+      - "MUSE_"
+
+  - name: "Talorys"
+    id: "talorys"
+    type: "agent_framework"
+    severity: "low"
+    description: "Talorys Cloudflare个人Agent(聊天/记忆/任务/笔记/定时提醒, Durable Objects+Workers AI, npx create-talorys, rociiu, 1.4k⭐)"
+
+    process_patterns:
+      - "\\btalorys\\b"
+      - "create[-_]talorys"
+
+    env_indicators:
+      - "TALORYS_"
+
+  - name: "Agents Universe"
+    id: "agents-universe"
+    type: "agent_framework"
+    severity: "low"
+    description: "Agents Universe 企业数字分身协作平台(共享智能体+项目上下文协同, Python+Vue3, agents-universe, 783⭐)"
+
+    process_patterns:
+      - "agents[-_]universe"
+      - "agents.*universe"
+
+    env_indicators:
+      - "AGENTS_UNIVERSE_"
+
+  - name: "MasterAgent"
+    id: "master-agent"
+    type: "agent_framework"
+    severity: "low"
+    description: "MasterAgent 端侧NPU AI Agent(100%本地运行, Sub-100ms Qualcomm NPU延迟, 零云依赖, C++, OpenSparX, 851⭐)"
+
+    process_patterns:
+      - "master[-_]agent"
+      - "masteragent"
+
+    env_indicators:
+      - "MASTER_AGENT_"
+
+  - name: "Open SEO MCP"
+    id: "open-seo-mcp"
+    type: "agent_framework"
+    severity: "low"
+    description: "Open SEO MCP 搜索引擎优化MCP服务器(关键词/排名/审计/外链/AI可见度, GSC/GA4集成, Ryze-AI, 8.2k⭐)"
+
+    process_patterns:
+      - "open[-_]seo[-_]mcp"
+      - "seo[-_]mcp"
+      - "ryze.*mcp"
+
+    env_indicators:
+      - "SEO_MCP_"
+      - "RYZE_"
+
+  - name: "FFmpeg Skill MCP"
+    id: "ffmpeg-skill-mcp"
+    type: "agent_framework"
+    severity: "low"
+    description: "FFmpeg Skill 视频编辑MCP(42个FFmpeg工具+机器可读契约, 剪辑/字幕/重构图/响度/平台导出, kajisho5, 4.1k⭐)"
+
+    process_patterns:
+      - "ffmpeg[-_]skill"
+      - "ffmpeg[-_]mcp"
+      - "ffmpeg.*skill"
+
+    env_indicators:
+      - "FFMPEG_SKILL_"
+      - "FFMPEG_MCP_"
+
+  - name: "x64dbg MCP"
+    id: "x64dbg-mcp"
+    type: "agent_framework"
+    severity: "low"
+    description: "x64dbg MCP 调试器MCP服务器(Zig零依赖单二进制, 断点/单步/内存/寄存器, duty1g, 2.6k⭐)"
+
+    process_patterns:
+      - "x64dbg[-_]mcp"
+      - "x64dbg.*mcp"
+      - "x64dbg[-_]server"
+
+    env_indicators:
+      - "X64DBG_MCP_"
+
+  - name: "AOCI Code"
+    id: "aoci-code"
+    type: "agent_framework"
+    severity: "low"
+    description: "AOCI Code 代码知识图谱MCP(Git版本化代码库+DB Schema地图, 本地优先Go, Agent长期上下文, aoci-spec, 1.8k⭐)"
+
+    process_patterns:
+      - "aoci[-_]code"
+      - "aoci.*code"
+      - "aoci.*mcp"
+
+    env_indicators:
+      - "AOCI_"
+
+  - name: "Cortico"
+    id: "cortico"
+    type: "agent_framework"
+    severity: "low"
+    description: "Cortico 事件流AI Agent框架(个人形象Bot构建, 事件驱动架构, Pal-AI-Lab, 317⭐)"
+
+    process_patterns:
+      - "\\bcortico\\b"
+      - "cortico.*agent"
+
+    env_indicators:
+      - "CORTICO_"
+
+  - name: "OpenCorvus"
+    id: "opencorvus"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenCorvus DIY Agent团队Harness(长时程Agent工作编排, yangheng95, 310⭐)"
+
+    process_patterns:
+      - "opencorvus"
+      - "open[-_]corvus"
+
+    env_indicators:
+      - "OPENCORVUS_"
+
+  - name: "dsh-memory"
+    id: "dsh-memory"
+    type: "agent_framework"
+    severity: "low"
+    description: "dsh-memory 白箱AGI记忆架构(元认知循环+知识飞轮+世界模型+自举纪律, 零LLM管线, FuRongJun, 552⭐)"
+
+    process_patterns:
+      - "dsh[-_]memory"
+      - "dsh.*memory"
+
+    env_indicators:
+      - "DSH_MEMORY_"
+
+  - name: "Movo"
+    id: "movo"
+    type: "agent_framework"
+    severity: "low"
+    description: "Movo DeepSeek Harness企业Agent平台(知识/深研/内容生成/浏览器自动化/治理, himovo, 339⭐)"
+
+    process_patterns:
+      - "\\bmovo\\b"
+      - "movo.*serve"
+
+    env_indicators:
+      - "MOVO_"
 
 # ==================== 部署/推理 ====================
 deployment_tools:
