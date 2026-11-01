@@ -1841,6 +1841,20 @@ ml_frameworks:
           - "import mlx_dspark"
           - "from mlx_dspark"
 
+  - name: "vrhino"
+    id: "vrhino"
+    type: "ml_framework"
+    severity: "low"
+    description: "vrhino 本地AI视频生成原生运行时(自包含native runtime+模型格式, 无Python/CUDA Toolkit依赖, NVIDIA私有runtime, Wan2.1/Wan2.2视频模型, pixelrhino-ai)"
+
+    process_patterns:
+      - "\\bvrhino\\b"
+      - "vrhino.*serve"
+      - "vrhino.*doctor"
+
+    env_indicators:
+      - "VRHINO_"
+
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
   - name: "LangChain"
@@ -4631,6 +4645,143 @@ agent_frameworks:
 
     env_indicators:
       - "MOVO_"
+
+  - name: "Orkas"
+    id: "orkas"
+    type: "agent_framework"
+    severity: "low"
+    description: "Orkas 本地优先桌面多Agent团队(Commander编排16个专业Agent+协调Claude Code/Codex/OpenCode/OpenClaw/Hermes, 项目/定时自动化/连接器, macOS/Windows, Orkas-AI, MIT, GitHub日榜trending)"
+
+    process_patterns:
+      - "\\borkas\\b"
+      - "orkas.*commander"
+
+    env_indicators:
+      - "ORKAS_"
+
+  - name: "Lightpanda Browser"
+    id: "lightpanda"
+    type: "agent_framework"
+    severity: "low"
+    description: "Lightpanda 专为AI/自动化构建的无头浏览器(Zig从头编写非Chromium内核, 比Chromium轻16倍快9倍, CDP+WebDriver Bidi双协议, lightpanda-io, GitHub日榜trending)"
+
+    process_patterns:
+      - "\\blightpanda\\b"
+      - "lightpanda serve"
+
+    default_ports:
+      - 9222
+
+    http_endpoints:
+      - path: "/json/version"
+        method: "GET"
+
+    env_indicators:
+      - "LIGHTPANDA_"
+
+  - name: "Sno Station"
+    id: "sno-station"
+    type: "agent_framework"
+    severity: "low"
+    description: "Sno Station 跨编码Agent协作运行时(Codex/Claude Code/Cursor/Hermes/OpenClaw共享记忆+限流无缝接续+互相review, REM夜间记忆强化, sno-ai, 1.1k⭐)"
+
+    process_patterns:
+      - "sno[-_]station"
+      - "sno-station.*serve"
+      - "mem-(claude|codex|cursor|hermes|claw)"
+
+    env_indicators:
+      - "SNO_STATION"
+      - "SNO_AI"
+
+  - name: "FrontierAgent"
+    id: "frontier-agent"
+    type: "agent_framework"
+    severity: "low"
+    description: "FrontierAgent 开源Agent运行时+终端TUI(Apodex, ReAct/Agent Team双模式, 长程研究与文件型任务沙箱, SGLang集成+评测套件, 5.4k⭐)"
+
+    process_patterns:
+      - "frontier-agent"
+      - "frontieragent"
+      - "frontier_agent"
+
+  - name: "Squadra"
+    id: "squadra"
+    type: "agent_framework"
+    severity: "low"
+    description: "Squadra 多编码Agent协调工具(Claude/Codex/Cursor窗口共享任务+独立互审+双语本地dashboard+MCP插件, Python 3.12+, 安装于~/.local/bin/squadra, dagoSte, 1.1k⭐)"
+
+    process_patterns:
+      - "\\bsquadra\\b"
+      - "squadra.*dashboard"
+
+    env_indicators:
+      - "SQUADRA_"
+
+  - name: "DeterminFlow"
+    id: "determinflow"
+    type: "agent_framework"
+    severity: "low"
+    description: "DeterminFlow 面向生产的AI工作流运行时(版本化节点+结构化输出+断点恢复+审计, 多Agent节点各自授权工具, 真实生产验证, alikon-art, 951⭐)"
+
+    process_patterns:
+      - "determinflow"
+      - "determin-flow"
+
+    env_indicators:
+      - "DETERMINFLOW_"
+
+  - name: "dscode"
+    id: "dscode"
+    type: "agent_framework"
+    severity: "low"
+    description: "dscode DeepSeek编码Agent harness(终端TUI, 持久shell+Ultra子代理+自动审批+Chrome集成, npm包todd-dsh-tui-harness, bin/dscode.mjs, 1k⭐)"
+
+    process_patterns:
+      - "\\bdscode\\b"
+      - "dscode\\.mjs"
+      - "todd-dsh-tui-harness"
+
+    env_indicators:
+      - "DSCODE_"
+
+  - name: "hyperfide"
+    id: "hyperfide"
+    type: "agent_framework"
+    severity: "low"
+    description: "hyperfide Agent代码图谱工作流工具(符号/调用/导入图索引SQLite, spec驱动fleet编排多Agent, 快照+漂移检测+投影合并, 全命令MCP暴露, 别名cg, Sidiora-Labs, 639⭐)"
+
+    process_patterns:
+      - "\\bhyperfide\\b"
+      - "hyperfide (serve|watch|fleet)"
+
+    env_indicators:
+      - "HYPERFIDE_"
+
+  - name: "activity-frames"
+    id: "activity-frames"
+    type: "agent_framework"
+    severity: "low"
+    description: "activity-frames 本地工作流结构化MCP服务器(录屏→活动帧→可复现逐步脚本, 重复工作流/日常模式检测, aframes CLI+Python API, pip安装, 532⭐)"
+
+    process_patterns:
+      - "activity-frames"
+      - "activity_frames"
+      - "\\baframes\\b"
+      - "aframes mcp"
+
+    env_indicators:
+      - "ACTIVITY_FRAMES_"
+
+  - name: "reverify"
+    id: "reverify"
+    type: "agent_framework"
+    severity: "low"
+    description: "reverify 确定性二进制验证工具包(Agent提案+确定性工具对照实际字节裁决, capstone/unicorn/lief/Z3可选引擎, CLI+MCP server, pip install reverify, 1.3k⭐)"
+
+    process_patterns:
+      - "\\breverify\\b"
+      - "reverify mcp"
 
 # ==================== 部署/推理 ====================
 deployment_tools:
@@ -8380,6 +8531,19 @@ monitoring_tools:
 
     env_indicators:
       - "ANY_LLM_"
+
+  - name: "TokenEconomizer"
+    id: "token-economizer"
+    type: "monitoring"
+    severity: "low"
+    description: "TokenEconomizer 编码Agent成本控制系统(微软研究院+UC Berkeley, 经验驱动黑盒降本18.4-30.9%, Micro-skills跨会话记忆仓库事实, SWE-Bench五组合验证, microsoft, 3.4k⭐)"
+
+    process_patterns:
+      - "tokeneconomizer"
+      - "token[-_]economizer"
+
+    env_indicators:
+      - "TOKENECONOMIZER_"
 
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
