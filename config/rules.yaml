@@ -891,6 +891,71 @@ llm_services:
     env_indicators:
       - "JANAS_"
 
+  # ========== 2026-11-02 批次: 端侧MoE推理/Apple Silicon推理 ==========
+  - name: "FreeToken"
+    id: "freetoken"
+    type: "llm_framework"
+    severity: "medium"
+    description: "FreeToken 边缘原生MoE大模型服务引擎(消费级GPU本地运行290B+前沿MoE, 带宽自适应CPU-GPU协同执行+全局LRU专家缓存+语义感知KV缓存+弹性显存, OpenAI/Anthropic兼容API, CLI `ft serve`, pip包freetoken, 默认端口1919, FlashML-org, GitHub日榜trending)"
+
+    process_patterns:
+      - "\\bfreetoken\\b"
+      - "\\bft serve\\b"
+      - "freetoken\\.serve"
+      - "python.*freetoken"
+
+    default_ports:
+      - 1919
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "FREETOKEN_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import freetoken"
+          - "from freetoken"
+
+  - name: "TurboFieldfare"
+    id: "turbo-fieldfare"
+    type: "llm_framework"
+    severity: "low"
+    description: "TurboFieldfare Apple Silicon本地推理(Swift+Metal自定义runtime, Gemma4 26B-A4B约2GB RAM可在8GB Mac运行, OpenAI兼容本地服务器TurboFieldfareServer, 端口8080, .gturbo模型格式, drumih, 7.1k⭐)"
+
+    process_patterns:
+      - "TurboFieldfare(Server|Mac|DecodeService|CLI|Repack|PackageTests)"
+      - "turbo[-_]fieldfare"
+      - "\\.gturbo"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+  - name: "TurboFieldfare"
+    id: "turbo-fieldfare"
+    type: "llm_framework"
+    severity: "low"
+    description: "TurboFieldfare Apple Silicon 极简内存推理(Gemma 4 26B-A4B 约2GB RAM运行, Swift+Metal原生runtime+CLI+Mac App, drumih, 7.1k⭐)"
+
+    process_patterns:
+      - "turbo-fieldfare"
+      - "TurboFieldfareCLI"
+      - "fieldfare"
+
+    env_indicators:
+      - "FIELDFARE_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -1854,6 +1919,23 @@ ml_frameworks:
 
     env_indicators:
       - "VRHINO_"
+
+  - name: "Indra OCR"
+    id: "indra-ocr"
+    type: "ml_framework"
+    severity: "low"
+    description: "Indra 1M参数超轻量OCR模型(CPU运行, 比tesseract快15x, 接近1B+参数模型精度, pip install indra-ocr, datalab-to, 1.6k⭐)"
+
+    process_patterns:
+      - "indra-ocr"
+      - "indra_ocr"
+      - "python.*indra"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import indra_ocr"
+          - "from indra_ocr import"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -4783,6 +4865,170 @@ agent_frameworks:
       - "\\breverify\\b"
       - "reverify mcp"
 
+  # ========== 2026-11-02 批次: 语音Agent交互/多Agent桌面/VoIP通知 ==========
+  - name: "OpenMausBot"
+    id: "openmausbot"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenMausBot 开源Grok Bot替代(自托管多Agent聊天应用, 每个bot是本地真实Agent-Claude/Codex+独立云电脑+独立应用连接, Electron+TypeScript, local-first BYO-agent, milind-soni, 4.2k⭐, GitHub日榜trending)"
+
+    process_patterns:
+      - "openmausbot"
+      - "OpenMausBot"
+      - "openmaus[- ]bot"
+
+  - name: "tapq"
+    id: "tapq"
+    type: "agent_framework"
+    severity: "low"
+    description: "tapq 语音驱动编码Agent中继(Swift CLI tapq-kernel, 直呼Claude Code/Codex名字语音下指令, 朗读权限请求+语音应答+朗读回复, 本地OpenAI key运行, spaceamoeba-t, 651⭐)"
+
+    process_patterns:
+      - "\\btapq\\b"
+      - "tapq-kernel"
+      - "tapq[-_]kernel"
+
+  - name: "agentring"
+    id: "agentring"
+    type: "agent_framework"
+    severity: "low"
+    description: "agentring Agent→手机VoIP语音通知(自托管relay+Android应用, Agent遇阻/完成时真实来电语音播报, 语音决策回传transcript, 可回拨Agent, daemon为Python CLI+MCP server, uv tool安装, 配置~/.agentring, relay基于LiveKit, mutonby, 248⭐)"
+
+    process_patterns:
+      - "\\bagentring\\b"
+      - "agentring (mcp|call|msg|init)"
+      - "\\.agentring"
+
+  - name: "Handy"
+    id: "handy"
+    type: "agent_framework"
+    severity: "low"
+    description: "Handy 开源离线语音转文字桌面应用(Tauri+Rust, 快捷键录音→本地Whisper/Parakeet V3转写+Silero VAD, 全程无云端, Win/macOS/Linux, brew/winget/.deb分发, cjpais, GitHub日榜trending)"
+
+    process_patterns:
+      - "\\bhandy\\b"
+      - "handy_app"
+      - "Handy\\.app"
+
+  - name: "Hypit"
+    id: "hypit"
+    type: "agent_framework"
+    severity: "low"
+    description: "Hypit AI视频克隆Agent工作流(SVML语言描述视频→footage/字幕/B-roll/特效全工作流, Claude Code/Codex集成, Node 22+, hypit-ai, 27.6k⭐, Trendshift日榜#1)"
+
+    process_patterns:
+      - "\\bhypit\\b"
+      - "hypit.*workflow"
+
+    env_indicators:
+      - "HYPIT_"
+
+  - name: "Brigade"
+    id: "brigade"
+    type: "agent_framework"
+    severity: "low"
+    description: "Brigade 个人智能体团队企业级框架(Agent crew编排, Claude/ChatGPT/Copilot订阅登录复用, Cloudflare/bore/frp隧道暴露, npm @spinabot/brigade, spinabot, 11.3k⭐)"
+
+    process_patterns:
+      - "\\bbrigade\\b"
+      - "brigade.*serve"
+      - "brigade.*expose"
+
+    env_indicators:
+      - "BRIGADE_"
+
+  - name: "oh-my-hermes"
+    id: "oh-my-hermes"
+    type: "agent_framework"
+    severity: "low"
+    description: "oh-my-hermes Hermes Agent一体化运行层(按lane类别自动选模型链, /dag-ulw图并行执行, 100+ omh-*专家技能自动加载, LSP集成, rlaope, 5k⭐)"
+
+    process_patterns:
+      - "oh-my-hermes"
+      - "\\bomh\\b"
+      - "omh.*setup"
+
+    env_indicators:
+      - "OMH_"
+
+  - name: "phone-harness"
+    id: "phone-harness"
+    type: "agent_framework"
+    severity: "low"
+    description: "phone-harness 让Agent控制真实手机(iPhone通过Mac镜像/Android通过adb, 滚动/点击/输入/读屏, Claude Code/Codex集成, 4.1k⭐)"
+
+    process_patterns:
+      - "phone-harness"
+      - "phoneharness"
+      - "phone_harness"
+
+    env_indicators:
+      - "PHONE_HARNESS"
+
+  - name: "Mika"
+    id: "mika"
+    type: "agent_framework"
+    severity: "low"
+    description: "Mika Android端侧AI Agent(直接操作手机App和网页完成任务, 无需root, wangzan101, 5.8k⭐)"
+
+    process_patterns:
+      - "\\bmika\\b"
+      - "mika-agent"
+      - "mika_agent"
+
+  - name: "Andee"
+    id: "andee"
+    type: "agent_framework"
+    severity: "low"
+    description: "Andee 手机/Mac端侧AI Agent(像人一样使用任意App, 无需集成无需root, kuafuai, 3.4k⭐)"
+
+    process_patterns:
+      - "\\bandee\\b"
+      - "andee-agent"
+      - "andee_agent"
+
+  - name: "EverRoom"
+    id: "everroom"
+    type: "agent_framework"
+    severity: "low"
+    description: "EverRoom 持久化Agent工作空间(记住项目/决策/来源, 跨会话自改进持续工作, NxcoreAI, 3k⭐)"
+
+    process_patterns:
+      - "everroom"
+      - "ever-room"
+      - "EverRoom"
+
+    env_indicators:
+      - "EVERROOM_"
+
+  - name: "Raven"
+    id: "raven"
+    type: "agent_framework"
+    severity: "low"
+    description: "Raven Harness of Harnesses超级Agent(可信持久自演进多Agent系统, Raven-Research自主深研/Raven-Code Agentic开发, ACP/CLI/OpenAI兼容API编排13种第三方Agent, EverMind-AI, 6k⭐, HF日榜#1)"
+
+    process_patterns:
+      - "\\braven\\b"
+      - "raven-agent"
+      - "raven_agent"
+
+    env_indicators:
+      - "RAVEN_"
+
+  - name: "Reason Network"
+    id: "reason-network"
+    type: "agent_framework"
+    severity: "low"
+    description: "Reason Network 团队编码Agent互联网络(Claude Code/Codex/Cursor/Gemini CLI等互相发消息, MCP Server reason-network, 会话唤醒/收件箱, reason-machines, 1.5k⭐)"
+
+    process_patterns:
+      - "reason-network"
+      - "reason_network"
+      - "reasonmachines"
+
+    env_indicators:
+      - "REASON_NETWORK"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -6692,6 +6938,99 @@ deployment_tools:
           - "import eagle_harness"
           - "from eagle_harness import"
 
+  # ========== 2026-11-02 批次: AI呼叫中心 ==========
+  - name: "AI-Native Call Center"
+    id: "ai-native-callcenter"
+    type: "deployment"
+    severity: "medium"
+    description: "AI-Native Call Center 开源AI原生呼叫中心(单Go二进制+PostgreSQL+FreeSWITCH, AI默认接听+流程引导+人工队列无感接管, SIP/WebSocket电话+REST API+Web UI全内置, 默认HTTP 8080/SIP 5060/ws 5066/PG 15432, Docker镜像rasonyang/ai-native-callcenter, 安装/opt/aicc|~/.aicc, CLI aicc doctor, rasonyang, 517⭐)"
+
+    process_patterns:
+      - "ai-native-callcenter"
+      - "\\baicc\\b"
+      - "mod_callcenter"
+      - "aicc doctor"
+
+    default_ports:
+      - 8080
+      - 5060
+      - 5066
+      - 15432
+
+    docker_images:
+      - "rasonyang/ai-native-callcenter"
+      - "aicc:local"
+
+    env_indicators:
+      - "AICC_"
+
+  - name: "GenOffice"
+    id: "genoffice"
+    type: "deployment"
+    severity: "low"
+    description: "GenOffice 开源AI办公套件(Docs/Sheets/Slides/PDF/Markdown原生OOXML格式编辑, AI面板追踪修改, CLI+MCP Server+headless导出, genspark-ai, 11.6k⭐)"
+
+    process_patterns:
+      - "\\bgenoffice\\b"
+      - "genoffice.*serve"
+      - "genoffice.*mcp"
+
+    env_indicators:
+      - "GENOFFICE_"
+
+  - name: "open-seo-mcp"
+    id: "open-seo-mcp"
+    type: "deployment"
+    severity: "low"
+    description: "open-seo-mcp-skills 免费SEO MCP服务器+SEO/GEO技能(关键词研究/排名追踪/内容优化, Ryze-AI-Adgent, 8.7k⭐)"
+
+    process_patterns:
+      - "open-seo-mcp"
+      - "open_seo_mcp"
+      - "open-seo"
+
+    env_indicators:
+      - "OPEN_SEO"
+
+  - name: "new-term-radar"
+    id: "new-term-radar"
+    type: "deployment"
+    severity: "low"
+    description: "new-term-radar 每日AI新术语雷达(捕捉X/HuggingFace/GitHub上的新模型/产品/仓库名, MCP Server, zhuyansen, 2k⭐)"
+
+    process_patterns:
+      - "new-term-radar"
+      - "new_term_radar"
+      - "term-radar"
+
+  - name: "pgbot"
+    id: "pgbot"
+    type: "deployment"
+    severity: "low"
+    description: "pgbot Postgres数据库智能诊断(AI Agent数据库健康检查/findings-first报告/变更对比, curl安装, pgrundev, 1.5k⭐)"
+
+    process_patterns:
+      - "\\bpgbot\\b"
+      - "pgbot.*scan"
+
+    env_indicators:
+      - "PGBOT_"
+      - "PGSERVICE"
+
+  - name: "rune"
+    id: "rune"
+    type: "deployment"
+    severity: "low"
+    description: "rune GPU加速全功能IDE+终端多路复用器(Agent自动化友好, 多语言智能内置, brew/curl安装, unstablebuild, 1.5k⭐)"
+
+    process_patterns:
+      - "\\brune\\b"
+      - "rune.*serve"
+      - "rune.*agent"
+
+    env_indicators:
+      - "RUNE_"
+
 # ==================== AI 网关/代理 ====================
 ai_gateways:
   - name: "One API"
@@ -8544,6 +8883,57 @@ monitoring_tools:
 
     env_indicators:
       - "TOKENECONOMIZER_"
+
+  # ========== 2026-11-02 批次: AI安全终端/反AI逆向防护 ==========
+  - name: "AI Security Tool"
+    id: "ai-security-tool"
+    type: "monitoring"
+    severity: "low"
+    description: "AI Security Tool 开源AI安全终端+供应链扫描器(CVE/SBOM检测, SSH/SFTP/RDP/VNC/Serial多协议, 12+自主AI Agent自动安全工作流, CTF/DevSecOps, 跨平台Web UI, ZeroDayEvil, 1.3k⭐)"
+
+    process_patterns:
+      - "ai-security-tool"
+      - "ai_security_tool"
+      - "zerodayevil"
+
+  - name: "BLA"
+    id: "bla"
+    type: "monitoring"
+    severity: "low"
+    description: "BLA (Blind LLM Agents) 反AI逆向工程防护盾(对抗REA类AI逆向Agent, 投毒Poison→耗尽Exhaust→幻觉Hallucinate三层防御, npm CLI bla-agents + MCP工具bla_harden/bla_defend, npx bla-agents harden ., qybaihe, 1.9k⭐)"
+
+    process_patterns:
+      - "bla-agents"
+      - "bla_harden"
+      - "bla_defend"
+      - "bla (harden|defend)"
+
+  - name: "Folkbench"
+    id: "folkbench"
+    type: "monitoring"
+    severity: "low"
+    description: "Folkbench AI API中转站评测排行与切换工具(实测可用率/延迟/价格, Claude Code/Codex/Gemini CLI一键配置, Folkbench, 4.3k⭐)"
+
+    process_patterns:
+      - "\\bfolkbench\\b"
+      - "folk-bench"
+
+    env_indicators:
+      - "FOLKBENCH_"
+
+  - name: "ponytail"
+    id: "ponytail"
+    type: "monitoring"
+    severity: "low"
+    description: "ponytail Claude Code成本/审计状态栏(实时显示token花费/agent时间/代码复用率/测试结果, /ponytail-audit全仓库审计排名, Board本地看板, DietrichGebert, 183k⭐)"
+
+    process_patterns:
+      - "\\bponytail\\b"
+      - "ponytail-audit"
+      - "ponytail-review"
+
+    env_indicators:
+      - "PONYTAIL_"
 
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
