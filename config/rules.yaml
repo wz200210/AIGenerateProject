@@ -956,6 +956,51 @@ llm_services:
     env_indicators:
       - "FIELDFARE_"
 
+  # ========== 2026-11-04 批次: 单机大规模MoE推理引擎(GitHub日榜侦察) ==========
+  - name: "colibri"
+    id: "colibri"
+    type: "llm_framework"
+    severity: "low"
+    description: "colibri 分层MoE推理引擎(纯C单文件引擎,热专家GPU/温专家RAM/冷专家NVMe流式,GLM-5.2/Kimi K3/DeepSeek V4等13引擎,OpenAI+Anthropic兼容+MCP,JustVugg,日榜trending)"
+
+    process_patterns:
+      - "\\bcolibri\\b"
+      - "coli (serve|chat|web|ui|mcp)"
+      - "c/coli"
+      - "colibri.*engine"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/v1/chat/completions"
+        method: "POST"
+
+    env_indicators:
+      - "COLI_VULKAN"
+      - "COLI_METAL"
+      - "COLI_API_KEY"
+      - "COLI_MODEL_MIRROR"
+
+  - name: "Kimi K3 in C"
+    id: "kimi-k3-in-c"
+    type: "llm_framework"
+    severity: "low"
+    description: "kimi-k3-in-c 单CPU运行2.78T参数Kimi K3(便携C99,176KB引擎无BLAS/GPU,8GB RAM流式专家,字节级一致输出,FareedKhan-dev,9.9k⭐)"
+
+    process_patterns:
+      - "bin/k3\\s"
+      - "k3 --(trunk|preset|chat)"
+      - "k3-doctor"
+      - "pack-trunk"
+
+    env_indicators:
+      - "K3_MODEL_DIR"
+      - "K3_TOK_FILES"
+      - "OMP_NUM_THREADS"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -1936,6 +1981,21 @@ ml_frameworks:
         patterns:
           - "import indra_ocr"
           - "from indra_ocr import"
+
+  # ========== 2026-11-04 批次: 免训练模型行为修改工具(GitHub日榜侦察) ==========
+  - name: "Heretic"
+    id: "heretic"
+    type: "ml_framework"
+    severity: "low"
+    description: "Heretic 免训练LLM行为修改(ARA任意秩消融/方向消融abliteration,去审查/抑slop/降谄媚,TPE+Optuna优化,HF模型复现清单Grimoire,pip heretic-llm,p-e-w,trendshift日榜#1)"
+
+    process_patterns:
+      - "\\bheretic\\b"
+      - "heretic-llm"
+      - "heretic --(reproduce|collect-reproducibles)"
+
+    env_indicators:
+      - "HERETIC_CONFIG_FILE"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -5029,6 +5089,48 @@ agent_frameworks:
     env_indicators:
       - "REASON_NETWORK"
 
+  # ========== 2026-11-04 批次: 桌面控制/Agent工作流工具(GitHub日榜+周榜侦察) ==========
+  - name: "Agent Desktop"
+    id: "agent-desktop"
+    type: "agent_framework"
+    severity: "low"
+    description: "vercel-labs agent-desktop 桌面应用电脑控制CLI(读写系统无障碍树AX/UIA/AT-SPI,ref点击输入,macOS/Windows/Linux,MCP stdio+native二进制+libagent_desktop_ffi,npm agent-desktop,日榜trending)"
+
+    process_patterns:
+      - "agent-desktop"
+      - "libagent_desktop"
+
+    env_indicators:
+      - "AGENT_DESKTOP_"
+
+  - name: "Worktrunk"
+    id: "worktrunk"
+    type: "agent_framework"
+    severity: "low"
+    description: "Worktrunk Git worktree并行AI Agent工作流CLI(wt switch/merge/list,LLM提交信息,CoW构建缓存,Claude Code/Codex并行启动,Rust,cargo worktrunk,max-sixty,周榜trending)"
+
+    process_patterns:
+      - "worktrunk"
+      - "git-wt"
+      - "\\bwt (switch|merge|remove|step)\\b"
+
+    env_indicators:
+      - "WT_CONFIG"
+
+  - name: "Grandet"
+    id: "grandet"
+    type: "agent_framework"
+    severity: "low"
+    description: "Grandet 模型API比价助手(官方/推理商/中转站列价对比+免费额度,Agent Skill装到Claude Code/Codex/OpenClaw等~/.claude/skills/grandet-api-price-finder,远程MCP grandet.ai/mcp,hanzohanzhe,1k⭐)"
+
+    process_patterns:
+      - "grandet"
+      - "grandet-api-price-finder"
+      - "connect.mjs"
+
+    env_indicators:
+      - "GRANDET_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -7030,6 +7132,121 @@ deployment_tools:
 
     env_indicators:
       - "RUNE_"
+
+  # ========== 2026-11-04 批次: 企业知识引擎/语音Agent/元搜索(GitHub topic侦察) ==========
+  - name: "Jonex"
+    id: "jonex"
+    type: "deployment"
+    severity: "medium"
+    description: "Jonex 企业级多模态领域知识引擎(解析+本体编译+向量/图索引+溯源检索,内置LLM网关+LightRAG/Milvus/Neo4j,Docker Compose多租户,yuezhiai,1.5k⭐)"
+
+    process_patterns:
+      - "jonex"
+      - "llmgw"
+      - "jonex-wiki"
+
+    default_ports:
+      - 80
+      - 8080
+
+    docker_images:
+      - "jonex/python-base"
+      - "jonex/llm-gateway"
+
+    env_indicators:
+      - "LLMGW_"
+      - "LIGHTRAG_API_KEY"
+      - "JONEX_"
+
+  - name: "Agentero"
+    id: "agentero"
+    type: "deployment"
+    severity: "low"
+    description: "Agentero 人机协作科研工作台(PDF结构化阅读+双链笔记+Agent伴读,ACP协议接Claude Code/Codex,内置MCP Server+无头CLI,Zotero迁移+S3同步,poco-ai,1k⭐)"
+
+    process_patterns:
+      - "agentero"
+      - "Agentero"
+
+    env_indicators:
+      - "AGENTERO_"
+
+  - name: "RustXNG"
+    id: "rustxng"
+    type: "deployment"
+    severity: "low"
+    description: "RustXNG 自托管元搜索引擎(Rust单二进制,基于SearXNG为AI Agent检索 grounding,JSON/MCP stdio,免API key多引擎,ghcr.io/sahenjp/rustxng,sahenjp,804⭐)"
+
+    process_patterns:
+      - "rustxng"
+      - "rustxng-index"
+      - "rustxng mcp"
+
+    default_ports:
+      - 29483
+      - 8888
+
+    docker_images:
+      - "ghcr.io/sahenjp/rustxng"
+      - "rustxng"
+
+    http_endpoints:
+      - path: "/healthz"
+        method: "GET"
+      - path: "/search"
+        method: "GET"
+      - path: "/metrics"
+        method: "GET"
+
+    env_indicators:
+      - "SEARXNG_PORT"
+      - "RUSTXNG_IDLE_TIMEOUT"
+
+  - name: "Carrel"
+    id: "carrel"
+    type: "deployment"
+    severity: "low"
+    description: "Carrel 本体增强生成OAG知识库(文档解析+向量/关键词/图混合检索,MinerU+Qdrant+OpenSearch+Neo4j,Web控制台+search API+Agent skill,carrel-search,FengZhenfei,740⭐)"
+
+    process_patterns:
+      - "\\bcarrel\\b"
+      - "carrel-search"
+      - "carrel.*serve"
+
+    default_ports:
+      - 9800
+      - 9810
+
+    http_endpoints:
+      - path: "/search"
+        method: "POST"
+
+    env_indicators:
+      - "CARREL_"
+      - "KB_SEARCH_TOKEN"
+      - "KB_WEB_TOKEN"
+      - "VLM_BASE_URL"
+
+  - name: "Lampline"
+    id: "lampline"
+    type: "deployment"
+    severity: "medium"
+    description: "Lampline 自托管电话语音Agent平台(Pipecat引擎,YAML agents-as-code+vk CLI测试/评审,Twilio/Telnyx/SIP jambonz,Dialogflow CX导入导出,Evals真实电话评分,Ollama本地免key,C4rohan,524⭐)"
+
+    process_patterns:
+      - "lampline"
+      - "\\bvk (test|lint|mcp|import|export)\\b"
+      - "vpe"
+
+    default_ports:
+      - 7860
+
+    docker_images:
+      - "lampline"
+
+    env_indicators:
+      - "VPE_DOCKER_API_KEY"
+      - "VPE_LLM_BASE_URL"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
