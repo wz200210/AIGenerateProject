@@ -1001,6 +1001,70 @@ llm_services:
       - "K3_TOK_FILES"
       - "OMP_NUM_THREADS"
 
+  # ========== 2026-11-05 批次: 分布式LLM池化/边缘MoE推理/推理基础设施(GitHub Trending+API侦察) ==========
+  - name: "mesh-llm"
+    id: "mesh-llm"
+    type: "llm_framework"
+    severity: "low"
+    description: "mesh-llm 分布式LLM池化框架(GPU/内存跨机器聚合,OpenAI兼容API,Skippy模型管理+split执行,Mesh节点发现/路由/插件,Rust,Mesh-LLM,周榜trending)"
+
+    process_patterns:
+      - "\\bmesh-llm\\b"
+      - "meshllm"
+      - "\\bskippy\\b"
+      - "skippy.*serve"
+
+    default_ports:
+      - 9337
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/v1/chat/completions"
+        method: "POST"
+
+    env_indicators:
+      - "MESH_LLM_"
+      - "SKIPPY_"
+
+  - name: "BigMoeOnEdge"
+    id: "bigmoeonedge"
+    type: "llm_framework"
+    severity: "low"
+    description: "BigMoeOnEdge 边缘MoE流式推理(超RAM运行MoE,llama.cpp fork,专家闪存流式,Android/iOS/macOS/Win/Linux,自适应规划器+OpenAI兼容本地服务器,Helldez,709⭐)"
+
+    process_patterns:
+      - "bigmoeonedge"
+      - "bigmoe.*serve"
+      - "bigmoe.*engine"
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "BIGMOE_"
+
+  - name: "modelsphere"
+    id: "modelsphere"
+    type: "llm_framework"
+    severity: "low"
+    description: "modelsphere 开源LLM推理基础设施(生产级模型服务,智能自动扩缩,质量感知动态节流,Prefill/Decode分离,异构加速器,modelsphere,175⭐)"
+
+    process_patterns:
+      - "\\bmodelsphere\\b"
+      - "modelsphere.*serve"
+      - "modelsphere.*inference"
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "MODELSPHERE_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -1996,6 +2060,21 @@ ml_frameworks:
 
     env_indicators:
       - "HERETIC_CONFIG_FILE"
+
+  # ========== 2026-11-05 批次: 开源System-1决策模型(GitHub API侦察) ==========
+  - name: "laya"
+    id: "laya"
+    type: "ml_framework"
+    severity: "low"
+    description: "laya 开源Jev兼容System-1决策模型(Node.js/TypeScript,ONNX Runtime,状态→校准概率选择/评分/布尔,LAYA_CACHE缓存,接收状态+类型化问题→单次前向,receptron,1k⭐)"
+
+    process_patterns:
+      - "@receptron/laya"
+      - "receptron-laya"
+      - "\\blaya\\b.*onnx"
+
+    env_indicators:
+      - "LAYA_CACHE"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -5131,6 +5210,143 @@ agent_frameworks:
     env_indicators:
       - "GRANDET_"
 
+  # ========== 2026-11-05 批次: 编码Agent运行时/浏览器自动化/Agent聚合/Docker团队平台(GitHub Trending侦察) ==========
+  - name: "Open Interpreter"
+    id: "open-interpreter"
+    type: "agent_framework"
+    severity: "low"
+    description: "Open Interpreter 开源编码Agent(Rust重写,Codex fork,harness模拟claude-code/kimi-code/qwen-code等,低成模型优化,i/interpreter CLI,openinterpreter,周榜trending)"
+
+    process_patterns:
+      - "open-interpreter"
+      - "\\binterpreter\\b"
+      - "openinterpreter"
+      - "open_interp"
+
+    env_indicators:
+      - "INTERPRETER_"
+      - "OPEN_INTERPRETER_"
+
+  - name: "agent-browser"
+    id: "agent-browser"
+    type: "agent_framework"
+    severity: "low"
+    description: "agent-browser Vercel Labs浏览器自动化CLI(Rust,AI Agent驱动Chrome,snapshot→accessibility tree→ref操作,后台daemon+CDP协议,npm agent-browser,周榜trending)"
+
+    process_patterns:
+      - "agent-browser"
+      - "agent_browser"
+      - "agentbrowser"
+
+    env_indicators:
+      - "AGENT_BROWSER_"
+
+  - name: "Codync"
+    id: "codync"
+    type: "agent_framework"
+    severity: "low"
+    description: "Codync Agent聚合bot(Rust,codync-host单二进制,Claude Code/Codex/Gemini/Cursor等40+ Agent变bot,iPhone/Mac/Win/Linux消息委托,BYO订阅,组聊轮流回答,leepokai,周榜trending)"
+
+    process_patterns:
+      - "codync"
+      - "codync-host"
+      - "\\bcodync\\b"
+
+    env_indicators:
+      - "CODYNC_"
+
+  - name: "herdr"
+    id: "herdr"
+    type: "agent_framework"
+    severity: "low"
+    description: "herdr 编码Agent运行时(后台server保持终端运行,SSH断连不丢,session恢复,多机合一窗口,working/blocked/idle状态标记,Agent原生CLI+socket API,Rust单二进制,herdrdev,周榜trending)"
+
+    process_patterns:
+      - "\\bherdr\\b"
+      - "herdr.*serve"
+      - "herdr.*daemon"
+
+    env_indicators:
+      - "HERDR_"
+
+  - name: "nakama"
+    id: "nakama"
+    type: "agent_framework"
+    severity: "low"
+    description: "nakama AI Agent团队平台(Dashboard聊天界面,Agent工具+技能+记忆+IM频道Telegram/WhatsApp/Discord/Slack,多租户隔离,单Docker容器,ahmadrosid,周榜trending)"
+
+    process_patterns:
+      - "\\bnakama\\b"
+      - "nakama.*agent"
+      - "nakama.*server"
+
+    docker_images:
+      - "nakama"
+      - "ahmadrosid/nakama"
+
+    env_indicators:
+      - "NAKAMA_"
+
+  - name: "nasiko"
+    id: "nasiko"
+    type: "agent_framework"
+    severity: "low"
+    description: "nasiko 开放Agent运行时(发现已运行编码Agent,统一花费schema,模型路由,调用路径中运行,Docker部署,Nasiko-Labs,Rust,周榜trending)"
+
+    process_patterns:
+      - "\\bnasiko\\b"
+      - "nasiko.*runtime"
+      - "nasiko.*proxy"
+
+    docker_images:
+      - "nasiko"
+      - "nasiko-labs/nasiko"
+
+    env_indicators:
+      - "NASIKO_"
+
+  - name: "inferoa"
+    id: "inferoa"
+    type: "agent_framework"
+    severity: "low"
+    description: "inferoa 推理原生Tokenmaxxing Agent Harness(Loop Engineering,持久递归循环,前缀缓存保持+可变上下文边界+token压力暴露,推理路径选择,agentic-in,567⭐)"
+
+    process_patterns:
+      - "\\binferoa\\b"
+      - "inferoa.*loop"
+      - "inferoa.*agent"
+
+    env_indicators:
+      - "INFEROA_"
+
+  - name: "humanizer"
+    id: "humanizer"
+    type: "agent_framework"
+    severity: "low"
+    description: "humanizer 去AI痕迹Agent Skill(基于Wikipedia Signs of AI writing,AI文本→人类风格,Claude Code/Codex等skill兼容,blader,周榜trending)"
+
+    process_patterns:
+      - "\\bhumanizer\\b"
+      - "humanizer.*skill"
+      - "blader/humanizer"
+
+    env_indicators:
+      - "HUMANIZER_"
+
+  - name: "shannon"
+    id: "shannon"
+    type: "agent_framework"
+    severity: "medium"
+    description: "shannon 自主AI渗透测试Agent(源码分析→攻击路径识别→真实漏洞利用验证,Web/API安全测试,npx @keygraph/shannon,KeygraphHQ,周榜trending)"
+
+    process_patterns:
+      - "\\bshannon\\b"
+      - "@keygraph/shannon"
+      - "shannon.*pentest"
+
+    env_indicators:
+      - "SHANNON_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -7247,6 +7463,91 @@ deployment_tools:
     env_indicators:
       - "VPE_DOCKER_API_KEY"
       - "VPE_LLM_BASE_URL"
+
+  # ========== 2026-11-05 批次: NotebookLM替代/GPU资源管理/AI内网/视频制作/PR审查(GitHub Trending+API侦察) ==========
+  - name: "open-notebook"
+    id: "open-notebook"
+    type: "deployment"
+    severity: "low"
+    description: "open-notebook 开源NotebookLM替代(100%本地,多模态PDF/视频/音频/网页,播客生成,全文+向量搜索,20+ LLM提供商,Docker/cloud/local,lfnovo,周榜trending)"
+
+    process_patterns:
+      - "open-notebook"
+      - "open_notebook"
+      - "opennotebook"
+
+    default_ports:
+      - 8080
+      - 3000
+
+    docker_images:
+      - "lfnovo/open-notebook"
+      - "open-notebook"
+
+    env_indicators:
+      - "OPEN_NOTEBOOK_"
+
+  - name: "berth"
+    id: "berth"
+    type: "deployment"
+    severity: "low"
+    description: "berth 轻量GPU资源管理器(Go,控制GPU访问权限+调度+交接,防程序互相崩溃,Gateway+Harbor模式,Linux/Win,T-Crypt,287⭐)"
+
+    process_patterns:
+      - "\\bberth\\b"
+      - "berth.*gateway"
+      - "berth.*harbor"
+
+    env_indicators:
+      - "BERTH_"
+
+  - name: "autonomous-grid"
+    id: "autonomous-grid"
+    type: "deployment"
+    severity: "low"
+    description: "autonomous-grid AI内网(联网已有电脑做推理/训练,统一OpenAI兼容端点,本地优先无账号,Ollama/vLLM/LM Studio网络聚合,grid CLI,autonomous-ai,274⭐)"
+
+    process_patterns:
+      - "autonomous-grid"
+      - "\\bgrid\\b.*(start|serve)"
+      - "grid.*inference"
+
+    env_indicators:
+      - "GRID_"
+
+  - name: "OpenMontage"
+    id: "openmontage"
+    type: "deployment"
+    severity: "low"
+    description: "OpenMontage 开源Agent视频制作系统(12条制作管线,100+工具,700+ Agent技能文件,AI编码助手→视频制作工作室,Remotion,calesthio,周榜trending)"
+
+    process_patterns:
+      - "openmontage"
+      - "open-montage"
+      - "montage.*pipeline"
+
+    env_indicators:
+      - "MONTAGE_"
+      - "OPENMONTAGE_"
+
+  - name: "pr-agent"
+    id: "pr-agent"
+    type: "deployment"
+    severity: "low"
+    description: "pr-agent 开源AI PR审查Agent(Qodo社区维护,GitHub/GitLab/Bitbucket/Azure DevOps集成,自动代码审查+建议,The-PR-Agent,周榜trending)"
+
+    process_patterns:
+      - "pr-agent"
+      - "pr_agent"
+      - "qodo.*review"
+
+    docker_images:
+      - "pr-agent"
+      - "qodo/pr-agent"
+
+    env_indicators:
+      - "PR_AGENT_"
+      - "QODO_"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
