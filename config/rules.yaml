@@ -9453,6 +9453,212 @@ monitoring_tools:
     env_indicators:
       - "PONYTAIL_"
 
+  # ========== 2026-11-06 批次: AI Agent技能/安全/开发工具侦察 ==========
+  - name: "SkillSpector"
+    id: "skillspector"
+    type: "monitoring"
+    severity: "medium"
+    description: "SkillSpector NVIDIA AI Agent技能安全扫描器(71漏洞模式17类, 提示注入/数据外泄/供应链/权限提升/MCP投毒检测, 静态+LLM双层分析, OSV.dev CVE查询, SARIF输出, MCP Server模式, Docker支持, NVIDIA, 周榜trending)"
+
+    process_patterns:
+      - "skillspector"
+      - "skillspector.*(scan|mcp)"
+      - "python.*skillspector"
+
+    env_indicators:
+      - "SKILLSPECTOR_"
+
+  - name: "Caveman"
+    id: "caveman"
+    type: "agent_framework"
+    severity: "low"
+    description: "Caveman AI Agent token压缩代理+技能(33%输入token削减, 洞穴人风格输出+日志/JSON/CSV压缩+Auto模型路由+代码块复用, Claude Code/Codex/Gemini/OpenCode等30+ Agent支持, npm @caveman-ai/cli, 100k+⭐, HN #1, JuliusBrussee)"
+
+    process_patterns:
+      - "\\bcaveman\\b"
+      - "caveman-(claude|codex|gemini|opencode|aider|kilo|qwen|hermes|openclaw|pi)"
+      - "@caveman-ai/cli"
+      - "caveman-(blocks|setup|discover|learn|manage|optimize|explore)"
+
+    env_indicators:
+      - "CAVEMAN_"
+      - "CAVE_MAN_"
+
+  - name: "Hallmark"
+    id: "hallmark"
+    type: "agent_framework"
+    severity: "low"
+    description: "Hallmark 反AI-slop设计技能(50主题目录, 浏览器lint检查机器生成特征, 对比度/焦点/减少动效检查, 真实照片库755张, Claude Code/Cursor/Codex/OpenCode, npx skills add, Nutlope/Together AI, 周榜trending)"
+
+    process_patterns:
+      - "\\bhallmark\\b"
+      - "sloplint"
+      - "hallmark.*(theme|redesign|audit)"
+
+    env_indicators:
+      - "HALLMARK_"
+
+  - name: "Superpowers"
+    id: "superpowers"
+    type: "agent_framework"
+    severity: "low"
+    description: "Superpowers Agentic Skills框架+软件开发方法论(大脑风暴/设计/计划/子Agent驱动开发/TDD/代码审查全流程, Claude Code/Codex/Cursor/Gemini CLI等16+ harness插件, obra, 周榜trending)"
+
+    process_patterns:
+      - "superpowers.*(skill|plugin)"
+      - "using-superpowers"
+      - "brainstorming.*superpowers"
+      - "subagent-driven-development"
+
+    env_indicators:
+      - "SUPERPOWERS_"
+
+  - name: "Spec Kit"
+    id: "spec-kit"
+    type: "agent_framework"
+    severity: "low"
+    description: "Spec Kit GitHub官方Spec-Driven Development工具包(speckit CLI, 规范→计划→任务→实现→收敛全流程, 扩展/预设/工作流/目录/捆绑包, 支持Copilot/Claude Code/Codex等, specify init命令, Python 3.11+, 周榜trending)"
+
+    process_patterns:
+      - "\\bspeckit\\b"
+      - "spec-kit"
+      - "specify.*(init|extension|preset|workflow)"
+      - "/speckit-"
+
+    env_indicators:
+      - "SPECKIT_"
+      - "SPEC_KIT_"
+
+  - name: "Beads"
+    id: "beads"
+    type: "agent_framework"
+    severity: "low"
+    description: "Beads (bd) 编码Agent分布式图问题追踪器(Dolt数据库驱动版本控制, 依赖图任务管理, 多Agent/多分支零冲突, JSON输出+自动就绪检测, 语义记忆衰减, HTTP后端, Claude Code/Codex/Cursor集成, gastownhall/steveyegge)"
+
+    process_patterns:
+      - "\\bbd\\b"
+      - "beads.*(init|ready|claim|close|prime|remember)"
+      - "bd-(create|ready|update|close|prime)"
+      - "beads-mcp"
+
+    env_indicators:
+      - "BEADS_"
+      - "BD_"
+
+  - name: "NetBird"
+    id: "netbird"
+    type: "deployment"
+    severity: "medium"
+    description: "NetBird 零信任网络连接平台(WireGuard P2P, 人员/机器/AI Agent跨网络安全连接, 身份认证, 自托管, 周榜trending)"
+
+    process_patterns:
+      - "netbird"
+      - "netbird-(agent|client|signal|relay|management)"
+
+    default_ports:
+      - 33073
+      - 10000
+
+    env_indicators:
+      - "NETBIRD_"
+
+  - name: "Kronos"
+    id: "kronos"
+    type: "ml_framework"
+    severity: "low"
+    description: "Kronos 金融市场语言基础模型(金融时序+文本预训练, 市场预测/量化分析, shiyu-coder, 周榜trending)"
+
+    process_patterns:
+      - "\\bkronos\\b"
+      - "kronos.*(train|infer|finetune)"
+      - "python.*kronos"
+
+    env_indicators:
+      - "KRONOS_"
+
+  - name: "OpenBot"
+    id: "openbot"
+    type: "agent_framework"
+    severity: "low"
+    description: "OpenBot 开源AI同事平台(每个Agent独立浏览器/文件/工具, AG-UI协议, 审计网关+CEL策略, 人机协作接管, CopilotKit, 端口3001/3010/4100/4200/4201/4500, 周榜trending)"
+
+    process_patterns:
+      - "openbot"
+      - "agent-(computer|bot|langgraph)"
+      - "supervisor.*openbot"
+
+    default_ports:
+      - 3001
+      - 3010
+      - 4100
+      - 4200
+      - 4201
+      - 4500
+
+    env_indicators:
+      - "OPENBOT_"
+      - "COMPUTER_(TOKEN|RUNTIME|SUPERVISOR_URL)"
+      - "AGENT_(TOOL_TOKEN|COMPUTER_POLICY)"
+
+  - name: "MoneyPrinterTurbo"
+    id: "money-printer-turbo"
+    type: "ml_framework"
+    severity: "low"
+    description: "MoneyPrinterTurbo AI短视频自动生成(主题/关键词→高清短视频, 大模型+自动化工作流, 文案/配音/字幕/配乐全自动, harry0703, 周榜trending)"
+
+    process_patterns:
+      - "moneyprinterturbo"
+      - "money[-_]printer[-_]turbo"
+      - "python.*moneyprinter"
+
+    default_ports:
+      - 8080
+
+    env_indicators:
+      - "MONEYPRINTER_"
+
+  - name: "Scenario"
+    id: "scenario"
+    type: "agent_framework"
+    severity: "low"
+    description: "Scenario AI Agent多媒体生产技能(图像/视频/音频/3D, 模型选择+价格预估+角色品牌一致性, Scenario MCP, Blender/Maya/ZBrush/Unreal/Unity专家集成, scenario-labs, 周榜trending)"
+
+    process_patterns:
+      - "scenario.*(mcp|skill)"
+      - "scenario-labs"
+
+    env_indicators:
+      - "SCENARIO_"
+
+  - name: "Speculative Decoding"
+    id: "speculative-decoding"
+    type: "llm_framework"
+    severity: "low"
+    description: "EAGLE-4 投机解码加速(4.3x推理加速, 适配SGLang/vLLM, Docker镜像, 推理优化)"
+
+    process_patterns:
+      - "eagle[-_]4"
+      - "speculative[-_]decoding"
+      - "spec.*decode"
+
+    env_indicators:
+      - "EAGLE_"
+
+  - name: "DS Harness Remote"
+    id: "ds-harness-remote"
+    type: "agent_framework"
+    severity: "low"
+    description: "DS Harness Remote DeepSeek Harness远程访问方案(P2P低延迟端到端加密, PC/移动端/Web访问DSH/Codex/Cursor/Claude Code工作区, liguobao)"
+
+    process_patterns:
+      - "ds[-_]harness[-_]remote"
+      - "dsh.*remote"
+      - "ds-harness.*plugin"
+
+    env_indicators:
+      - "DS_HARNESS_"
+      - "DSH_REMOTE_"
+
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
   - name: "OpenAI API Key"
