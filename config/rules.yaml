@@ -9659,6 +9659,133 @@ monitoring_tools:
       - "DS_HARNESS_"
       - "DSH_REMOTE_"
 
+  # ========== 2026-11-07 批次: AI 基础设施侦察(GitHub日榜/周榜) ==========
+  - name: "NVIDIA Auto Ontology"
+    id: "auto-ontology"
+    type: "agent_framework"
+    severity: "medium"
+    description: "NVIDIA Auto Ontology 语义图谱推理层(企业元数据→本体/知识图谱, NL-to-SQL确定性查询, MCP/CLI/API三种暴露方式, FastAPI后端+Next.js前端+pgvector, Better Auth RBAC, NVIDIA NIM推理, Helm/Docker Compose部署, 日榜trending 2015⭐/天)"
+
+    process_patterns:
+      - "auto[-_]ontology"
+      - "uvicorn.*auto[-_]ontology"
+      - "auto[-_]ontology.*(mcp|cli|serve)"
+
+    default_ports:
+      - 3000
+      - 3001
+      - 3002
+
+    env_indicators:
+      - "AUTO_ONTOLOGY_"
+      - "DEFAULT_MODELS_"
+      - "REASONING_ENDPOINT"
+      - "EMBED_ENDPOINT"
+      - "RERANK_ENDPOINT"
+
+  - name: "Loop Engineering"
+    id: "loop-engineering"
+    type: "agent_framework"
+    severity: "low"
+    description: "Loop Engineering Agent循环工程设计模式库+CLI(daily-triage/PR Babysitter/CI Sweeper等8模式, loop-audit/loop-init/loop-cost工具链, STATE.md/LOOP.md/loop-budget.md状态文件, Claude/Codex/Grok/OpenCode/OpenClaw多harness脚手架, npm @cobusgreyling/loop, cobusgreyling, 11.7k⭐)"
+
+    process_patterns:
+      - "loop[-_]audit"
+      - "loop[-_]init"
+      - "loop[-_]cost"
+      - "loop[-_]doctor"
+      - "@cobusgreyling/loop"
+      - "cobusgreyling.*loop"
+
+    env_indicators:
+      - "LOOP_ENGINEERING_"
+
+  - name: "Cloudflare Security Audit Skill"
+    id: "security-audit-skill"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Cloudflare security-audit-skill 编码Agent安全审计技能(6阶段:侦察→覆盖引导狩猎→候选验证→结构化输出→独立记录验证→目标中立报告, coverage-ledger.json+findings.json+REPORT.md, 供应链/云配置/LLM提示注入等11类攻击面, npx skills add安装, cloudflare, 64k⭐, 日榜trending)"
+
+    process_patterns:
+      - "security[-_]audit"
+      - "validate[-_]findings\\.cjs"
+      - "validate[-_]coverage[-_]ledger\\.cjs"
+      - "skills add.*security[-_]audit"
+
+    env_indicators:
+      - "SECURITY_AUDIT_"
+
+  - name: "ffmpeg-skill"
+    id: "ffmpeg-skill"
+    type: "agent_framework"
+    severity: "low"
+    description: "ffmpeg-skill 编码Agent本地视频编辑MCP(42个FFmpeg工具:剪辑/字幕/重构图/响度/多机位/整片渲染, probe→edit→check→verify固定工作流, SKILL.md+机器可读契约, stdio MCP默认12工具FFMPEG_SKILL_MCP_FULL=1全量42, Claude Code/Cursor/Codex, npm ffmpeg-skill, kajisho5, 4.7k⭐)"
+
+    process_patterns:
+      - "ffmpeg[-_]skill"
+      - "ffmpeg[-_]skill[-_]mcp"
+
+    env_indicators:
+      - "FFMPEG_SKILL_"
+
+  - name: "Codex with ChatGPT"
+    id: "codex-with-chatgpt"
+    type: "agent_framework"
+    severity: "low"
+    description: "Codex with ChatGPT (c2c) ChatGPT网页版规划大脑+Codex执行分离方案(只读MCP桥接+OAuth保护, ChatGPT Plus订阅额度复用, c2c setup配置CLI, cloudflared隧道, skill安装至CODEX_HOME/skills/codex-with-chatgpt/, 中文文档, XiaoDuoYa, 7.7k⭐)"
+
+    process_patterns:
+      - "codex[-_]with[-_]chatgpt"
+      - "\\bc2c\\b.*(setup|status|connect)"
+      - "chatgpt.*mcp.*bridge"
+
+    env_indicators:
+      - "C2C_"
+      - "CODEX_WITH_CHATGPT_"
+
+  - name: "Chat On Steroids"
+    id: "chat-on-steroids"
+    type: "agent_framework"
+    severity: "low"
+    description: "Chat On Steroids (CoS) ChatGPT本地编码工作台(桌面应用Win/macOS/Linux, 文件读写/终端/测试运行, 多worker并行+Goal/Loop长任务+Compact&Resume会话续接, Chrome扩展桥接ChatGPT网页, 自定义MCP server连接, totec448-spec, 5.1k⭐)"
+
+    process_patterns:
+      - "chat[-_]on[-_]steroids"
+      - "Chat[- ]On[- ]Steroids"
+      - "\\bcos[-_]core\\b"
+
+    env_indicators:
+      - "COS_"
+
+  - name: "Appllama Skills"
+    id: "appllama-skills"
+    type: "agent_framework"
+    severity: "low"
+    description: "Appllama 移动端构建Agent技能(研究畅销App真实界面/流程/设计模式, appllama-usage研究引擎+appllama-app-design-skill构建标准, Expo/React Native原生级屏幕, 模拟器全动效验证闭环, Appllama MCP设计库, skills.sh安装, 4.9k⭐)"
+
+    process_patterns:
+      - "appllama"
+      - "appllama[-_](usage|mcp)"
+
+    env_indicators:
+      - "APPLLAMA_"
+
+  - name: "AIHOT"
+    id: "aihot"
+    type: "agent_framework"
+    severity: "low"
+    description: "AIHOT AI热点日报网站框架(多信源采集→大模型初筛+独立双打分→事件聚簇热度排序→中文日报自动生成, 提示词原文全开源可定制行业信源, Node.js 24+PostgreSQL 17+Docker Compose, aihot.news原站, KKKKhazix, 9.7k⭐)"
+
+    process_patterns:
+      - "\\baihot\\b"
+      - "AIHOT"
+
+    docker_images:
+      - "aihot"
+
+    env_indicators:
+      - "AIHOT_"
+
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
   - name: "OpenAI API Key"
