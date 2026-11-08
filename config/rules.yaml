@@ -1513,6 +1513,27 @@ vector_databases:
     env_indicators:
       - "KIVIDB_"
 
+# ==================== 2026-11-08 批次: HN 高分侦察 ====================
+  - name: "Antfly"
+    id: "antfly"
+    type: "vector_database"
+    severity: "medium"
+    description: "Antfly 分布式多模态搜索与记忆数据库(Zig单二进制,全文+向量+图搜索三合一,内嵌Termite ML推理引擎, MongoDB风格原地更新, 流式RAG, Multi-Raft分布式基于etcd库+Pebble存储引擎, MCP server+K8s operator, antflydb/antfly, HN 107分)"
+
+    process_patterns:
+      - "\\bantfly\\b"
+      - "antflyd"
+      - "antfly swarm"
+
+    default_ports:
+      - 8080
+
+    docker_images:
+      - "antflydb/antfly"
+
+    env_indicators:
+      - "ANTFLY_"
+
 # ==================== ML 框架 ====================
 ml_frameworks:
   - name: "Hugging Face Transformers"
@@ -5347,6 +5368,63 @@ agent_frameworks:
     env_indicators:
       - "SHANNON_"
 
+  - name: "Rivet"
+    id: "rivet"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Rivet Agent工作负载编排器(actor模型替代重量级沙箱, 72KB基线内存vs 512MB沙箱, 4.9ms p99启动vs 1.7s, S3持久化SQLite+SSD缓存分层, WebSocket多人协作, 空闲冬眠, 单机Rust二进制自托管, TypeScript/Rust SDK, YC W23, rivet-dev, 6.8k⭐, HN 120分)"
+
+    process_patterns:
+      - "rivet[-_]server"
+      - "rivet[-_]guard"
+      - "rivet[-_]client[-_]config"
+      - "\\brivet\\b.*actor"
+
+    default_ports:
+      - 6420
+      - 6421
+
+    docker_images:
+      - "rivet"
+
+    env_indicators:
+      - "RIVET_"
+
+  - name: "Optio"
+    id: "optio"
+    type: "agent_framework"
+    severity: "low"
+    description: "Optio AI编码Agent编排系统(GitHub Issues/Linear ticket→PR全自动生命周期, K8s隔离pod+git worktrees运行Claude Code/Codex, CI失败自动反馈Agent恢复, reviewer评论→下一轮prompt, 30s轮询PR状态, squash-merge闭环, Fastify+Next.js+BullMQ+Drizzle+Postgres+Helm chart, jonwiggins, 1.1k⭐, HN 88分)"
+
+    process_patterns:
+      - "\\boptio\\b"
+      - "optio[-_]worker"
+      - "optio[-_]server"
+      - "optio.*bullmq"
+
+    docker_images:
+      - "optio"
+
+    env_indicators:
+      - "OPTIO_"
+
+  - name: "Ghidra MCP"
+    id: "ghidra-mcp"
+    type: "agent_framework"
+    severity: "low"
+    description: "Ghidra MCP Server AI逆向工程MCP服务(200+ MCP工具:反汇编/反编译/符号分析/交叉引用/数据流追踪, GUI插件+无头服务器双模式, 懒加载工具+约定强制执行, 批量分析管线, Java+Python, Claude等Agent直接驱动Ghidra, bethington, 6.2k⭐, HN 298分)"
+
+    process_patterns:
+      - "ghidra[-_]mcp"
+      - "ghidra.*mcp"
+      - "GhidraMCP"
+
+    default_ports:
+      - 8080
+
+    env_indicators:
+      - "GHIDRA_MCP_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -8315,6 +8393,39 @@ ai_gateways:
     env_indicators:
       - "AIFW_TAG"
       - "ConnectionStrings__PostgreSQL"
+
+  - name: "Forge"
+    id: "forge-llm"
+    type: "ai_gateway"
+    severity: "medium"
+    description: "Forge LLM tool-calling可靠性层/代理(自托管LLM五层护栏:重试提示/步骤强制/错误恢复/VRAM感知上下文压缩/救援解析, 8B模型agentic任务53%→99%, ACM CAIS'26论文, proxy server模式OpenAI兼容透明接入, 支持Ollama/Llamafile/llama.cpp, Python, antoinezambelli, 2.3k⭐, HN 687分)"
+
+    process_patterns:
+      - "forge[-_]proxy"
+      - "forge.*guardrail"
+      - "python.*forge.*proxy"
+
+    default_ports:
+      - 8080
+      - 8000
+
+    env_indicators:
+      - "FORGE_"
+
+  - name: "Context Gateway"
+    id: "context-gateway"
+    type: "ai_gateway"
+    severity: "medium"
+    description: "Context Gateway Agent上下文压缩代理(SLM分类器检测工具输出信号部分按意图条件压缩, expand()回溯原始输出, 85%窗口容量后台压缩+懒加载工具描述, 编码Agent与LLM之间的代理层, 支出上限+dashboard+Slack通知, Go, Compresr-ai, 647⭐, HN 97分)"
+
+    process_patterns:
+      - "context[-_]gateway"
+      - "contextgateway"
+      - "compresr"
+
+    env_indicators:
+      - "CONTEXT_GATEWAY_"
+      - "COMPRESR_"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
