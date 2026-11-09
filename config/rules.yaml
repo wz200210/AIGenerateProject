@@ -1534,6 +1534,28 @@ vector_databases:
     env_indicators:
       - "ANTFLY_"
 
+# ==================== 2026-11-09 批次: HN 高分侦察 ====================
+  - name: "Utopia"
+    id: "utopia"
+    type: "vector_database"
+    severity: "low"
+    description: "Utopia 开源企业级世界模型(双时序知识图谱+GraphRAG, 本体论驱动, pgvector向量搜索, 多模态摄取PDF/DOCX/扫描件/录音, MinerU/Volcengine Ark视觉, Web/GitHub/Jira/Notion/WebDAV/S3定时同步, Rust单二进制, ghcr.io/deeplethe/utopia, deeplethe, 8.7k⭐)"
+
+    process_patterns:
+      - "\\butopia\\b"
+      - "utopia[-_]server"
+      - "utopia.*serve"
+
+    default_ports:
+      - 1516
+
+    docker_images:
+      - "ghcr.io/deeplethe/utopia"
+      - "deeplethe/utopia"
+
+    env_indicators:
+      - "UTOPIA_"
+
 # ==================== ML 框架 ====================
 ml_frameworks:
   - name: "Hugging Face Transformers"
@@ -5425,6 +5447,84 @@ agent_frameworks:
     env_indicators:
       - "GHIDRA_MCP_"
 
+# ==================== 2026-11-09 批次: HN 高分侦察 ====================
+  - name: "Reef"
+    id: "reef"
+    type: "agent_framework"
+    severity: "low"
+    description: "Reef 持续自我改进Agent基础设施(首个开源continual learning Agent基建, 服务OpenAI Responses API /v1/responses, 记录反馈→产出模型更新→版本历史提交, GEPA/SDFT/SDPO/Meta-Harness配方, 控制面+workers架构, Python 3.12+, Human-Agent-Society, 7.8k⭐)"
+
+    process_patterns:
+      - "\\breef serve\\b"
+      - "reef[-_]infra"
+      - "python.*reef"
+
+    http_endpoints:
+      - path: "/v1/responses"
+        method: "POST"
+
+    env_indicators:
+      - "REEF_"
+      - "MODEL_PATH"
+
+  - name: "Rakazo"
+    id: "rakazo"
+    type: "agent_framework"
+    severity: "low"
+    description: "Rakazo 开源自托管Grok Bot替代(持久AI队友:独立记忆/routine/应用/沙箱计算机, Docker/e2b/novita/daytona/createos/boat/boxd/railway多沙箱Provider, 群聊@mention多bot协作, TypeScript+Electron+Expo, elie222, 7.6k⭐)"
+
+    process_patterns:
+      - "\\brakazo\\b"
+      - "rakazo.*sandbox"
+
+    default_ports:
+      - 3000
+      - 5173
+
+    docker_images:
+      - "rakazo"
+
+    env_indicators:
+      - "RAKAZO_"
+      - "SANDBOX_SUPERVISOR_TOKEN"
+
+  - name: "Sim"
+    id: "sim"
+    type: "agent_framework"
+    severity: "low"
+    description: "Sim Apache-2.0 n8n替代Agent工作流平台(可视化构建Agentic工作流, 支持Ollama/vLLM本地模型, Next.js+PostgreSQL+pgvector+Redis, MCP server接入, Docker Compose自托管, simstudioai, 30k⭐)"
+
+    process_patterns:
+      - "simstudio"
+      - "\\bsim server\\b"
+      - "sim.*nextjs"
+
+    default_ports:
+      - 3000
+      - 3002
+
+    docker_images:
+      - "ghcr.io/simstudioai/simstudio"
+      - "ghcr.io/simstudioai/realtime"
+      - "ghcr.io/simstudioai/cron"
+
+    env_indicators:
+      - "SIM_"
+      - "BETTER_AUTH_SECRET"
+
+  - name: "Axe"
+    id: "axe"
+    type: "agent_framework"
+    severity: "low"
+    description: "Axe Unix哲学AI Agent CLI(12MB单二进制替代AI框架, TOML定义单技能agent, 管道串联+cron/git hook/CI触发, 多Provider: Anthropic/OpenAI/Ollama/OpenCode/AWS Bedrock, MCP工具SSE/streamable-HTTP接入, Go, jrswab, 909⭐, HN 227分)"
+
+    process_patterns:
+      - "\\baxe\\b"
+      - "axe.*toml"
+
+    env_indicators:
+      - "AXE_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -8427,6 +8527,49 @@ ai_gateways:
       - "CONTEXT_GATEWAY_"
       - "COMPRESR_"
 
+# ==================== 2026-11-09 批次: HN 高分侦察 ====================
+  - name: "Agent Vault"
+    id: "agent-vault"
+    type: "ai_gateway"
+    severity: "medium"
+    description: "Agent Vault AI Agent凭证代理与保险库(HTTP credential broker, Agent不持有凭证消除泄露风险, 透明HTTP/HTTPS代理注入出站请求凭证, Infisical出品, Go, docker infisical/agent-vault, 2.5k⭐, HN 156分)"
+
+    process_patterns:
+      - "agent[-_]vault"
+      - "agentvault"
+
+    default_ports:
+      - 14321
+      - 14322
+
+    docker_images:
+      - "infisical/agent-vault"
+
+    env_indicators:
+      - "AGENT_VAULT_"
+
+  - name: "Experiential"
+    id: "experiential"
+    type: "ai_gateway"
+    severity: "low"
+    description: "Experiential 开源零加价LLM网关与路由器(BYOK/自托管/本地模型统一OpenAI兼容API, 用户+Agent级模型权限+花费控制, 生产流量转化自定义路由器/模型优化质量速度成本, pip install experiential, exp CLI, Python, experientiallabs, 15.3k⭐, HN 222分)"
+
+    process_patterns:
+      - "experiential"
+      - "\\bexp gateway\\b"
+      - "exp.*serve"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/chat/completions"
+        method: "POST"
+
+    env_indicators:
+      - "EXP_"
+      - "EXP_GATEWAY_KEY"
+
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
   - name: "OpenClaw"
@@ -9896,6 +10039,27 @@ monitoring_tools:
 
     env_indicators:
       - "AIHOT_"
+
+# ==================== 2026-11-09 批次: HN 高分侦察 ====================
+  - name: "Torrix"
+    id: "torrix"
+    type: "monitoring"
+    severity: "low"
+    description: "Torrix LLM可观测性平台(追踪每次LLM请求: token/成本/延迟/完整prompt trace/推理token捕获/PII脱敏/AI治理策略, 兼容OpenAI/Anthropic/Gemini/Groq/Mistral/Azure/DeepSeek/Perplexity/Fireworks/Together/Cohere/HF/Replicate/Ollama, 自托管无需Postgres/Redis, 单二进制后台服务, torrix-ai, HN 74分)"
+
+    process_patterns:
+      - "\\btorrix\\b"
+      - "torrix[-_]server"
+
+    default_ports:
+      - 8088
+
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+
+    env_indicators:
+      - "TORRIX_"
 
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
