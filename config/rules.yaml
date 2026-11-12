@@ -5525,6 +5525,93 @@ agent_frameworks:
     env_indicators:
       - "AXE_"
 
+# ==================== 2026-11-11 批次: GitHub周榜+HN侦察 ====================
+  - name: "Omnara"
+    id: "omnara"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Omnara 开源自托管托管Agent平台(Claude Managed Agents/OpenAI Agents API替代, Go+Next.js前端, durable execution持久化执行, 托管沙箱池+模型provider配置, API优先: /api/v1, omnara-ai, 3.4k⭐, HN 114分)"
+
+    process_patterns:
+      - "\\bomnara\\b"
+      - "omnara[-_]api"
+      - "omnara[-_]worker"
+
+    default_ports:
+      - 8000
+
+    docker_images:
+      - "ghcr.io/omnara-ai/omnara-api"
+      - "ghcr.io/omnara-ai/omnara-worker"
+      - "ghcr.io/omnara-ai/omnara-web"
+
+    env_indicators:
+      - "OMNARA_"
+
+  - name: "claude-mem"
+    id: "claude_mem"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Claude-Mem 跨会话持久化Agent记忆(Claude Code/Codex/Cursor/OpenCode/OpenClaw/Hermes/Copilot/Goose/Roo Code/Warp/T3 Code等20+ harness, Bun本地worker HTTP服务+SQLite claude-mem.db+Chroma向量语义搜索, worker端口37700+uid偏移(37700-37799), server端口37877+偏移, Windows遗留37777, 数据~/.claude-mem, thedotmack, 116k⭐, GitHub周榜)"
+
+    process_patterns:
+      - "claude[-_]mem"
+      - "claude-mem.*worker"
+
+    default_ports:
+      - 37777
+
+    env_indicators:
+      - "CLAUDE_MEM_"
+
+  - name: "agent-desktop"
+    id: "agent_desktop"
+    type: "agent_framework"
+    severity: "low"
+    description: "agent-desktop AI Agent电脑操作CLI(无障碍树accessibility tree读取为JSON+元素ref交互, 无需截图/像素匹配, click/type/set-value/clipboard, macOS AX API/Windows UI Automation/Linux AT-SPI, CLI+C库双形态, vercel-labs, 21.7k⭐, GitHub周榜)"
+
+    process_patterns:
+      - "agent[-_]desktop"
+      - "agent-desktop.*snapshot"
+
+    env_indicators:
+      - "AGENT_DESKTOP_"
+
+  - name: "OpenMausBot"
+    id: "openmausbot"
+    type: "agent_framework"
+    severity: "medium"
+    description: "OpenMausBot 开源自托管Grok Bot/Meta Muse替代(多Agent团队桌面app, Electron+Docker双形态, 每bot独立Agent+BYOK(Claude/ChatGPT/Grok), 本地数据~/.openmausbot, 内置VM+浏览器自动化, webhook+手机relay配对, milind-soni, 21k⭐, GitHub周榜)"
+
+    process_patterns:
+      - "openmausbot"
+      - "mausbot"
+
+    default_ports:
+      - 8799
+      - 8800
+      - 8080
+
+    docker_images:
+      - "ghcr.io/milind-soni/openmausbot"
+
+    env_indicators:
+      - "OMB_"
+
+    http_endpoints:
+      - path: "/api/health"
+        method: "GET"
+
+  - name: "Worktrunk"
+    id: "worktrunk"
+    type: "agent_framework"
+    severity: "low"
+    description: "Worktrunk AI Agent并行工作流Git worktree管理CLI(worktree如分支般易用: wt switch/create/remove/list, hooks自动化create/pre-merge/post-merge, 写时复制构建缓存, 并行多Agent开发, Rust, max-sixty, 12.4k⭐, GitHub周榜)"
+
+    process_patterns:
+      - "\\bwt\\b.*worktree"
+      - "worktrunk"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -7726,6 +7813,22 @@ deployment_tools:
     env_indicators:
       - "PR_AGENT_"
       - "QODO_"
+
+  - name: "Waymark"
+    id: "waymark"
+    type: "deployment"
+    severity: "low"
+    description: "Waymark 分布式后台工作流durable执行引擎(编译一次永重放: 源码→IR→字节码, 崩溃/重启/长任务无损恢复, 基于Postgres无额外基础设施, Python client+Rust运行时一体包, webapp端口24119, piercefreeman, 157⭐, HN 88分)"
+
+    process_patterns:
+      - "\\bwaymark\\b"
+      - "waymark.*server"
+
+    default_ports:
+      - 24119
+
+    env_indicators:
+      - "WAYMARK_"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
