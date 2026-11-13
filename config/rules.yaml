@@ -1556,6 +1556,20 @@ vector_databases:
     env_indicators:
       - "UTOPIA_"
 
+# ==================== 2026-11-12 批次: GitHub周榜+HN侦察 ====================
+  - name: "zvec"
+    id: "zvec"
+    type: "vector_database"
+    severity: "low"
+    description: "阿里 zvec 轻量级进程内向量数据库(C++,内嵌式无服务器,稠密+稀疏向量+全文搜索,DiskANN/RaBitQ索引,支持macOS/Windows/Linux/Android/iOS, alibaba, 16.2k⭐)"
+
+    process_patterns:
+      - "\\bzvec\\b"
+      - "zvec.*(search|index)"
+
+    env_indicators:
+      - "ZVEC_"
+
 # ==================== ML 框架 ====================
 ml_frameworks:
   - name: "Hugging Face Transformers"
@@ -5611,6 +5625,167 @@ agent_frameworks:
     process_patterns:
       - "\\bwt\\b.*worktree"
       - "worktrunk"
+
+# ==================== 2026-11-13 批次: GitHub周榜侦察 ====================
+  - name: "GBrain"
+    id: "gbrain"
+    type: "agent_framework"
+    severity: "medium"
+    description: "GBrain Garry Tan(YC CEO)开源Agent记忆/知识图谱系统(显式事实+来源追踪+更正撤回, 关键词检索+语义搜索+合成层+类型化知识图谱, MCP Server+CLI, gbrain mcp expose/Tailscale隧道, OpenClaw/Hermes/Claude Code/Codex/Grok Bot/Muse, PGLite/SQLite, MIT, garrytan, 32.8k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "\\bgbrain\\b"
+      - "gbrain.*(mcp|serve|daemon)"
+      - "gbrain-mcp"
+
+    env_indicators:
+      - "GBRAIN_"
+
+    http_endpoints:
+      - path: "/mcp"
+        method: "POST"
+
+  - name: "oh-my-pi"
+    id: "oh-my-pi"
+    type: "agent_framework"
+    severity: "medium"
+    description: "oh-my-pi(omp) IDE深度集成编码Agent(Stencil Labs, Pi fork, 60+ providers/31内置工具/14 LSP ops/28 DAP ops, Rust核心80k行+Bun运行时, 编辑器: VS Code/JetBrains/Vim/Neovim/Emacs, CLI: omp/pi-coding-agent, npm @oh-my-pi/pi-coding-agent, brew can1357/tap/omp, omp.sh安装脚本, can1357, 38.9k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "oh-my-pi"
+      - "pi-coding-agent"
+      - "\\bomp\\b.*(agent|coding)"
+
+    env_indicators:
+      - "OMP_"
+      - "PI_CODING_"
+      - "OH_MY_PI_"
+
+  - name: "Paradev"
+    id: "paradev"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Paradev(原Superset) 开源源码Agent并行编排桌面App(Codex App/Conductor替代, 每任务独立Git worktree+分支+终端, Changes审查面板+PR工作流+浏览器预览, Claude Code/Codex/OpenCode/Gemini CLI/Cursor Agent, Electron+macOS/Linux, 远程主机+iOS/iPad, CLI仍叫superset, ParadevAI, 16.3k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "\\bparadev\\b"
+      - "paradev.*(agent|workspace)"
+      - "\\bsuperset\\b.*agent"
+
+    env_indicators:
+      - "PARADEV_"
+      - "SUPERSET_"
+
+  - name: "billion-context"
+    id: "billion-context"
+    type: "agent_framework"
+    severity: "low"
+    description: "billion-context 编码Agent上下文压缩插件(月级单会话/数十亿token, 小上下文窗口5x token缩减, 95-97%前缀缓存命中率, Claude Code/Codex/OpenCode/Pi/Gemini/Kimi/Qwen Code/Copilot等20+ harness, npm billion-context, /acp /acp-cache命令, ranxianglei, 7.2k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "billion[-_]context"
+      - "\\bbili\\b.*(context|compress)"
+
+    env_indicators:
+      - "BILLION_CONTEXT_"
+      - "BILI_"
+
+  - name: "gstack"
+    id: "gstack"
+    type: "agent_framework"
+    severity: "low"
+    description: "gstack Garry Tan(YC CEO)开源Claude Code虚拟工程团队(CEO/EM/设计师/审查者/QA/安全官/发布工程师23个角色slash command, /office-hours /review /qa /autoplan /ship, 安装到~/.claude/skills/gstack, gstack-config+gstack-team-init CLI, team mode自动更新, MIT, garrytan, 141.4k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "\\bgstack\\b"
+      - "gstack[-_]config"
+      - "gstack[-_]team[-_]init"
+      - "gstack.*(skill|setup)"
+
+    env_indicators:
+      - "GSTACK_"
+
+  - name: "Paseo"
+    id: "paseo"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Paseo 开源Agent开发环境(桌面/移动/Web/CLI四端, Claude Code/Codex/Copilot/OpenCode/Pi/Antigravity/Muse Code多Provider统一编排, 并行Agent各居worktree, 内建diff审查+PR+浏览器+终端, 语音控制, 自托管零遥测, iOS/Android原生, getpaseo, 24k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "\\bpaseo\\b"
+      - "paseo.*(agent|orchestrat)"
+
+    env_indicators:
+      - "PASEO_"
+
+  - name: "Codex Security"
+    id: "codex-security"
+    type: "agent_framework"
+    severity: "medium"
+    description: "OpenAI Codex Security AI安全扫描CLI/SDK(漏洞发现/验证/修复, Standard/Deep扫描模式, Git changes diff扫描, SARIF/JSON/CSV导出, GitHub Action+TypeScript SDK, npm @openai/codex-security, CLI: cs/codex-security, Node 22+/Python 3.10+, openai, 12.7k⭐, GitHub日榜trending)"
+
+    process_patterns:
+      - "codex[-_]security"
+      - "codex-security.*scan"
+      - "@openai/codex-security"
+
+    env_indicators:
+      - "CODEX_API_KEY"
+      - "CODEX_SECURITY_"
+
+  - name: "Anthropic Skills"
+    id: "anthropic-skills"
+    type: "agent_framework"
+    severity: "low"
+    description: "Anthropic Agent Skills公开仓库(官方技能集: algorithmic-art/canvas-design/brand-guidelines等, SKILL.md+templates结构, .claude-plugin/marketplace.json插件市场格式, Claude Code/Claude Desktop直接加载, anthropics, 193.9k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "anthropic.*skill"
+      - "claude.*skill.*(load|scan)"
+
+    env_indicators:
+      - "CLAUDE_SKILL_"
+      - "ANTHROPIC_SKILL_"
+
+  - name: "Addy Osmani Agent Skills"
+    id: "agent-skills-addyosmani"
+    type: "agent_framework"
+    severity: "low"
+    description: "Addy Osmani生产级Agent工程技能集(.agents/plugins/+.claude-plugin/+.claude/commands/多格式, 代码审查/构建/简化/计划/规范/发布等工程流程, Claude Code/Codex/Cursor/Gemini CLI/Antigravity, addyosmani, 116.9k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "agent[-_]skills.*addyosmani"
+      - "addyosmani.*skill"
+
+    env_indicators:
+      - "AGENT_SKILLS_"
+
+  - name: "Google Skills"
+    id: "google-skills"
+    type: "agent_framework"
+    severity: "low"
+    description: "Google Agent Skills(Google产品/技术官方技能集, .claude-plugin/marketplace.json+.agents/plugins/格式, index.json索引, Google Cloud/GCP服务集成, google, 24.1k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "google.*agent.*skill"
+      - "gcp.*skill.*(load|scan)"
+
+    env_indicators:
+      - "GOOGLE_SKILL_"
+      - "GCP_SKILL_"
+
+  - name: "Matt Pocock Skills"
+    id: "mattpocock-skills"
+    type: "agent_framework"
+    severity: "low"
+    description: "Matt Pocock(Total TypeScript)Skills for Real Engineers(.agents/adr/决策记录+.claude-plugin/插件市场, 显式安装指针+per-ticket实现者+软件工厂技能, Claude Code插件格式, mattpocock, 323.3k⭐, GitHub周榜trending)"
+
+    process_patterns:
+      - "mattpocock.*skill"
+      - "skills.*real.*engineer"
+
+    env_indicators:
+      - "MATT_POCOCK_"
 
 # ==================== 部署/推理 ====================
 deployment_tools:
