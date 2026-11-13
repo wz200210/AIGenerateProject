@@ -34,6 +34,7 @@ type ServiceConfig struct {
 	HTTPEndpoints     []HTTPEndpointConfig `yaml:"http_endpoints"`
 	EnvIndicators     []string             `yaml:"env_indicators"`
 	SemanticAnalyzers []SemanticAnalyzerConfig `yaml:"semantic_analyzers"`
+	DockerImages      []string             `yaml:"docker_images,omitempty"`
 }
 
 // VersionProbeConfig 版本探测配置

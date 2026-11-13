@@ -62,6 +62,14 @@ func (cs *ConfigBasedScanner) compilePatterns() {
 				}
 			}
 		}
+		// 编译 Docker 镜像匹配模式
+		for _, dockerImage := range svc.DockerImages {
+			if _, exists := cs.processPatterns[dockerImage]; !exists {
+				if re, err := regexp.Compile(`(?i)` + dockerImage); err == nil {
+					cs.processPatterns[dockerImage] = re
+				}
+			}
+		}
 	}
 }
 
@@ -687,6 +695,23 @@ func (cs *ConfigBasedScanner) scanDockerContainers() ([]types.AIComponent, error
 
 		// 匹配服务
 		for _, svc := range cs.serviceConfigs {
+			// 1. 用 docker_images 字段匹配
+			for _, dockerImage := range svc.DockerImages {
+				if re, ok := cs.processPatterns[dockerImage]; ok && re.MatchString(image) {
+					comp := types.AIComponent{
+						Name:        svc.Name,
+						Type:        types.AIComponentType(svc.Type),
+						Version:     version,
+						Confidence:  0.95,
+						Severity:    types.Severity(svc.Severity),
+						Description: fmt.Sprintf("Docker: %s (Image: %s, Status: %s)", containerName, image, status),
+						RawContent:  line,
+					}
+					components = append(components, comp)
+					goto nextContainer
+				}
+			}
+			// 2. 用 process_patterns 匹配（兼容旧逻辑）
 			for _, pattern := range svc.ProcessPatterns {
 				if re, ok := cs.processPatterns[pattern]; ok && re.MatchString(image) {
 					comp := types.AIComponent{
