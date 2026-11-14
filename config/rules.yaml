@@ -1065,6 +1065,53 @@ llm_services:
     env_indicators:
       - "MODELSPHERE_"
 
+  # ==================== 2026-11-14 批次: GitHub搜索+HN侦察 ====================
+  - name: "DeepInfer"
+    id: "deepinfer"
+    type: "llm_framework"
+    severity: "medium"
+    description: "DeepInfer DeepSeek官方高性能大规模推理框架(DeepSeek-V4.1-Flash生产级推理,FlashMLA/DeepGEMM/DeepEP优化内核,Attention DP+MoE EP+EPLB并行,DSpark投机解码+置信度验证,异步零开销批调度,SM100/Ascend 950,deepseek-ai,26k⭐)"
+
+    process_patterns:
+      - "\\bdeepinfer\\b"
+      - "deepinfer.*serve"
+      - "deepinfer.*inference"
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "DEEPINFER_"
+
+  - name: "Strata"
+    id: "strata"
+    type: "llm_framework"
+    severity: "medium"
+    description: "Strata 消费级硬件本地推理引擎(Qwen3.8-Flash-Next一键安装Win/Linux/macOS,OpenAI/Anthropic兼容localhost API,strata launch CLI,视觉输入,GHCR镜像ghcr.io/niko1221/strata,Niko1221,44k⭐)"
+
+    process_patterns:
+      - "\\bstrata\\b"
+      - "strata.*launch"
+      - "strata.*serve"
+      - "strata-engine"
+
+    default_ports:
+      - 8080
+
+    docker_images:
+      - "niko1221/strata"
+      - "ghcr.io/niko1221/strata"
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "STRATA_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -5787,6 +5834,106 @@ agent_frameworks:
     env_indicators:
       - "MATT_POCOCK_"
 
+  # ==================== 2026-11-14 批次: GitHub搜索+HN侦察 ====================
+  - name: "DSH SuperAgent"
+    id: "dsh-superagent"
+    type: "agent_framework"
+    severity: "low"
+    description: "dsh-superagent-prototype DeepSeek官方自主Agent系统原型(更自治的Agent架构实验,DeepSeek Harness生态,TypeScript,deepseek-ai,23.1k⭐)"
+
+    process_patterns:
+      - "dsh[-.]superagent"
+      - "superagent.*prototype"
+      - "dsh.*autonomous.*agent"
+
+    env_indicators:
+      - "DSH_SUPERAGENT_"
+      - "DSH_AGENT_"
+
+  - name: "DSHDesktop"
+    id: "dsh-desktop"
+    type: "agent_framework"
+    severity: "low"
+    description: "DSHDesktop DeepSeek Harness桌面版(Electron桌面App,dsh-plugin-desktop插件体系,DeepSeek Harness图形界面,dataelement,18.8k⭐)"
+
+    process_patterns:
+      - "dsh[-.]desktop"
+      - "dshdesktop"
+      - "DSHDesktop"
+
+    env_indicators:
+      - "DSH_DESKTOP_"
+
+  - name: "dsh-Go"
+    id: "dsh-go"
+    type: "agent_framework"
+    severity: "low"
+    description: "dsh-Go DeepSeek Harness口袋版(Flutter手机本机运行DSH+遥控电脑,Android/iOS,DeepSeek Harness移动生态,ccch1mneyyy,22.2k⭐)"
+
+    process_patterns:
+      - "dsh[-.]go\\b"
+      - "dshgo"
+      - "dsh.*flutter"
+
+    env_indicators:
+      - "DSH_GO_"
+
+  - name: "learnharness"
+    id: "learnharness"
+    type: "agent_framework"
+    severity: "low"
+    description: "learnharness 学习困难的Agent Harness(用Agent驾驭高难度学习材料,TypeScript,amosblomqvist,9.3k⭐)"
+
+    process_patterns:
+      - "\\blearnharness\\b"
+      - "learn[-.]harness"
+      - "learnharness.*agent"
+
+    env_indicators:
+      - "LEARNHARNESS_"
+
+  - name: "Hob"
+    id: "hob"
+    type: "agent_framework"
+    severity: "low"
+    description: "Hob 端侧开源AI桌面助手(Claude Cowork/ChatGPT本地替代,Electron+llama.cpp运行Gemma/gpt-oss开源权重,Mac/Win/Linux隐私本地,FrigadeHQ,535⭐,HN Show)"
+
+    process_patterns:
+      - "\\bhob\\b.*llama"
+      - "hob.*desktop.*agent"
+      - "FrigadeHQ.*hob"
+
+    env_indicators:
+      - "HOB_"
+
+  - name: "big-arrow-on-the-screen"
+    id: "big-arrow-screen"
+    type: "agent_framework"
+    severity: "low"
+    description: "big-arrow-on-the-screen Agent屏幕标注CLI(AI Agent在Mac屏幕画箭头/方框/文字,点击穿透,自动消失,Claude Code/Codex Skill,Swift,franzenzenhofer,878⭐,HN 421分)"
+
+    process_patterns:
+      - "big[-.]arrow"
+      - "bigarrow.*screen"
+      - "arrow.*screen.*agent"
+
+    env_indicators:
+      - "BIG_ARROW_"
+
+  - name: "SCM"
+    id: "scm-visual-memory"
+    type: "agent_framework"
+    severity: "low"
+    description: "SCM macOS多模态视觉记忆搜索(本地照片+视频帧AI搜索,CLIP+EmbeddingGemma+transformers.js,视频Agent视觉记忆层,allenv0,529⭐,HN 184分)"
+
+    process_patterns:
+      - "\\bscm\\b.*visual"
+      - "scm.*memory.*search"
+      - "visual.*memory.*macos"
+
+    env_indicators:
+      - "SCM_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -8004,6 +8151,24 @@ deployment_tools:
 
     env_indicators:
       - "WAYMARK_"
+
+  # ==================== 2026-11-14 批次: GitHub搜索+HN侦察 ====================
+  - name: "AWS Emulator"
+    id: "aws-emulator"
+    type: "deployment"
+    severity: "low"
+    description: "AWS Emulator 本地AWS API模拟器(Rust单二进制,CC0协议,本地仿真S3/SQS/DynamoDB等AWS服务,AI Agent云操作测试/开发隔离环境,aws官方,7.6k⭐,HN 986分)"
+
+    process_patterns:
+      - "aws[-.]emulator"
+      - "awsemulator"
+      - "aws_emulator"
+
+    docker_images:
+      - "aws-emulator"
+
+    env_indicators:
+      - "AWS_EMULATOR_"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
