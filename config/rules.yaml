@@ -1112,6 +1112,31 @@ llm_services:
     env_indicators:
       - "STRATA_"
 
+  # ==================== 2026-11-15 批次: HN高分+antirez新作侦察 ====================
+  - name: "DwarfStar"
+    id: "ds4"
+    type: "llm_framework"
+    severity: "medium"
+    description: "DwarfStar(ds4) antirez自研消费级本地推理引擎(DeepSeek V4 Flash/PRO+GLM 5.2/5.3+Qwen3.8 Flash Next,Metal/CUDA/ROCm多GPU+RDMA张量并行+SSD流式,OpenAI兼容HTTP API,内置编码Agent,C源码MIT,antirez/ds4,24.4k⭐,HN 499分)"
+
+    process_patterns:
+      - "ds4[-.]server"
+      - "ds4[-.]agent"
+      - "\\bds4\\b.*--ctx"
+      - "dwarfstar"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "DS4_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -2179,6 +2204,50 @@ ml_frameworks:
 
     env_indicators:
       - "LAYA_CACHE"
+
+  # ==================== 2026-11-15 批次: antirez端侧推理系列(HN侦察) ====================
+  - name: "h3-metal"
+    id: "h3-metal"
+    type: "ml_framework"
+    severity: "low"
+    description: "h3-metal MiniMax-H3 Apple Silicon原生推理引擎(纯C+Metal/MetalPerformanceShaders,文生视频/音频+首尾帧条件+Ref2VA参考,M3 Max/M5 Max优化,antirez/h3.c,3.1k⭐,HN 440分)"
+
+    process_patterns:
+      - "\\bh3\\b.*--info"
+      - "\\bh3\\b.*--width"
+      - "h3[-_]metal"
+      - "h3.*minimax"
+
+    env_indicators:
+      - "H3_MODEL"
+      - "H3_METAL"
+
+  - name: "iris.c"
+    id: "iris-c"
+    type: "ml_framework"
+    severity: "low"
+    description: "iris.c Flux 2图像生成模型纯C推理(Apple Silicon Metal加速,单文件自包含,antirez/iris.c,2.1k⭐)"
+
+    process_patterns:
+      - "iris[-.]c"
+      - "\\biris\\b.*--prompt"
+      - "iris.*flux2"
+
+    env_indicators:
+      - "IRIS_"
+
+  - name: "qwen-asr"
+    id: "qwen-asr"
+    type: "ml_framework"
+    severity: "low"
+    description: "qwen-asr Qwen3-ASR语音识别纯C推理(0.6b/1.7b转录模型,CPU可跑,antirez/qwen-asr,639⭐)"
+
+    process_patterns:
+      - "qwen[-_]asr"
+      - "qwen.*asr.*transcribe"
+
+    env_indicators:
+      - "QWEN_ASR_"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -5934,6 +6003,70 @@ agent_frameworks:
     env_indicators:
       - "SCM_"
 
+  # ==================== 2026-11-15 批次: HN高分+GitHub周榜侦察 ====================
+  - name: "OneCLI"
+    id: "onecli"
+    type: "agent_framework"
+    severity: "low"
+    description: "OneCLI 团队级Agent沙箱平台(Rust凭证网关MITM注入+访问策略执行,每员工独立隔离Agent+按需密钥注入,Bitwarden/1Password对接,K8s Helm自托管,TypeScript+Rust,兼容Hermes/OpenClaw/NanoClaw,onecli/onecli,3.6k⭐,HN 161分)"
+
+    process_patterns:
+      - "\\bonecli\\b"
+      - "onecli.*gateway"
+      - "@onecli/"
+
+    default_ports:
+      - 10254
+
+    docker_images:
+      - "ghcr.io/onecli/charts/onecli"
+
+    env_indicators:
+      - "ONECLI_"
+
+  - name: "Plannotator"
+    id: "plannotator"
+    type: "agent_framework"
+    severity: "low"
+    description: "Plannotator Agent审查工作台(浏览器内对Claude Code/Codex/Gemini CLI/OpenCode等编码Agent的计划-代码-HTML进行标注/评论/反馈,Inbox+代码评审+分享门户,插件+hook+slash命令集成,独立TUI版,backnotprop/plannotator,11.5k⭐,GitHub周榜trending)"
+
+    process_patterns:
+      - "plannotator[-.]annotate"
+      - "plannotator[-.]tui"
+      - "\\bplannotator\\b"
+      - "plannotator.*review"
+
+    env_indicators:
+      - "PLANNOTATOR_"
+
+  - name: "Hephaestus"
+    id: "hephaestus"
+    type: "agent_framework"
+    severity: "low"
+    description: "Hephaestus 半结构化多Agent编排框架(工作流随Agent执行自我构建,Workflows discover what needs to be done,Python,Ido-Levi/Hephaestus,1.2k⭐,HN 81分)"
+
+    process_patterns:
+      - "hephaestus.*agent"
+      - "hephaestus.*orchestrat"
+      - "\\bhephaestus\\b"
+
+    env_indicators:
+      - "HEPHAESTUS_"
+
+  - name: "Jido"
+    id: "jido"
+    type: "agent_framework"
+    severity: "low"
+    description: "Jido Elixir自主Agent框架(Jido 2.0,OTP分布式多Agent系统,动态工作流,纯函数决策边界,Hex包agentjido/jido,1.9k⭐,HN 323分)"
+
+    process_patterns:
+      - "jido.*beam"
+      - "beam.*jido"
+      - "\\bjido\\b.*(agent|workflow|exs)"
+
+    env_indicators:
+      - "JIDO_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -8169,6 +8302,38 @@ deployment_tools:
 
     env_indicators:
       - "AWS_EMULATOR_"
+
+  # ==================== 2026-11-15 批次: HN高分侦察 ====================
+  - name: "Emdash"
+    id: "emdash"
+    type: "deployment"
+    severity: "low"
+    description: "Emdash 开源Agentic开发环境(YC W26,桌面App并行运行多编码Agent,自动检测Provider CLI,生命周期hook跟踪+可恢复会话,SSH仓库支持,Electron,macOS/Win/Linux全平台,brew cask emdash,generalaction/emdash,6.3k⭐,HN 206分)"
+
+    process_patterns:
+      - "\\bemdash\\b"
+      - "Emdash.*(agent|task)"
+      - "emdash.*provider"
+
+    env_indicators:
+      - "EMDASH_"
+
+  - name: "AgentRun"
+    id: "agentrun"
+    type: "deployment"
+    severity: "low"
+    description: "AgentRun 自改进Agent管理平台(持久化执行+学习记忆,兼容Claude Code/Codex/OpenCode/pi harness,本地npx @parcha/agentrun起服务+runner,数据存~/.agentrun,自托管Render/Docker,Parcha-ai/agentrun,1.1k⭐,HN 137分)"
+
+    process_patterns:
+      - "@parcha/agentrun"
+      - "agentrun.*(server|runner)"
+      - "\\bagentrun\\b"
+
+    default_ports:
+      - 7340
+
+    env_indicators:
+      - "AGENTRUN_"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
