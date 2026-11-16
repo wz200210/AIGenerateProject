@@ -6067,6 +6067,37 @@ agent_frameworks:
     env_indicators:
       - "JIDO_"
 
+  # ==================== 2026-11-16 批次: Agent RL训练框架侦察 ====================
+  - name: "Agent Lightning"
+    id: "agent-lightning"
+    type: "agent_framework"
+    severity: "low"
+    description: "Microsoft Agent Lightning轻量级Agentic RL训练框架(3.5K行代码,真实Agent harness内训练+零代码改动,vLLM+verl训练引擎,K8s原生Job支持,SWE-bench 47.8%→61.6%,microsoft/agent-lightning,19k⭐)"
+
+    process_patterns:
+      - "agent[-.]lightning"
+      - "lightning.*trainer"
+      - "lightning.*verl"
+      - "agl.*train"
+
+    env_indicators:
+      - "AGL_"
+      - "AGENT_LIGHTNING_"
+
+  - name: "Retake"
+    id: "retake"
+    type: "vector_database"
+    severity: "low"
+    description: "Retake Postgres开源混合搜索扩展(向量+全文+语义搜索统一SQL接口,PostgreSQL原生扩展无需外部服务,pip install retake,Python SDK+SQLAlchemy集成,HN 88分)"
+
+    process_patterns:
+      - "retake.*search"
+      - "retake.*postgres"
+      - "\\bretake\\b"
+
+    env_indicators:
+      - "RETAKE_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -9177,6 +9208,95 @@ ai_gateways:
     env_indicators:
       - "EXP_"
       - "EXP_GATEWAY_KEY"
+
+  # ==================== 2026-11-16 批次: 搜索引擎+分布式推理+Agent训练侦察 ====================
+  - name: "Typesense"
+    id: "typesense"
+    type: "vector_database"
+    severity: "medium"
+    description: "Typesense开源搜索引擎(内存模糊搜索+向量搜索混合,Algolia+Pinecone开源替代,ElasticSearch易用替代,单二进制零依赖,Docker typesense/typesense,27.1k⭐)"
+
+    process_patterns:
+      - "typesense.*server"
+      - "typesense[-.]server"
+      - "\\btypesense\\b"
+
+    default_ports:
+      - 8108
+
+    docker_images:
+      - "typesense/typesense"
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/collections"
+        method: "GET"
+
+    env_indicators:
+      - "TYPESENSE_"
+
+  - name: "Meilisearch"
+    id: "meilisearch"
+    type: "vector_database"
+    severity: "medium"
+    description: "Meilisearch闪电般搜索引擎API(AI驱动混合搜索:全文+语义+向量,Rust单二进制零依赖,Docker getmeili/meilisearch,自托管/云双模式,59.9k⭐)"
+
+    process_patterns:
+      - "meilisearch"
+      - "meili.*server"
+
+    default_ports:
+      - 7700
+
+    docker_images:
+      - "getmeili/meilisearch"
+
+    http_endpoints:
+      - path: "/health"
+        method: "GET"
+      - path: "/indexes"
+        method: "GET"
+
+    env_indicators:
+      - "MEILI_"
+
+  - name: "exo"
+    id: "exo"
+    type: "llm_framework"
+    severity: "medium"
+    description: "exo分布式AI集群推理(Apple Silicon设备互联跑大模型,RDMA over Thunderbolt零日支持,张量并行分片,自动设备发现+去中心化编排,MLX推理后端,brew/pip安装,exo-explore/exo,48.5k⭐)"
+
+    process_patterns:
+      - "\\bexo\\b.*serve"
+      - "exo.*cluster"
+      - "exo.*inference"
+      - "exo.*mlx"
+
+    default_ports:
+      - 52415
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "EXO_"
+
+  - name: "VoltAgent"
+    id: "voltagent"
+    type: "agent_framework"
+    severity: "low"
+    description: "VoltAgent端到端AI Agent工程平台(TypeScript开源Agent框架,Core Runtime+Supervisor/Sub-Agent编排,LLM多Provider适配,Memory+Guardrails+Evals一体化,npm create voltagent-app,11k⭐,HN 32分)"
+
+    process_patterns:
+      - "voltagent"
+      - "@voltagent/"
+      - "voltagent.*core"
+
+    env_indicators:
+      - "VOLTAGENT_"
+      - "VOLT_"
 
 # ==================== 监控/可观测性 ====================
 monitoring_tools:
