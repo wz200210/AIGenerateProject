@@ -1137,6 +1137,114 @@ llm_services:
     env_indicators:
       - "DS4_"
 
+  # ==================== 2026-11-17 批次: HN+GitHub Trending侦察 ====================
+  - name: "Kapitsa"
+    id: "kapitsa"
+    type: "llm_framework"
+    severity: "medium"
+    description: "Kapitsa Apple Silicon高性能推理引擎(Qwen/Nemotron/Flint,351 tok/s M5 Max,编码Agent集成:opencode/Claude Code/Codex/aider/Goose,OpenAI+Anthropic API兼容,kapitsa serve端口8000,brew install nace-ai/tap/kapitsa,nace-ai/kapitsa,815⭐)"
+
+    process_patterns:
+      - "\\bkapitsa\\b"
+      - "kapitsa.*serve"
+      - "kapitsa.*(claude|codex|opencode|aider|goose)"
+
+    default_ports:
+      - 8000
+
+    docker_images:
+      - "nace-ai/kapitsa"
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "KAPITSA_"
+
+  - name: "Tokasaurus"
+    id: "tokasaurus"
+    type: "llm_framework"
+    severity: "medium"
+    description: "Tokasaurus斯坦福Scaling Intelligence高吞吐LLM推理引擎(OpenAI API兼容,数据/流水线/张量并行,Paged KV缓存+前缀缓存,Hydragen共享前缀优化,CUDA graphs,toka CLI默认端口10210,pip install tokasaurus,ScalingIntelligence/tokasaurus,484⭐,HN 218分)"
+
+    process_patterns:
+      - "\\btoka\\b.*model"
+      - "tokasaurus"
+      - "toka[-.]ping"
+
+    default_ports:
+      - 10210
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "TOKASAURUS_"
+      - "TOKA_"
+
+  - name: "TrnRT"
+    id: "trnrt"
+    type: "llm_framework"
+    severity: "medium"
+    description: "TrnRT AWS Trainium2开源LLM推理引擎(NKI megakernels,1M token上下文,FP8 KV缓存前缀树,OpenAI兼容API,GLM-5.3-Flash首个支持模型,trn2.48xlarge双引擎,RunanywhereAI/trnrt,1588⭐)"
+
+    process_patterns:
+      - "\\btrnrt\\b"
+      - "trnrt.*serve"
+      - "trnrt.*engine"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+      - path: "/health"
+        method: "GET"
+
+    env_indicators:
+      - "TRNRT_"
+      - "NEURON_"
+
+  - name: "Kinetic"
+    id: "kinetic"
+    type: "llm_framework"
+    severity: "low"
+    description: "Kinetic Rust开源本地AI推理引擎(GGUF格式,CUDA+Vulkan加速,llama.cpp兼容,单二进制本地LLM运行,Veloresearch/kinetic,90⭐)"
+
+    process_patterns:
+      - "\\bkinetic\\b.*(infer|serve|model)"
+      - "kinetic.*gguf"
+
+    env_indicators:
+      - "KINETIC_"
+
+  - name: "Pithos"
+    id: "pithos"
+    type: "llm_framework"
+    severity: "low"
+    description: "Pithos零依赖C语言推理引擎(Liquid AI LFM2/LFM2.5模型,AVX2/OpenCL加速,终端聊天+OpenAI兼容HTTP服务+Web Agent+终端Agent四合一,单可执行文件,benmaster82/Pithos,35⭐)"
+
+    process_patterns:
+      - "\\bpithos\\b"
+      - "pithos.*(serve|chat|agent)"
+
+    default_ports:
+      - 8080
+
+    http_endpoints:
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "PITHOS_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -2248,6 +2356,23 @@ ml_frameworks:
 
     env_indicators:
       - "QWEN_ASR_"
+
+  # ==================== 2026-11-17 批次: 端侧AI基础设施 ====================
+  - name: "RunAnywhere"
+    id: "runanywhere"
+    type: "ml_framework"
+    severity: "medium"
+    description: "RunAnywhere端侧AI推理SDK(YC W26,一套C++核心八平台SDK:LLM/视觉/语音/嵌入/RAG/图像生成,QHexRT/MLX/llama.cpp/sherpa+ONNX/Core ML多引擎路由,Hexagon NPU/ANE/Metal/CUDA/WebGPU加速,RunanywhereAI/runanywhere-sdks,10.3k⭐,HN 240分)"
+
+    process_patterns:
+      - "runanywhere"
+      - "qhexrt"
+
+    docker_images:
+      - "runanywhereai/runanywhere"
+
+    env_indicators:
+      - "RUNANYWHERE_"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -6097,6 +6222,37 @@ agent_frameworks:
 
     env_indicators:
       - "RETAKE_"
+
+  # ==================== 2026-11-17 批次: HN高分Agent协作+验证工具 ====================
+  - name: "Rowboat"
+    id: "rowboat"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Rowboat开源Agent团队群组协作平台(YC S24,多Agent群聊协作+共享白板/文档/任务,支持Claude Code/Codex/Hermes/OpenClaw,Agent自扩展团队,桌面+Web+移动端,TypeScript/Electron,rowboatlabs/rowboat,18.3k⭐,HN 205分)"
+
+    process_patterns:
+      - "\\browboat\\b"
+      - "rowboat.*(agent|space|server)"
+
+    docker_images:
+      - "rowboatlabs/rowboat"
+      - "ghcr.io/rowboatlabs/rowboat"
+
+    env_indicators:
+      - "ROWBOAT_"
+
+  - name: "ProofShot"
+    id: "proofshot"
+    type: "agent_framework"
+    severity: "low"
+    description: "ProofShot AI编码Agent视觉验证CLI(浏览器会话录制+截图+控制台错误收集+证明工件打包,PR内联评论,支持Claude Code/Cursor/Codex/OpenCode/Gemini CLI,npm install proofshot,AmElmo/proofshot,872⭐,HN 161分)"
+
+    process_patterns:
+      - "\\bproofshot\\b"
+      - "proofshot.*(record|verify|pr)"
+
+    env_indicators:
+      - "PROOFSHOT_"
 
 # ==================== 部署/推理 ====================
 deployment_tools:
