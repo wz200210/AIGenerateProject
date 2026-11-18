@@ -1245,6 +1245,45 @@ llm_services:
     env_indicators:
       - "PITHOS_"
 
+  # ==================== 2026-11-18 批次: HN高分自优化推理引擎 ====================
+  - name: "Magnitude"
+    id: "magnitude"
+    type: "llm_framework"
+    severity: "medium"
+    description: "Magnitude自优化开源推理引擎(下载模型时为硬件调优kernel,平均比Ollama快2x,内置投机解码drafter+量化KV缓存,Apple Silicon/NVIDIA/AMD/Intel/纯CPU,OpenAI+Anthropic兼容API,magnitude serve远程服务器模式,官方Docker镜像,桌面App+CLI,连接Pi/OpenCode/Hermes/Codex等Agent,YC S25,magnitudedev/magnitude,7.9k⭐,HN 194分)"
+
+    process_patterns:
+      - "\\bmagnitude\\b"
+      - "magnitude.*(serve|inference)"
+
+    default_ports:
+      - 10100
+
+    docker_images:
+      - "magnitudedev/magnitude"
+
+    http_endpoints:
+      - path: "/inference/v1/models"
+        method: "GET"
+      - path: "/inference/v1"
+        method: "GET"
+
+    env_indicators:
+      - "MAGNITUDE_"
+
+  - name: "tiny-vLLM"
+    id: "tiny-vllm"
+    type: "llm_framework"
+    severity: "low"
+    description: "tiny-vLLM教学型高性能LLM推理引擎(C++/CUDA从零实现vLLM核心: Safetensors加载/PagedAttention/FlashAttention-like在线softmax/KV缓存/连续批处理,可运行推理服务器含课程,jmaczan/tiny-vllm,1.2k⭐,HN 205分)"
+
+    process_patterns:
+      - "tiny[-_]?vllm"
+      - "tiny_vllm.*server"
+
+    env_indicators:
+      - "TINY_VLLM_"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -2373,6 +2412,25 @@ ml_frameworks:
 
     env_indicators:
       - "RUNANYWHERE_"
+
+  # ==================== 2026-11-18 批次: 浏览器内推理 ====================
+  - name: "WebLLM"
+    id: "webllm"
+    type: "ml_framework"
+    severity: "low"
+    description: "WebLLM浏览器内高性能LLM推理引擎(纯WebGPU/WebAssembly在浏览器运行Llama/Qwen/Gemma等模型,无需服务器,Chrome扩展+Web App,MLC引擎编译到WASM,npm install @mlc-ai/web-llm,mlc-ai/web-llm,19.4k⭐,HN 145分)"
+
+    process_patterns:
+      - "web[-_]llm"
+      - "webllm.*(chat|serve)"
+
+    semantic_analyzers:
+      - type: "node_import"
+        patterns:
+          - "@mlc-ai/web-llm"
+
+    env_indicators:
+      - "WEBLLM_"
 
 # ==================== Agent/RAG 框架 ====================
 agent_frameworks:
@@ -6253,6 +6311,44 @@ agent_frameworks:
 
     env_indicators:
       - "PROOFSHOT_"
+
+  # ==================== 2026-11-18 批次: Generative UI SDK + 金融Agent ====================
+  - name: "Tambo"
+    id: "tambo"
+    type: "agent_framework"
+    severity: "low"
+    description: "Tambo开源Generative UI SDK(Agent生成并渲染React组件的工具包,注册组件库+streaming状态管理+对话状态钩子,React/Next.js集成,npm install tambo @tambo-ai/react,tambo-ai/tambo,11.2k⭐,HN 101分)"
+
+    process_patterns:
+      - "\\btambo\\b"
+
+    semantic_analyzers:
+      - type: "node_import"
+        patterns:
+          - "@tambo-ai/react"
+          - "tambo"
+
+    env_indicators:
+      - "TAMBO_"
+
+  - name: "LangAlpha"
+    id: "langalpha"
+    type: "agent_framework"
+    severity: "low"
+    description: "LangAlpha华尔街量化金融AI Agent(Claude Code for Financial Market,LangChain/LangGraph驱动多Agent:研究/技术分析/经济日历/选股/交易策略,Python 3.13+,MCP+Skills扩展,Apache-2.0,ginlix-ai/langalpha,2.3k⭐,HN 148分)"
+
+    process_patterns:
+      - "\\blangalpha\\b"
+      - "langalpha.*(agent|trade|research)"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import langalpha"
+          - "from langalpha"
+
+    env_indicators:
+      - "LANGALPHA_"
 
 # ==================== 部署/推理 ====================
 deployment_tools:
