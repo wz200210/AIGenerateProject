@@ -1284,6 +1284,54 @@ llm_services:
     env_indicators:
       - "TINY_VLLM_"
 
+# ==================== 2026-11-19 批次: GitHub侦察 ====================
+  - name: "halogen-flash-server"
+    id: "halogen-flash"
+    type: "llm_framework"
+    severity: "medium"
+    description: "halogen AMD Strix Halo专用高性能推理引擎(Qwen3.8-Flash-Next,100 tok/s decode,131K上下文投机解码,4.16bpw量化,OpenAI+Anthropic兼容API,容器化部署,引擎闭源仅部署面开源,peonist-ai/halogen-flash-server,1.4k⭐)"
+
+    process_patterns:
+      - "halogen[-_]flash"
+      - "halogen.*server"
+
+    default_ports:
+      - 8731
+
+    docker_images:
+      - "ghcr.io/peonist-ai/halogen-flash-server"
+      - "peonist-ai/halogen-flash-server"
+
+    http_endpoints:
+      - path: "/v1/chat/completions"
+        method: "POST"
+      - path: "/health"
+        method: "GET"
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "HALOGEN_"
+      - "HALOGEN_API_PORT"
+      - "HALOGEN_PORT"
+      - "HALOGEN_DOWNLOAD"
+
+  - name: "PolyStrata"
+    id: "polystrata"
+    type: "llm_framework"
+    severity: "medium"
+    description: "PolyStrata消费级GPU本地大模型推理引擎(12模型支持:Qwen3.8-Flash-Next/GLM5.3/DeepSeek V4/LFM2.5/Flint/Gemma4等,strata+strata-poly双引擎,MoE专家路由GPU/RAM/SSD三层调度,125B模型跑12GB显卡,OpenAI+Anthropic兼容API,Windows/Linux,simplexai-labs/PolyStrata,1.2k⭐)"
+
+    process_patterns:
+      - "polystrata"
+      - "strata[-_]poly"
+      - "strata.*serve"
+
+    env_indicators:
+      - "STRATA_"
+      - "POLYSTRATA_"
+      - "STRATA_UV"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -6350,6 +6398,52 @@ agent_frameworks:
     env_indicators:
       - "LANGALPHA_"
 
+  # ==================== 2026-11-19 批次: GitHub侦察 ====================
+  - name: "ZCode"
+    id: "zcode"
+    type: "agent_framework"
+    severity: "medium"
+    description: "ZCode Z.ai官方AI编程工作台(桌面应用+浏览器界面+终端Agent三合一,多Agent协同+代码审查+项目管理,Electron桌面+Node.js后端,CLI bin=zcode,pnpm monorepo,zai-org/ZCode,8.8k⭐)"
+
+    process_patterns:
+      - "\\bzcode\\b"
+      - "zcode[-_]cli"
+      - "zcode.*(agent|server|desktop)"
+
+    env_indicators:
+      - "ZCODE_"
+
+  - name: "SoduWork"
+    id: "soduwork"
+    type: "agent_framework"
+    severity: "medium"
+    description: "SoduWork多harness团队AI引擎(支持Pi/OpenCode/DeepSeek Harness/Qwen Code/Kimi Code/Codex等,一个harness干活另一个审查,请求→Agent执行→人工签收闭环,插件审核共享+角色权限成本审计,自托管,Electron+Python,默认端口18989,mdiri-ai/SoduWork,3.7k⭐)"
+
+    process_patterns:
+      - "soduwork"
+      - "sodu[-_]work"
+      - "soduwork.*(server|desktop|engine)"
+
+    default_ports:
+      - 18989
+
+    env_indicators:
+      - "SODUWORK_"
+
+  - name: "SoL-Pi"
+    id: "sol-pi"
+    type: "agent_framework"
+    severity: "low"
+    description: "SoL-Pi NVlabs Agent Harness效率扩展(Pi插件:Action Fusion合并编辑+验证/ObservationPack大文本稳定句柄/Evidence-Preserving Reducer日志压缩/Online Context Compact上下文压缩,零Pi补丁纯公共API,Claude Code/Codex skill集成,NVlabs/SoL-Pi,3.7k⭐)"
+
+    process_patterns:
+      - "sol[-_]pi"
+      - "solpi"
+
+    env_indicators:
+      - "SOL_PI_"
+      - "SOLPI_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -8617,6 +8711,39 @@ deployment_tools:
 
     env_indicators:
       - "AGENTRUN_"
+
+# ==================== 2026-11-19 批次: GitHub侦察 ====================
+  - name: "shrt"
+    id: "shrt"
+    type: "deployment"
+    severity: "low"
+    description: "shrt合同驱动gRPC回归测试harness(Connect协议YAML链式API调用测试,基准快照对比自动回归检测,Agent驱动:shrt init安装Claude Code skill,Go单二进制,connect-go+gRPC,N4darae/shrt,3k⭐)"
+
+    process_patterns:
+      - "\\bshrt\\b"
+      - "shrt.*(test|chain|contract)"
+
+    env_indicators:
+      - "SHRT_"
+
+  - name: "rust-anything"
+    id: "rust-anything"
+    type: "ml_framework"
+    severity: "low"
+    description: "rust-anything AI辅助全应用Rust迁移工具(录制Node/Python/C/Go/Ruby/Java行为→Rust重写→逐条回放验证,Prettier 19x加速实例,record/bridge/diff/gate/lift五阶段,npm包+crates.io,支持Claude Code/Codex,erkamyaman/rust-anything,4.1k⭐)"
+
+    process_patterns:
+      - "rust[-_]anything"
+      - "rust_anything"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import rust_anything"
+          - "from rust_anything"
+
+    env_indicators:
+      - "RUST_ANYTHING_"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
