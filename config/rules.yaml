@@ -1332,6 +1332,39 @@ llm_services:
       - "POLYSTRATA_"
       - "STRATA_UV"
 
+# ==================== 2026-11-20 批次: HN+GitHub侦察 ====================
+  - name: "ZSE"
+    id: "zse"
+    type: "llm_framework"
+    severity: "medium"
+    description: "ZSE零依赖LLM推理引擎(纯Python+ctypes+自编译CUDA/ROCm/Metal内核,无PyTorch/Triton依赖,冷启动5-7秒快vLLM 20-30x,INT4量化22GB显存跑32B模型,内置RAG混合检索+认证+限流,OpenAI兼容API,pip zse-engine,Zyora-Dev/zse,242⭐,HN 58分)"
+
+    process_patterns:
+      - "\\bzse\\b"
+      - "zse[-_]serve"
+      - "zse[-_]engine"
+      - "zse.*server"
+
+    default_ports:
+      - 8000
+
+    http_endpoints:
+      - path: "/v1/chat/completions"
+        method: "POST"
+      - path: "/v1/models"
+        method: "GET"
+
+    env_indicators:
+      - "ZSE_"
+      - "ZSE_ENGINE_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import zse"
+          - "from zse"
+          - "import zse_engine"
+
 # ==================== 向量数据库 ====================
 vector_databases:
   - name: "Milvus"
@@ -1836,6 +1869,33 @@ vector_databases:
 
     env_indicators:
       - "ZVEC_"
+
+  - name: "GibRAM"
+    id: "gibram"
+    type: "vector_database"
+    severity: "low"
+    description: "GibRAM内存级GraphRAG知识图谱服务器(实体+关系+文档块+向量同一结构存储,图遍历+语义搜索混合检索,Python SDK可换chunker/extractor/embedder,数据RAM驻留TTL过期,Docker gibramio/gibram,gibram-io/gibram,107⭐,HN 60分)"
+
+    process_patterns:
+      - "gibram[-_]server"
+      - "\\bgibram\\b"
+      - "gibram.*(serve|search)"
+
+    default_ports:
+      - 6161
+
+    docker_images:
+      - "gibramio/gibram"
+      - "gibramio/gibram:latest"
+
+    env_indicators:
+      - "GIBRAM_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from gibram import"
+          - "import gibram"
 
 # ==================== ML 框架 ====================
 ml_frameworks:
@@ -6444,6 +6504,120 @@ agent_frameworks:
       - "SOL_PI_"
       - "SOLPI_"
 
+# ==================== 2026-11-20 批次: HN+GitHub侦察 ====================
+  - name: "BrowserOS"
+    id: "browseros"
+    type: "agent_framework"
+    severity: "medium"
+    description: "BrowserOS开源Agentic浏览器(Claude Code/Codex/Cursor/OpenClaw等MCP Agent直连,Chromium fork,并行Agent各跑独立tab,会话录像回放,数据本地~/.browserclaw/,Rust后端claw-server+TypeScript agent平台,端口9200/49337,browseros-ai/BrowserOS,14.4k⭐)"
+
+    process_patterns:
+      - "browseros"
+      - "browseros[-_]claw[-_]server"
+      - "claw[-_]server"
+      - "BrowserOS.*(browser|agent)"
+
+    default_ports:
+      - 9200
+      - 49337
+
+    env_indicators:
+      - "BROWSERCLAW_"
+      - "CLAW_NATIVE_BROWSEROS_VERSION"
+
+  - name: "Juggler"
+    id: "juggler"
+    type: "agent_framework"
+    severity: "low"
+    description: "Juggler可视化编码Agent工作台(Miller列界面,Claude Code/OpenAI Codex/GitHub Copilot/Gemini/Ollama多供应商即插即用,会话树形分支,LLM事务全检查,桌面+浏览器+CLI多客户端同步,端口3939,juggler-ai/juggler,868⭐,JUCE作者开发,HN 280分)"
+
+    process_patterns:
+      - "\\bjuggler\\b"
+      - "juggler[-_]server"
+      - "juggler.*(serve|app|desktop)"
+
+    default_ports:
+      - 3939
+
+    env_indicators:
+      - "JUGGLER_"
+
+  - name: "Omni"
+    id: "omni-getomnico"
+    type: "agent_framework"
+    severity: "medium"
+    description: "Omni自托管企业级AI Agent(Google Workspace/Slack/Jira/Confluence/HubSpot等连接器,权限感知公司上下文,BM25+pgvector混合搜索Postgres/ParadeDB,Python沙箱代码执行,MCP扩展,Docker Compose/Terraform部署,端口3000-3004/4001-4019,getomnico/omni,827⭐,HN 177分)"
+
+    process_patterns:
+      - "omni[-_]searcher"
+      - "omni[-_]indexer"
+      - "omni[-_]ai[-_]service"
+      - "omni[-_]connector"
+      - "omni[-_]web"
+      - "omni.*agent.*runtime"
+
+    default_ports:
+      - 3000
+      - 3001
+      - 3002
+      - 3003
+      - 3004
+
+    docker_images:
+      - "getomnico/omni"
+      - "ghcr.io/getomnico/omni"
+
+    env_indicators:
+      - "OMNI_"
+      - "SEARCHER_PORT"
+      - "INDEXER_PORT"
+      - "AI_SERVICE_PORT"
+      - "CONNECTOR_MANAGER_PORT"
+
+  - name: "Pizza Bot"
+    id: "pizza-bot"
+    type: "agent_framework"
+    severity: "low"
+    description: "Pizza Bot长时运行AI Agent收件箱(DeepAgents/LangGraph状态化运行时,异步多会话不中断,完成工作进Unread+审批进Action队列,检查点断点恢复,cron/webhook触发,Amazon Bedrock/Anthropic/OpenAI/Ollama多模型,api-server进程,pizza-bot-app/pizza-bot,565⭐,HN 61分)"
+
+    process_patterns:
+      - "pizza[-_]bot"
+      - "pizzabot"
+      - "pizza[-_]bot.*api[-_]server"
+
+    env_indicators:
+      - "PIZZA_BOT_"
+      - "PIZZABOT_"
+
+  - name: "peerd"
+    id: "peerd"
+    type: "agent_framework"
+    severity: "low"
+    description: "peerd浏览器原生AI Agent Harness(Chrome/Firefox扩展,Workers+OPFS+WASM/WASI+WebRTC+WebAuthn浏览器原语,标签页驱动+站点学习复用,浏览器内代码执行沙箱,BYOK云模型+本地WebGPU模型,Manifest V3,NotASithLord/peerd,425⭐,HN 75分)"
+
+    process_patterns:
+      - "\\bpeerd\\b"
+      - "peerd.*(extension|harness|agent)"
+      - "peerd[-_]provider"
+
+    env_indicators:
+      - "PEERD_"
+
+  - name: "superhq"
+    id: "superhq"
+    type: "agent_framework"
+    severity: "low"
+    description: "superhq沙箱化AI Agent编排平台(Rust+GPUI桌面应用,Claude Code/Codex/Pi多Agent并行隔离VM运行,认证网关反向代理注入凭证Agent不可见,Shuru沙箱SDK,文件变更diff审查面板,端口转发管理,brew install superhq,superhq-ai/superhq,296⭐,HN 63分)"
+
+    process_patterns:
+      - "superhq"
+      - "super[-_]hq"
+      - "shuru.*(sandbox|runtime)"
+
+    env_indicators:
+      - "SUPERHQ_"
+      - "SHURU_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -8744,6 +8918,56 @@ deployment_tools:
 
     env_indicators:
       - "RUST_ANYTHING_"
+
+# ==================== 2026-11-20 批次: HN+GitHub侦察 ====================
+  - name: "InsForge"
+    id: "insforge"
+    type: "deployment"
+    severity: "medium"
+    description: "InsForge编码Agent全栈后端平台(数据库Postgres+PostgREST/认证/S3存储/模型网关/边缘函数/站点部署,MCP Server+CLI双接口,编码Agent自主操作后端资源,Docker Compose自托管,ghcr.io/insforge/insforge-oss,端口7130/7131,npm @insforge/sdk,InsForge/InsForge,13.3k⭐,HN 62分)"
+
+    process_patterns:
+      - "insforge"
+      - "insforge[-_]oss"
+      - "insforge.*(server|backend|gateway)"
+
+    default_ports:
+      - 7130
+      - 7131
+
+    docker_images:
+      - "ghcr.io/insforge/insforge-oss"
+      - "ghcr.io/insforge/postgres"
+
+    env_indicators:
+      - "INSFORGE_"
+      - "POSTGREST_PORT"
+      - "ENCRYPTION_KEY"
+      - "ROOT_ADMIN_PASSWORD"
+
+    semantic_analyzers:
+      - type: "node_import"
+        patterns:
+          - "@insforge/sdk"
+
+  - name: "mcp2cli"
+    id: "mcp2cli"
+    type: "deployment"
+    severity: "low"
+    description: "mcp2cli MCP/OpenAPI/GraphQL→CLI转换器(运行时零代码生成,96-99% token节省,AI Agent skill自动发现调用任意MCP Server,uvx直接运行+pip安装,skill.sh集成Claude Code/Cursor/Codex,knowsuchagency/mcp2cli,2.4k⭐,HN 146分)"
+
+    process_patterns:
+      - "mcp2cli"
+      - "mcp[-_]to[-_]cli"
+
+    env_indicators:
+      - "MCP2CLI_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import mcp2cli"
+          - "from mcp2cli"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
