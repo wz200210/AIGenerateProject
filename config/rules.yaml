@@ -1897,6 +1897,43 @@ vector_databases:
           - "from gibram import"
           - "import gibram"
 
+# ==================== 2026-11-21 批次: GitHub Trending+HN侦察 ====================
+  - name: "FastGraphRAG"
+    id: "fast-graphrag"
+    type: "vector_database"
+    severity: "low"
+    description: "FastGraphRAG PageRank驱动自适应RAG框架(6x成本节省vs微软GraphRAG,实体+关系图自动构建,增量更新,异步类型安全,Python>=3.10,pip install fast-graphrag,circlemind-ai/fast-graphrag,4k⭐,HN 457分)"
+
+    process_patterns:
+      - "fast[-_]graphrag"
+      - "fastgraphrag"
+
+    env_indicators:
+      - "FAST_GRAPHRAG_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from fast_graphrag import"
+          - "import fast_graphrag"
+
+  - name: "omnigraph"
+    id: "omnigraph"
+    type: "vector_database"
+    severity: "low"
+    description: "omnigraph对象存储原生图数据库(分支+类型本体,S3兼容,Apache Arrow+DataFusion查询,Lance格式,MCP Server,Rust,ModernRelay/omnigraph,3.2k⭐,GH Trending Rust周榜)"
+
+    process_patterns:
+      - "omnigraph"
+      - "omnigraph[-_]server"
+
+    docker_images:
+      - "omnigraph"
+      - "modernrelay/omnigraph"
+
+    env_indicators:
+      - "OMNIGRAPH_"
+
 # ==================== ML 框架 ====================
 ml_frameworks:
   - name: "Hugging Face Transformers"
@@ -6618,6 +6655,146 @@ agent_frameworks:
       - "SUPERHQ_"
       - "SHURU_"
 
+# ==================== 2026-11-21 批次: GitHub Trending+HN侦察 ====================
+  - name: "Airweave"
+    id: "airweave"
+    type: "agent_framework"
+    severity: "low"
+    description: "Airweave开源上下文检索层(50+集成连接源持续同步,统一LLM友好搜索接口,Agent通过SDK/REST API/MCP查询,自托管Docker Compose,端口8080/8001/5432/6333/6379/7233/8081/8088,YC X25,airweave-ai/airweave,6.5k⭐,HN 164分)"
+
+    process_patterns:
+      - "airweave"
+      - "airweave[-_]backend"
+      - "airweave[-_]frontend"
+      - "airweave.*(server|api)"
+
+    default_ports:
+      - 8080
+      - 8001
+
+    docker_images:
+      - "airweave"
+      - "airweave-ai/airweave"
+      - "airweave-backend"
+      - "airweave-frontend"
+
+    env_indicators:
+      - "AIRWEAVE_"
+      - "ENCRYPTION_KEY"
+      - "STATE_SECRET"
+
+  - name: "QMD"
+    id: "qmd"
+    type: "agent_framework"
+    severity: "low"
+    description: "QMD本地文档搜索引擎(BM25全文+向量语义+LLM重排序混合搜索,node-llama-cpp+GGUF本地模型,Markdown笔记/文档/会议纪要索引,MCP Server+CLI双模式,npm @tobilu/qmd,HTTP传输端口8181,qmd mcp --http,tobi/qmd,31.3k⭐,GH Trending TS周榜)"
+
+    process_patterns:
+      - "\\bqmd\\b"
+      - "qmd.*(mcp|server|search|embed)"
+      - "@tobilu/qmd"
+
+    default_ports:
+      - 8181
+
+    env_indicators:
+      - "QMD_"
+
+    semantic_analyzers:
+      - type: "node_import"
+        patterns:
+          - "@tobilu/qmd"
+
+  - name: "kagent"
+    id: "kagent"
+    type: "agent_framework"
+    severity: "low"
+    description: "kagent Kubernetes原生AI Agent框架(Agent/AgentTemplate/Harness CRD,Go+Python ADK+Codex+Claude多运行时,RemoteMCPServer资源共享,OpenTelemetry追踪,Istio/Helm/Argo/Prometheus内置MCP工具,kagent-dev/kagent,4.5k⭐,GH Trending Go周榜)"
+
+    process_patterns:
+      - "\\bkagent\\b"
+      - "kagent[-_]controller"
+      - "kagent[-_]adk"
+      - "kagent.*(agent|harness)"
+
+    docker_images:
+      - "kagent"
+      - "kagent-dev/kagent"
+
+    env_indicators:
+      - "KAGENT_"
+
+  - name: "a2ui"
+    id: "a2ui"
+    type: "agent_framework"
+    severity: "low"
+    description: "a2ui开源生成式UI框架(Agent流式布局数据→原生组件渲染,React/Angular/Lit/Flutter/SwiftUI/Jetpack Compose全平台,a2ui-project/a2ui,17.7k⭐,GH Trending TS周榜)"
+
+    process_patterns:
+      - "a2ui"
+      - "a2ui[-_]server"
+
+    env_indicators:
+      - "A2UI_"
+
+    semantic_analyzers:
+      - type: "node_import"
+        patterns:
+          - "@a2ui/react"
+          - "@a2ui/angular"
+          - "@a2ui/core"
+
+  - name: "Plandex"
+    id: "plandex"
+    type: "agent_framework"
+    severity: "low"
+    description: "Plandex开源AI编码Agent(大型项目+真实任务,treesitter项目地图30+语言,终端命令自动调试,Chrome浏览器调试,CLI+自托管Docker Server,curl安装,plandex-ai/plandex,15.9k⭐,HN 257分)"
+
+    process_patterns:
+      - "plandex"
+      - "plandex[-_]server"
+      - "plandex.*cli"
+
+    docker_images:
+      - "plandex"
+      - "plandex-ai/plandex"
+
+    env_indicators:
+      - "PLANDEX_"
+
+  - name: "Patchwork"
+    id: "patchwork"
+    type: "agent_framework"
+    severity: "low"
+    description: "Patchwork Agentic AI企业工作流自动化框架(开发杂务自动化:代码审查/PR创建/依赖升级/文档生成,声明式step+prompt定义,多Agent协作,Python,pip install patchwork-cli,patched-codes/patchwork,1.6k⭐,HN 116分)"
+
+    process_patterns:
+      - "patchwork"
+      - "patchwork[-_]cli"
+      - "patchwork.*(step|prompt|agent)"
+
+    env_indicators:
+      - "PATCHWORK_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "import patchwork"
+          - "from patchwork"
+
+  - name: "Foremerge"
+    id: "foremerge"
+    type: "agent_framework"
+    severity: "low"
+    description: "Foremerge并行编码Agent协调协议(意图冲突检测→代码冲突之前捕获,多Agent工作区协调,Rust,naw103/foremerge,410⭐,HN 45分)"
+
+    process_patterns:
+      - "foremerge"
+      - "fore[-_]merge"
+
+    env_indicators:
+      - "FOREMERGE_"
+
 # ==================== 部署/推理 ====================
 deployment_tools:
   - name: "Triton Inference Server"
@@ -8968,6 +9145,55 @@ deployment_tools:
         patterns:
           - "import mcp2cli"
           - "from mcp2cli"
+
+# ==================== 2026-11-21 批次: GitHub Trending+HN侦察 ====================
+  - name: "OpenSandbox"
+    id: "opensandbox"
+    type: "deployment"
+    severity: "medium"
+    description: "OpenSandbox AI Agent沙箱运行时(安全隔离执行代码/命令/文件/浏览器,Firecracker 64ms创建+暂停恢复,本地Docker→K8s统一API,凭证保险库,Python/JS/Go/C# SDK+osb CLI+MCP,uvx opensandbox-server,AAIF项目,opensandbox-group/OpenSandbox,17.7k⭐,GH Trending Go周榜)"
+
+    process_patterns:
+      - "opensandbox"
+      - "opensandbox[-_]server"
+      - "\\bosb\\b.*sandbox"
+
+    docker_images:
+      - "opensandbox"
+      - "opensandbox-group/opensandbox"
+      - "opensandbox-server"
+
+    env_indicators:
+      - "OPENSANDBOX_"
+      - "SANDBOX_"
+
+    semantic_analyzers:
+      - type: "python_import"
+        patterns:
+          - "from opensandbox import"
+          - "import opensandbox"
+      - type: "node_import"
+        patterns:
+          - "@alibaba-group/opensandbox"
+
+  - name: "LoopForge"
+    id: "loopforge"
+    type: "deployment"
+    severity: "medium"
+    description: "LoopForge腾讯开源自托管编码Agent工作流平台(Main Bot聊天→Docker沙箱→多Agent CLI编排→PR交付,CodeBuddy/Codex/Claude Code/OpenCode/Cursor CLI等10+执行器,SOP标准工作流+人工审批门,./start.sh Docker Compose自托管,Tencent/LoopForge,5.4k⭐,GH Trending Go周榜)"
+
+    process_patterns:
+      - "loopforge"
+      - "loop[-_]forge"
+      - "loopforge.*(server|engine|bot)"
+
+    docker_images:
+      - "loopforge"
+      - "tencent/loopforge"
+
+    env_indicators:
+      - "LOOPFORGE_"
+      - "LOOP_FORGE_"
 
 # ==================== AI 网关/代理 ====================
 ai_gateways:
@@ -11391,6 +11617,24 @@ monitoring_tools:
 
     env_indicators:
       - "TORRIX_"
+
+  - name: "MCP-Shield"
+    id: "mcp-shield"
+    type: "monitoring"
+    severity: "medium"
+    description: "MCP-Shield MCP服务器安全扫描器(检测MCP Server中的安全漏洞:提示注入/工具投毒/数据外泄/权限过大,npm mcp-shield,Claude Desktop/Code MCP配置审计,riseandignite/mcp-shield,556⭐,HN 134分)"
+
+    process_patterns:
+      - "mcp[-_]shield"
+      - "mcpshield"
+
+    env_indicators:
+      - "MCP_SHIELD_"
+
+    semantic_analyzers:
+      - type: "node_import"
+        patterns:
+          - "mcp-shield"
 
 # ==================== API Key 检测规则 ====================
 api_key_patterns:
